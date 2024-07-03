@@ -1,24 +1,41 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
+  mongo:
+    image: mongo
+    container_name: mongo
     ports:
       - '27017:27017'
-    volumes:
-      - mongo-data:/data/db
+    networks:
+      - discount-hub-network
 
-  nestjs:
-    build: .
-    container_name: nestjs
+  redis:
+    image: redis
+    container_name: redis
     ports:
-      - '3000:3000'
-    depends_on:
-      - mongodb
-    volumes:
-      - .:/usr/src/app
-    command: npm run start:dev
+      - '6379:6379'
+    networks:
+      - discount-hub-network
 
-volumes:
-  mongo-data:
+  app:
+    image: discount-hub-image
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3030:3030'
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/nest
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=3030
+    networks:
+      - discount-hub-network
+
+networks:
+  discount-hub-network:
+    driver: bridge
