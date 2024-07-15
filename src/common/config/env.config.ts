@@ -1,25 +1,52 @@
-import 'dotenv/config';
-import { ConfigService } from '@nestjs/config';
-import { Environments } from 'src/common/constants/enum';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { plainToInstance } from 'class-transformer';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  // IsNumber,
+  IsOptional,
+  IsString,
+  validateSync,
+} from 'class-validator';
 
-const config = new ConfigService();
-const ENVIRONMENT = config.get('NODE_ENV');
+enum Environment {
+  Development = 'development',
+  Production = 'production',
+  Test = 'test',
+  Provision = 'provision',
+}
 
-export const env = {
-  NODE_ENV: ENVIRONMENT,
-  MONGO_URI: config.get<string>('MONGO_URI'),
-  PORT: config.get<number>('PORT'),
-  APP_URL: config.get<string>('APP_URL'),
-  REDIS_HOST: config.get<string>('REDIS_HOST'),
-  REDIS_PORT: config.get<string>('REDIS_PORT'),
+export class EnvironmentVariables {
+  @IsEnum(Environment)
+  NODE_ENV: Environment;
 
-  isDevelopment() {
-    return this.NODE_ENV === Environments.DEVELOPMENT;
-  },
-  isStaging() {
-    return this.NODE_ENV === Environments.STAGING;
-  },
-  isProduction() {
-    return this.NODE_ENV === Environments.PRODUCTION;
-  },
-};
+  @IsNumber()
+  PORT: number;
+
+  @IsString()
+  MONGODB_URI: string;
+
+  @IsString()
+  REDIS_PORT: string;
+
+  @IsString()
+  REDIS_HOST: string;
+
+  @IsNumber()
+  CACHE_TTL: number;
+}
+
+export function validateEnv(config: Record<string, unknown>) {
+  const validatedConfig = plainToInstance(EnvironmentVariables, config, {
+    enableImplicitConversion: true,
+  });
+  const errors = validateSync(validatedConfig, {
+    skipMissingProperties: false,
+  });
+
+  if (errors.length > 0) {
+    throw new Error(errors.toString());
+  }
+  return validatedConfig;
+}

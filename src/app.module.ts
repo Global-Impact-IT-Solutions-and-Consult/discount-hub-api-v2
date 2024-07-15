@@ -3,38 +3,67 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
-import { RedisService } from './redis.service';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-// import { ConfigModule, ConfigService } from '@nestjs/config';
-// import { env } from './common/config/env.config';
-// const { MONGO_URI, REDIS_PORT } = env;
-
+import type { RedisClientOptions } from 'redis';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { redisStore } from 'cache-manager-redis-yet';
+import { EnvironmentVariables, validateEnv } from './common/config/env.config';
+import { BullModule } from '@nestjs/bullmq';
+import { ServicesModule } from './services/services.module';
+import { CompanyModule } from './company/company.module';
+import { ProductModule } from './product/product.module';
+import { AuthModule } from './auth/auth.module';
+import { SeedModule } from './seed/seed.module';
+import { NotificationModule } from './notification/notification.module';
 @Module({
-  // imports: [MongooseModule.forRoot(MONGO_URI), UserModule],
   imports: [
-    MongooseModule.forRoot(
-      process.env.MONGO_URI || 'mongodb://localhost:27017/nest',
-    ),
-    UserModule,
-    CacheModule.register({
+    ConfigModule.forRoot({
       isGlobal: true,
-      store: redisStore as any,
-      url: process.env.REDIS_URI,
+      validate: validateEnv,
     }),
-    ClientsModule.register([
-      {
-        name: 'REDIS_SERVICE',
-        transport: Transport.REDIS,
-        options: {
-          host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT, 10) || 6379,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+      }),
+      inject: [ConfigService],
+    }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => ({
+        connection: {
+          host: configService.get('REDIS_HOST'),
+          port: configService.get('REDIS_PORT'),
         },
-      },
-    ]),
+      }),
+      inject: [ConfigService],
+    }),
+
+    CacheModule.registerAsync<RedisClientOptions>({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => ({
+        store: redisStore,
+        ttl: configService.get('CACHE_TTL'),
+        url: `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
+      }),
+      inject: [ConfigService],
+    }),
+    UserModule,
+    ServicesModule,
+    CompanyModule,
+    ProductModule,
+    AuthModule,
+    SeedModule,
+    NotificationModule,
   ],
   controllers: [AppController],
-  providers: [AppService, RedisService],
+  providers: [AppService],
 })
 export class AppModule {}
