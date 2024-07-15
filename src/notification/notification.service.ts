@@ -9,7 +9,7 @@ export class NotificationService {
   constructor(private emailService: EmailService) {}
 
   private generateNotificationReference(id: string) {
-    const presentDate = format(new Date(), 'YYMMDD');
+    const presentDate = format(new Date(), 'yyMMdd');
     const notificationReference = uniqid(
       `CG_${id}-`,
       `-${presentDate}`,
