@@ -17,10 +17,16 @@ export class NotificationService {
     return notificationReference.toUpperCase();
   }
 
-  async sendEmailConfirmationSuccessNotification(user: UserDocument) {
+  async sendConfirmEmailNotification(user: UserDocument) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const notificationReference = this.generateNotificationReference(user.id);
 
     await this.emailService.sendConfirmEmailMail(user);
+  }
+  async sendResetPasswordNotification(user: UserDocument) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const notificationReference = this.generateNotificationReference(user.id);
+
+    await this.emailService.sendResetPasswordMail(user);
   }
 }

@@ -10,6 +10,12 @@ export const defaultRoles: CreateRoleDto[] = [
   { name: 'user', description: 'Default user' },
 ];
 
+export enum RegistrationTypeEnum {
+  EMAIL = 'EMAIL',
+  LINKEDIN = 'LINKEDIN',
+  GOOGLE = 'GOOGLE',
+}
+
 interface IDefaultSuperAdmin extends CreateUserDto {
   isEmailVerified: boolean;
   roleName: string;

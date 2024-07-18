@@ -33,6 +33,18 @@ export class EnvironmentVariables {
   @IsString()
   REDIS_HOST: string;
 
+  @IsString()
+  CLIENT_URL: string;
+
+  @IsString()
+  GOOGLE_OAUTH_CLIENTID: string;
+
+  @IsString()
+  GOOGLE_OAUTH_SECRET: string;
+
+  @IsString()
+  BASE_URL: string;
+
   @IsNumber()
   CACHE_TTL: number;
 }

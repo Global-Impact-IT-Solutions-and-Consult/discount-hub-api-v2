@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,6 +14,7 @@ import * as otpGenerator from 'otp-generator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -63,6 +69,7 @@ export class UserService {
     return `This action removes a #${id} user`;
   }
 
+  // Confirm Email
   async generateConfirmEmailToken(user: UserDocument) {
     const verificationToken = otpGenerator.generate(4, {
       digits: true,
@@ -73,7 +80,59 @@ export class UserService {
     const expire = add(new Date(), { minutes: 15 });
     user.confirmEmailToken = verificationToken;
     user.confirmEmailTTL = expire;
-    this.notificationService.sendEmailConfirmationSuccessNotification(user);
+    this.notificationService.sendConfirmEmailNotification(user);
+    await user.save();
+    return user;
+  }
+
+  async confirmUserEmail(email: string, token: string) {
+    const user = await this.findOneByEmail(email);
+    const currentDate = new Date().getTime();
+
+    if (currentDate > new Date(user.confirmEmailTTL).getTime()) {
+      throw new UnauthorizedException('Token Expired');
+    }
+    if (token !== user.confirmEmailToken) {
+      throw new UnauthorizedException('Invalid Token');
+    }
+    user.isEmailVerified = true;
+    user.confirmEmailTTL = null;
+    user.confirmEmailToken = null;
+    await this.notificationService.sendConfirmEmailNotification(user);
+    await user.save();
+    return user;
+  }
+
+  // Password Reset
+  async generatePasswordResetToken(user: UserDocument) {
+    const passwordResetToken = otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+      upperCaseAlphabets: false,
+    });
+
+    const expire = add(new Date(), { minutes: 15 });
+
+    user.changePasswordToken = passwordResetToken;
+    user.changePasswordTokenTTL = expire;
+    this.notificationService.sendResetPasswordNotification(user);
+    await user.save();
+  }
+
+  async changePassword(changePasswordDto: ChangePasswordDto) {
+    const user = await this.findOneByEmail(changePasswordDto.email);
+    const currentDate = new Date().getTime();
+
+    if (currentDate > new Date(user.changePasswordTokenTTL).getTime()) {
+      throw new UnauthorizedException('Token Expired');
+    }
+    if (changePasswordDto.token !== user.changePasswordToken) {
+      throw new UnauthorizedException('Invalid Token');
+    }
+    user.password = changePasswordDto.password;
+    user.changePasswordToken = null;
+    user.changePasswordTokenTTL = null;
     await user.save();
     return user;
   }
