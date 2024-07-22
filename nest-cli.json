@@ -7,10 +7,12 @@
       {
         "name": "@nestjs/swagger",
         "options": {
-          "dtoFileNameSuffix": [".dto.ts", ""]
+          "dtoFileNameSuffix": [".dto.ts", ".schema.ts"]
         }
       }
     ],
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "assets": ["templates/**"],
+    "watchAssets": true
   }
 }

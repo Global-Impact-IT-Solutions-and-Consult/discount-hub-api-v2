@@ -12,6 +12,12 @@ export class Company {
   name: string;
 
   @Prop({
+    required: true,
+    unique: true,
+  })
+  slug: string;
+
+  @Prop({
     type: { type: Types.ObjectId, ref: 'User' },
   })
   admin: UserDocument;
@@ -24,6 +30,17 @@ export class Company {
 
   @Prop({ type: [{ type: String }] })
   urls: string[];
+
+  @Prop({ default: true })
+  isDeleted: boolean;
 }
 
 export const CompanySchema = SchemaFactory.createForClass(Company);
+
+CompanySchema.pre('find', function () {
+  this.where({ isDeleted: false });
+});
+
+CompanySchema.pre('findOne', function () {
+  this.where({ isDeleted: false });
+});

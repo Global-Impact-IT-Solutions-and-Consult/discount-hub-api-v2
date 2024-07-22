@@ -16,17 +16,22 @@ export class CompanyService {
     private cloudinaryService: CloudinaryService,
   ) {}
   async create(
-    createCompanyDto: CreateCompanyDto & { logo: Express.Multer.File },
+    createCompanyDto: CreateCompanyDto & { logo?: Express.Multer.File },
   ) {
+    let logoUrl = createCompanyDto.logoUrl;
     const user = await this.userService.findOne(createCompanyDto.adminId);
-    const logoUrl = await this.cloudinaryService.upload(
-      createCompanyDto.logo,
-      CloudinaryFoldersEnum.COMPANY_LOGO,
-    );
+    if (!logoUrl) {
+      logoUrl = await this.cloudinaryService.upload(
+        createCompanyDto.logo,
+        CloudinaryFoldersEnum.COMPANY_LOGO,
+      );
+    }
+
     const company = this.companyModel.create({
       admin: user.id,
       logo: logoUrl,
       name: createCompanyDto.name,
+      slug: createCompanyDto.slug,
       urls: createCompanyDto.urls,
       website: createCompanyDto.website,
     });
@@ -42,6 +47,14 @@ export class CompanyService {
     const company = await this.companyModel.findById(id);
     if (!company) {
       throw new NotFoundException(`Company not found for this ${id}`);
+    }
+    return company;
+  }
+
+  async findOneBySlug(slug: string) {
+    const company = await this.companyModel.findOne({ slug: slug });
+    if (!company) {
+      throw new NotFoundException(`Company not found for this slug: ${slug}`);
     }
     return company;
   }
@@ -66,7 +79,13 @@ export class CompanyService {
     return updatedCompany;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} company`;
+  async remove(id: string) {
+    const company = await this.companyModel.findByIdAndUpdate(id, {
+      isDeleted: true,
+    });
+    if (!company) {
+      throw new NotFoundException(`No Company found for this id: ${id}`);
+    }
+    return true;
   }
 }

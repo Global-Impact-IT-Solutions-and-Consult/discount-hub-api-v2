@@ -57,6 +57,9 @@ export class User {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
   companies: CompanyDocument[];
 
+  @Prop({ default: false })
+  isDeleted: boolean;
+
   comparePassword: (password) => Promise<boolean>;
 
   toJSON() {
@@ -102,4 +105,12 @@ UserSchema.pre('updateOne', function (next) {
       next();
     });
   });
+});
+
+UserSchema.pre('find', function () {
+  this.where({ isDeleted: false });
+});
+
+UserSchema.pre('findOne', function () {
+  this.where({ isDeleted: false });
 });

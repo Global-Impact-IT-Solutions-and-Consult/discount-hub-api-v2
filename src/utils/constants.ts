@@ -1,3 +1,4 @@
+import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CreateRoleDto } from 'src/user/role/dto/create-role.dto';
 
@@ -8,6 +9,17 @@ export const POSTGRES_ERROR_CODES = {
 export const defaultRoles: CreateRoleDto[] = [
   { name: 'super_admin', description: 'Site Super Admin' },
   { name: 'user', description: 'Default user' },
+];
+
+export const defaultCompanies: Partial<CreateCompanyDto>[] = [
+  {
+    name: 'Jumia',
+    slug: 'jumia',
+    urls: [],
+    website: 'https://www.jumia.com.ng/',
+    logoUrl:
+      'https://logos-world.net/wp-content/uploads/2022/12/Jumia-Logo-500x281.png',
+  },
 ];
 
 export enum RegistrationTypeEnum {

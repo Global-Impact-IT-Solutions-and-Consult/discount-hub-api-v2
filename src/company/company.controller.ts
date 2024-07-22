@@ -1,34 +1,96 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes } from '@nestjs/swagger';
 
 @Controller('company')
 export class CompanyController {
   constructor(private readonly companyService: CompanyService) {}
 
   @Post()
-  create(@Body() createCompanyDto: CreateCompanyDto) {
-    return this.companyService.create(createCompanyDto);
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('logo'))
+  async create(
+    @Body() createCompanyDto: CreateCompanyDto,
+    @UploadedFile() logo: Express.Multer.File,
+  ) {
+    const data = await this.companyService.create({
+      ...createCompanyDto,
+      logo,
+    });
+    return {
+      success: true,
+      message: 'Company Created Successfully',
+      data,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.companyService.findAll();
+  async findAll() {
+    const data = await this.companyService.findAll();
+    return {
+      success: true,
+      message: 'Companies fetched Successfully',
+      data,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.companyService.findOne(id);
+    return {
+      success: true,
+      message: 'Company fetched Successfully',
+      data,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companyService.update(+id, updateCompanyDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+  ) {
+    const data = await this.companyService.update(id, updateCompanyDto);
+    return {
+      success: true,
+      message: 'Company updated Successfully',
+      data,
+    };
+  }
+
+  @Patch(':id/logo')
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('logo'))
+  async updateLogo(
+    @Param('id') id: string,
+    @UploadedFile() logo: Express.Multer.File,
+  ) {
+    const data = await this.companyService.updateLogo(id, logo);
+    return {
+      success: true,
+      message: 'Company updated Successfully',
+      data,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companyService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.companyService.remove(id);
+    return {
+      success: true,
+      message: 'Company deleted Successfully',
+    };
   }
 }

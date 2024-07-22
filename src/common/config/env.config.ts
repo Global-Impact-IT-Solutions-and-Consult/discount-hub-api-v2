@@ -25,6 +25,14 @@ export class EnvironmentVariables {
   PORT: number;
 
   @IsString()
+  @IsNotEmpty()
+  SECRET_KEY: string;
+
+  @IsString()
+  @IsNotEmpty()
+  JWT_EXPIRATION_TIME: string;
+
+  @IsString()
   MONGODB_URI: string;
 
   @IsString()
