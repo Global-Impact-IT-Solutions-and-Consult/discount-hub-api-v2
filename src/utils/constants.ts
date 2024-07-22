@@ -34,3 +34,7 @@ export enum AppNotificationEnum {
   CREATED = 'CREATED',
   SEEN = 'SEEN',
 }
+
+export enum CloudinaryFoldersEnum {
+  COMPANY_LOGO = 'discount-hub-company-logo',
+}

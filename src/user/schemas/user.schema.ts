@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { Role } from '../role/schemas/role.schema';
 import { Exclude, instanceToPlain } from 'class-transformer';
+import { CompanyDocument } from 'src/company/schemas/company.schema';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -52,6 +53,9 @@ export class User {
 
   @Prop({ type: { type: Types.ObjectId, ref: 'Story' } })
   role: Role;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
+  companies: CompanyDocument[];
 
   comparePassword: (password) => Promise<boolean>;
 

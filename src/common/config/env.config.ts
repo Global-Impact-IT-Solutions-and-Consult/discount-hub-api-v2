@@ -47,6 +47,15 @@ export class EnvironmentVariables {
 
   @IsNumber()
   CACHE_TTL: number;
+
+  @IsString()
+  CLOUDINARY_API_KEY: string;
+
+  @IsString()
+  CLOUDINARY_API_SECRET: string;
+
+  @IsString()
+  CLOUDINARY_NAME: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

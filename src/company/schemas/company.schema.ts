@@ -16,7 +16,7 @@ export class Company {
   })
   admin: UserDocument;
 
-  @Prop()
+  @Prop({ required: true })
   website: string;
 
   @Prop()
