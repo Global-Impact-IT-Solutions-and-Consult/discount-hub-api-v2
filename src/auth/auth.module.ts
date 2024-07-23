@@ -1,45 +1,35 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { AuthService } from './services/auth.service';
+import { Module } from '@nestjs/common';
+import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UserSchema } from '../user/schemas/user.schema'; 
-import { UserModule } from '../user/user.module';
-// import { GoogleStrategy } from './strategies/google.strategy';
-// import { GoogleAuthController } from './google-auth.controller';
-// import { GoogleAuthService } from './services/google-auth.service';
-import { MailService } from '../mail/mail.service';
-import { ErrorSchema } from 'src/modules/error/schemas/error.schema';
-import { WalletService } from '../wallet/services/wallet.service';
-import { WalletSchema } from '../wallet/schemas/wallet.schema';
-import { NotificationModule } from '../notification/notification.module';
-// import { WalletModule } from '../wallet/wallet.module';
-// import { MailModule } from '../mail/mail.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserModule } from 'src/user/user.module';
+import { EnvironmentVariables } from 'src/common/config/env.config';
+import { CompanyModule } from 'src/company/company.module';
+import { LocalStrategy } from './strategy/local.strategy';
+import { JWTStrategy } from './strategy/jwt.strategy';
+import { GoogleStrategy } from './strategy/google.strategy';
 
 @Module({
   imports: [
-    JwtModule.register({}),
-    MongooseModule.forFeature([
-      { name: 'User', schema: UserSchema },
-      { name: 'Error', schema: ErrorSchema },
-      { name: 'Wallet', schema: WalletSchema },
-    ]),
-    forwardRef(() => UserModule),
-    forwardRef(() => NotificationModule),
-    // WalletModule,
-    // MailModule
+    PassportModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => ({
+        secret: configService.get('SECRET_KEY'),
+        signOptions: {
+          expiresIn: `${configService.get('JWT_EXPIRATION_TIME')}`,
+        },
+      }),
+    }),
+    UserModule,
+    CompanyModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    JwtService,
-    MailService,
-    ConfigService,
-    WalletService
-    // GoogleStrategy,
-    // GoogleAuthService
-  ],
-  exports: [AuthService, JwtService]
+  providers: [AuthService, LocalStrategy, JWTStrategy, GoogleStrategy],
 })
 export class AuthModule {}

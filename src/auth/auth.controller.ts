@@ -3,161 +3,103 @@ import {
   Controller,
   Get,
   HttpCode,
-  Param,
   Post,
-  Put,
+  Query,
   Req,
-  UseFilters,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './services/auth.service';
-import { SignInDto } from './dtos/sign-in.dto';
-import { ExceptionsLoggerFilter } from 'src/framework/exceptions/exceptionLogger.filter';
-import { IAuthorizedRequest } from 'src/common/interfaces/authorized-request.interface';
+import { AuthService } from './auth.service';
+import { LocalAuthGuard } from './guards/loginGuard.guard';
+import { UserDocument } from 'src/user/schemas/user.schema';
+import { RegisterDto } from './dto/register.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { IGoogleUser } from './strategy/google.strategy';
+import { Response } from 'express';
+import { ConfirmEmailDto } from './dto/confirm-email.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { VerifyOtpDto } from './dtos/verify-otp.dto';
-import { User } from '../user/interfaces/user.interface';
-import { ResendOtpDto } from './dtos/resend-otp.dto';
-import { Tokens } from './interfaces/tokens.interface';
-import { AuthGuard } from 'src/framework/guards/auth.guard';
-import { ResetPasswordDto } from './dtos/reset-password.dto';
-import { ForgotPasswordDto } from './dtos/forgot-password.dto';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { UserGuard } from 'src/framework/guards/user.guard';
-import { ChangePasswordDto } from './dtos/change-password.dto';
-import { CreateAccountDto } from './dtos/create-store-account.dto';
-import { VerifyAccountDto } from './dtos/verify-account.dto';
-import { SignInWithGoogleDto } from './dtos/sign-in-with-google.dto';
-import { SpikkGuard } from 'src/framework/guards/spikk.guard';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Post('/signup')
-  @UseFilters(ExceptionsLoggerFilter)
-  async signup(@Body() createAccountDto: CreateAccountDto) {
-    const message: string = await this.authService.signUp(
-      createAccountDto,
-    );
-    return {
-      status: true,
-      message
-    };
-  }
-
-  @Post('/email/validate')
-  @UseFilters(ExceptionsLoggerFilter)
   @HttpCode(200)
-  async verifyEmail(@Body() body: VerifyOtpDto) {
-    const data = await this.authService.userVerifyEmail(body);
-    return {
-      status: true,
-      message: 'Your email has been verified.',
-      data,
-    };
-  }
-
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  @HttpCode(200)
-  @UseFilters(ExceptionsLoggerFilter)
-  async signIn(@Body() data: SignInDto) {
-    const tokens = await this.authService.signIn(data);
+  async loginUser(@Req() request: Request) {
+    const user = (request as any).user as UserDocument;
+    const data = await this.authService.loginUser(user);
     return {
-      status: true,
-      message: 'Login successful',
-      data: tokens,
+      success: true,
+      message: 'user logged in successfully',
+      data: data,
     };
   }
 
-  @Get('/forgot/:email')
-  @UseFilters(ExceptionsLoggerFilter)
-  async forgotPassword(@Param() param: ForgotPasswordDto) {
-    const message: string = await this.authService.userForgotPassword(
-      param.email,
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async signInWithGoogle() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthCallback(@Req() request: Request, @Res() res: Response) {
+    const user = (request as any).user as IGoogleUser;
+    const data = await this.authService.googleLogin(user);
+    res.redirect(data);
+  }
+
+  @Post('register')
+  async registerAgent(@Body() registerDto: RegisterDto) {
+    const data = await this.authService.register(registerDto);
+    return {
+      success: true,
+      message: 'User registered please confirm your email',
+      data: data,
+    };
+  }
+
+  @Post('confirm-email')
+  async confirmEmail(@Body() confirmEmailDto: ConfirmEmailDto) {
+    const data = await this.authService.confirmUserEmail(
+      confirmEmailDto.email,
+      confirmEmailDto.token,
     );
     return {
-      status: true,
-      message,
-      data: null,
+      success: true,
+      message: 'Email confirmed successfully',
+      data: data,
     };
   }
 
-  @Post('/verify/validate')
-  @HttpCode(200)
-  @UseFilters(ExceptionsLoggerFilter)
-  async verifyAccount(@Body() body: VerifyAccountDto) {
-    const message: string = await this.authService.verifyAccount(body);
+  @Get('confirm-email')
+  async sendConfirmEmail(@Query('email') email: string) {
+    const data = await this.authService.sendConfirmEmail(email);
     return {
-      status: true,
-      message,
+      success: true,
+      message: 'Email confirmed request sent successfully',
+      data: data,
     };
   }
 
-  @Post('/reset/validate')
-  @HttpCode(200)
-  @UseFilters(ExceptionsLoggerFilter)
-  async resetPassword(@Body() body: ResetPasswordDto) {
-    const message: string = await this.authService.resetPassword(body);
+  @Get('change-password')
+  async sendChangePasswordLink(@Query('email') email: string) {
+    const data = await this.authService.sendChangePasswordUrl(email);
     return {
-      status: true,
-      message,
-      data: null,
+      success: true,
+      message: 'Password reset link sent successfully',
+      data: data,
     };
   }
 
-  @Get('/email/resend/:email')
-  @UseFilters(ExceptionsLoggerFilter)
-  async resendVerificationToken(@Param() param: ResendOtpDto) {
-    const message: string = await this.authService.userResendVerificationToken(
-      param.email,
-    );
+  @Post('change-password')
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    const data = await this.authService.changePassword(changePasswordDto);
     return {
-      status: true,
-      message,
-      data: null,
-    };
-  }
-
-  @Put('/change-password')
-  @UseGuards(AuthGuard)
-  @UseFilters(ExceptionsLoggerFilter)
-  async changePassword(
-    @Body() body: ChangePasswordDto,
-    @UserGuard() user: User,
-  ) {
-    const message: string = await this.authService.changePassword({
-      user,
-      ...body,
-    });
-    return {
-      status: true,
-      message,
-      data: null,
-    };
-  }
-
-  @Post('/google/sign-in')
-  @UseGuards(SpikkGuard)
-  async signInWithGoogle(@Body() body: SignInWithGoogleDto){
-    const tokens = await this.authService.signInWithGoogle(body)
-    return {
-      status: true,
-      message: "Google sign in successful",
-      data: tokens
-    }
-  }
-
-  @Get('logout')
-  @UseGuards(AuthGuard)
-  @UseFilters(ExceptionsLoggerFilter)
-  logout(@Req() request: IAuthorizedRequest) {
-    this.authService.logout(request.user.id);
-    return {
-      status: true,
-      message: 'Logged out successfully',
-      data: null,
+      success: true,
+      message: 'Password changed successfully',
+      data: data,
     };
   }
 }

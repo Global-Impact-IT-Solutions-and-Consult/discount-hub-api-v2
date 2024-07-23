@@ -1,43 +1,72 @@
 import {
   Controller,
   Get,
-  // Post,
+  Post,
   Body,
   Patch,
   Param,
   Delete,
-  Post,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@UseGuards(AuthGuard('jwt'))
+@ApiTags('User')
 @Controller('user')
+@ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const data = await this.userService.create(createUserDto);
+    return {
+      success: true,
+      message: 'User created successfully',
+      data,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    const data = await this.userService.findAll();
+    return {
+      success: true,
+      message: 'Users fetched successfully',
+      data,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.userService.findOne(id);
+    return {
+      success: true,
+      message: 'User fetched successfully',
+      data,
+    };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const data = await this.userService.update(id, updateUserDto);
+    return {
+      success: true,
+      message: 'User updated successfully',
+      data,
+    };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.userService.remove(id);
+    return {
+      success: true,
+      message: 'User deleted successfully',
+    };
   }
 }

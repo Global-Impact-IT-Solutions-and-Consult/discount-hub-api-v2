@@ -1,82 +1,116 @@
-import { Schema } from 'mongoose';
-import * as mongoose from 'mongoose';
-import { User } from '../interfaces/user.interface';
-import { UserRoles } from 'src/common/constants/enum';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
+import { Role } from '../role/schemas/role.schema';
+import { Exclude, instanceToPlain } from 'class-transformer';
+import { CompanyDocument } from 'src/company/schemas/company.schema';
 
-function transformValue(doc, ret: { [key: string]: any }) {
-  delete ret._id;
+export type UserDocument = HydratedDocument<User>;
+
+@Schema()
+export class User {
+  @Prop({
+    required: true,
+    unique: true,
+  })
+  email: string;
+
+  @Prop({
+    required: true,
+  })
+  password: string;
+
+  @Prop({
+    required: true,
+  })
+  firstName: string;
+
+  @Prop({
+    required: true,
+  })
+  lastName: string;
+
+  @Prop({
+    default: false,
+  })
+  isEmailVerified: boolean;
+
+  @Exclude({ toPlainOnly: true })
+  @Prop()
+  confirmEmailToken: string;
+
+  @Exclude({ toPlainOnly: true })
+  @Prop()
+  confirmEmailTTL: Date;
+
+  @Exclude({ toPlainOnly: true })
+  @Prop()
+  changePasswordToken: string;
+
+  @Exclude({ toPlainOnly: true })
+  @Prop()
+  changePasswordTokenTTL: Date;
+
+  @Prop({ type: { type: Types.ObjectId, ref: 'Story' } })
+  role: Role;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
+  companies: CompanyDocument[];
+
+  @Prop({ default: false })
+  isDeleted: boolean;
+
+  comparePassword: (password) => Promise<boolean>;
+
+  toJSON() {
+    return instanceToPlain(this);
+  }
 }
 
-export const UserSchema: Schema = new Schema<User>(
-  {
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    email: {
-      type: String,
-      unique: true,
-      required: [true, 'Email can not be empty'],
-      match: [
-        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-        'Email should be valid',
-      ],
-    },
-    password: {
-      type: String,
-      required: true,
-    },
-    role: {
-      type: String,
-      enum: UserRoles,
-      required: false,
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
-    confirmEmailToken: {
-      type: String,
-      required: false,
-    },
-    changePasswordToken: {
-      type: String,
-      required: false,
-    },
-    confirmEmailTTL: {
-      type: Date,
-      required: false,
-    },
-    changePasswordTokenTTL: {
-      type: Date,
-      required: false,
-    },
-  },
-  {
-    timestamps: true,
-    toObject: {
-      virtuals: true,
-      versionKey: false,
-      transform: transformValue,
-    },
-    toJSON: {
-      virtuals: true,
-      versionKey: false,
-      transform: transformValue,
-    },
-  },
-);
+export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.methods.compareEncryptedPassword = function (
-  password: string,
-  hashPassword: string,
-) {
-  return bcrypt.compare(password, hashPassword);
+UserSchema.methods.comparePassword = async function (password) {
+  const result = await bcrypt.compareSync(password, this.password);
+  return result;
 };
 
-export const UserModel = mongoose.model<User>('User', UserSchema);
+UserSchema.pre('save', function (next) {
+  // only hash the password if it has been modified (or is new)
+  if (this.isModified('password')) return next();
+
+  // generate a salt
+  bcrypt.genSalt(5, function (err, salt) {
+    if (err) return next(err);
+
+    // hash the password using our new salt
+    bcrypt.hash(this.password, salt, function (err, hash) {
+      if (err) return next(err);
+      // override the cleartext password with the hashed one
+      this.password = hash;
+      next();
+    });
+  });
+});
+
+UserSchema.pre('updateOne', function (next) {
+  // generate a salt
+  bcrypt.genSalt(5, function (err, salt) {
+    if (err) return next(err);
+
+    // hash the password using our new salt
+    bcrypt.hash(this.password, salt, function (err, hash) {
+      if (err) return next(err);
+      // override the cleartext password with the hashed one
+      this.password = hash;
+      next();
+    });
+  });
+});
+
+UserSchema.pre('find', function () {
+  this.where({ isDeleted: false });
+});
+
+UserSchema.pre('findOne', function () {
+  this.where({ isDeleted: false });
+});

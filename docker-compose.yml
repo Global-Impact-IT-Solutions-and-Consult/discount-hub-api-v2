@@ -6,6 +6,8 @@ services:
     container_name: mongo
     ports:
       - '27017:27017'
+    volumes:
+      - db
     networks:
       - discount-hub-network
 
@@ -17,25 +19,28 @@ services:
     networks:
       - discount-hub-network
 
-  app:
-    image: discount-hub-image
-    container_name: app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '3030:3030'
-    depends_on:
-      - mongo
-      - redis
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/nest
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PORT=3030
-    networks:
-      - discount-hub-network
+  # app:
+  #   image: discount-hub-image
+  #   container_name: app
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - '3030:3030'
+  #   depends_on:
+  #     - mongo
+  #     - redis
+  #   environment:
+  #     - MONGO_URI=mongodb://mongo:27017/nest
+  #     - REDIS_HOST=redis
+  #     - REDIS_PORT=6379
+  #     - PORT=3030
+  #   networks:
+  #     - discount-hub-network
 
 networks:
   discount-hub-network:
     driver: bridge
+
+volumes:
+  db:
