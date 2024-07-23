@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 import { promisify } from 'util';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class RedisService implements OnModuleInit {
@@ -26,7 +27,12 @@ export class RedisService implements OnModuleInit {
         await this.client.connect();
         this.getAsync = promisify(this.client.get).bind(this.client);
         this.setAsync = promisify(this.client.set).bind(this.client);
-        console.log('Connected to Redis');
+        // console.log('Connected to Redis');
+        Logger.log(`
+          ************************************************
+                        CoNnEcTeD To rEdIs  
+          ************************************************
+        `);
         break;
       } catch (err) {
         console.error(

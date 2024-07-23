@@ -7,6 +7,7 @@ import * as redisStore from 'cache-manager-redis-store';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisService } from './redis.service';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { StoreModule } from './store/store.module';
 // import { ConfigModule, ConfigService } from '@nestjs/config';
 // import { env } from './common/config/env.config';
 // const { MONGO_URI, REDIS_PORT } = env;
@@ -18,6 +19,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       process.env.MONGO_URI || 'mongodb://localhost:27017/nest',
     ),
     UserModule,
+    StoreModule,
     CacheModule.register({
       isGlobal: true,
       store: redisStore as any,
