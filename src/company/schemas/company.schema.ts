@@ -31,7 +31,7 @@ export class Company {
   @Prop({ type: [{ type: String }] })
   urls: string[];
 
-  @Prop({ default: true })
+  @Prop({ default: false })
   isDeleted: boolean;
 }
 

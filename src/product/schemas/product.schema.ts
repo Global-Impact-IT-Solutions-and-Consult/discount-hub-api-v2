@@ -30,6 +30,9 @@ export class Product {
   images: string;
 
   @Prop()
+  rating: number;
+
+  @Prop()
   specifications: string;
 
   @Prop()

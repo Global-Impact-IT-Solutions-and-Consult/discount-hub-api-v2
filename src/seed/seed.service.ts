@@ -57,7 +57,9 @@ export class SeedService implements OnApplicationBootstrap {
       let foundCompany: CompanyDocument = null;
       try {
         foundCompany = await this.companyService.findOneBySlug(company.slug);
-        if (foundCompany.urls !== company.urls) {
+        if (
+          JSON.stringify(foundCompany.urls) !== JSON.stringify(company.urls)
+        ) {
           foundCompany.urls = company.urls;
           await foundCompany.save();
           this.logger.log(`Company : ${company.name} updated`);

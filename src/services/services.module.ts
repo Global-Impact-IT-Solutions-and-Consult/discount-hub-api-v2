@@ -1,10 +1,10 @@
 import { Global, Module } from '@nestjs/common';
-import { ScrapersModule } from './scrapers/scrapers.module';
+import { ScraperModule } from './scraper/scraper.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Global()
 @Module({
-  imports: [ScrapersModule, CloudinaryModule],
-  exports: [ScrapersModule, CloudinaryModule],
+  imports: [ScraperModule, CloudinaryModule],
+  exports: [ScraperModule, CloudinaryModule],
 })
 export class ServicesModule {}

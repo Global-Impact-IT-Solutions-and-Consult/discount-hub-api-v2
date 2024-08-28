@@ -15,6 +15,8 @@ import { ProductModule } from './product/product.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
 import { NotificationModule } from './notification/notification.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -42,7 +44,9 @@ import { NotificationModule } from './notification/notification.module';
       }),
       inject: [ConfigService],
     }),
-
+    BullModule.registerQueue({
+      name: 'scraper',
+    }),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
@@ -62,6 +66,11 @@ import { NotificationModule } from './notification/notification.module';
     AuthModule,
     SeedModule,
     NotificationModule,
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot({
+      wildcard: false,
+      delimiter: '.',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
