@@ -17,6 +17,7 @@ import { SeedModule } from './seed/seed.module';
 import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AiModule } from './services/ai/ai.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -71,6 +72,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
       wildcard: false,
       delimiter: '.',
     }),
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

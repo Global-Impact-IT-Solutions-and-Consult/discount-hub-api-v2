@@ -3,3 +3,9 @@ export enum Environments {
   STAGING = 'staging',
   PRODUCTION = 'production',
 }
+
+export enum UserRoles {
+  SUPER_ADMIN = 'super_admin',
+  ADMIN = 'admin',
+  USER = 'user',
+}

@@ -1,34 +1,83 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { AiService } from 'src/services/ai/ai.service';
+// import { AiCategorizeDto } from './dto/ai-categorize.dto';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly aiService: AiService,
+  ) {}
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto) {
+    const data = await this.productService.create(createProductDto);
+    return {
+      success: true,
+      message: 'Product created successfully',
+      data,
+    };
   }
 
   @Get()
-  findAll() {
-    return this.productService.findAll();
+  async findAll() {
+    const data = await this.productService.findAll();
+    return {
+      success: true,
+      message: 'Products fetched successfully',
+      data,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.productService.findOne(id);
+    return {
+      success: true,
+      message: 'Product fetched successfully',
+      data,
+    };
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(+id, updateProductDto);
+    return this.productService.update(id, updateProductDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.productService.remove(id);
+    return {
+      success: true,
+      message: 'Product deleted successfully',
+    };
+  }
+
+  @Post('categorize')
+  // async categorize(@Body() aiCategorizeDto: AiCategorizeDto) {
+  async categorize(@Body() body: any) {
+    const categorizedProducts =
+      // await this.productService.categorize(aiCategorizeDto);
+      await this.productService.categorize(body);
+    console.log(
+      '🚀 ~ ProductController ~ categorize ~ categorizedProducts:',
+      categorizedProducts,
+    );
+    return {
+      success: true,
+      message: 'Product categorized successfully',
+      data: categorizedProducts,
+    };
   }
 }

@@ -1,26 +1,57 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Product } from './schemas/product.schema';
+import { Model } from 'mongoose';
+import { AiService } from 'src/services/ai/ai.service';
+// import { AiCategorizeDto } from './dto/ai-categorize.dto';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  constructor(
+    @InjectModel('Product') private readonly productModel: Model<Product>,
+    private readonly aiService: AiService,
+  ) {}
+
+  async create(createProduct: CreateProductDto): Promise<Product> {
+    const product = new this.productModel(createProduct);
+    return product.save();
   }
 
-  findAll() {
-    return `This action returns all product`;
+  async findAll(): Promise<Product[]> {
+    return await this.productModel.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: string): Promise<Product> {
+    return await this.productModel.findById(id);
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    return this.productModel
+      .findByIdAndUpdate(id, updateProductDto, { new: true })
+      .exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: string) {
+    return await this.productModel.findByIdAndDelete(id);
+  }
+
+  // async categorize(aiCategorizeDto: AiCategorizeDto) {
+  async categorize(body: any) {
+    // const product = await this.aiService.categorizeWords();
+    // const product = await this.aiService.categorizeWords(
+    //   aiCategorizeDto.categories,
+    //   aiCategorizeDto.words,
+    // );
+    const product = await this.aiService.categorizeProducts({
+      categories: body.categories,
+      brands: body.brands,
+      products: body.products,
+    });
+    return product;
   }
 }
