@@ -15,6 +15,7 @@ import { ProductModule } from './product/product.module';
 import { AuthModule } from './auth/auth.module';
 import { SeedModule } from './seed/seed.module';
 import { NotificationModule } from './notification/notification.module';
+import { AiModule } from './services/ai/ai.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -62,6 +63,7 @@ import { NotificationModule } from './notification/notification.module';
     AuthModule,
     SeedModule,
     NotificationModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

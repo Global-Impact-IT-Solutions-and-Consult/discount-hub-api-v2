@@ -64,6 +64,12 @@ export class EnvironmentVariables {
 
   @IsString()
   CLOUDINARY_NAME: string;
+
+  @IsString()
+  AI_URL: string;
+
+  @IsString()
+  AI_API_KEY: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

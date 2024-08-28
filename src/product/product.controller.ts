@@ -10,10 +10,15 @@ import {
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { AiService } from 'src/services/ai/ai.service';
+// import { AiCategorizeDto } from './dto/ai-categorize.dto';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly aiService: AiService,
+  ) {}
 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
@@ -56,6 +61,23 @@ export class ProductController {
     return {
       success: true,
       message: 'Product deleted successfully',
+    };
+  }
+
+  @Post('categorize')
+  // async categorize(@Body() aiCategorizeDto: AiCategorizeDto) {
+  async categorize(@Body() body: any) {
+    const categorizedProducts =
+      // await this.productService.categorize(aiCategorizeDto);
+      await this.productService.categorize(body);
+    console.log(
+      '🚀 ~ ProductController ~ categorize ~ categorizedProducts:',
+      categorizedProducts,
+    );
+    return {
+      success: true,
+      message: 'Product categorized successfully',
+      data: categorizedProducts,
     };
   }
 }

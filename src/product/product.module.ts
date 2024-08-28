@@ -10,6 +10,7 @@ import {
   TagAttribute,
   TagAttributeSchema,
 } from './schemas/tagAttribute.schema';
+import { AiModule } from 'src/services/ai/ai.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import {
       { name: Tag.name, schema: TagSchema },
       { name: TagAttribute.name, schema: TagAttributeSchema },
     ]),
+    AiModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],
