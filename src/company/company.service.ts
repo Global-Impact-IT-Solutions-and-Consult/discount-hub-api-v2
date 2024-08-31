@@ -38,6 +38,65 @@ export class CompanyService {
     return company;
   }
 
+  // async create(
+  //   createCompanyDto: CreateCompanyDto & { logo?: Express.Multer.File },
+  // ) {
+  //   try {
+  //     // Check if a company with the same slug already exists
+  //     const existingCompany = await this.companyModel
+  //       .findOne({ slug: createCompanyDto.slug })
+  //       .exec();
+
+  //     if (existingCompany) {
+  //       // If company exists, return the existing company to avoid duplication
+  //       return existingCompany;
+  //     }
+
+  //     // Fetch the user based on adminId provided in DTO
+  //     const user = await this.userService.findOne(createCompanyDto.adminId);
+  //     if (!user) {
+  //       throw new Error('Admin user not found'); // Handle the case where the admin user is not found
+  //     }
+
+  //     // Upload logo to Cloudinary if a new logo is provided and logoUrl is not already set
+  //     let logoUrl = createCompanyDto.logoUrl;
+  //     if (!logoUrl && createCompanyDto.logo) {
+  //       logoUrl = await this.cloudinaryService.upload(
+  //         createCompanyDto.logo,
+  //         CloudinaryFoldersEnum.COMPANY_LOGO,
+  //       );
+  //     }
+
+  //     // Create new company object
+  //     const newCompany = new this.companyModel({
+  //       admin: user.id,
+  //       logo: logoUrl,
+  //       name: createCompanyDto.name,
+  //       slug: createCompanyDto.slug,
+  //       urls: createCompanyDto.urls,
+  //       website: createCompanyDto.website,
+  //     });
+
+  //     // Save new company to the database
+  //     const savedCompany = await newCompany.save();
+  //     return savedCompany;
+  //   } catch (error) {
+  //     // Handle duplicate key error (E11000)
+  //     if (error.code === 11000 && error.keyPattern?.slug) {
+  //       const existingCompany = await this.companyModel
+  //         .findOne({ slug: createCompanyDto.slug })
+  //         .exec();
+  //       if (existingCompany) {
+  //         return existingCompany; // Return existing company on duplicate slug error
+  //       }
+  //     }
+
+  //     // Log other errors and provide meaningful feedback
+  //     console.error('Error creating company:', error);
+  //     throw new Error('Failed to create company. Please try again later.');
+  //   }
+  // }
+
   async findAll() {
     const companies = await this.companyModel.find();
     return companies;

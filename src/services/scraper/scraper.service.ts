@@ -12,10 +12,12 @@ export class ScraperService extends WorkerHost {
     super();
   }
   async process(job: Job<any, any, string>): Promise<any> {
+    console.log('SCRAPING!!!!!!');
     // do some stuff
     switch (job.name) {
       case 'scrape':
         const companies = await this.companyService.findAll();
+        console.log('🚀 ~ ScraperService ~ process ~ companies:', companies);
         for (const company of companies) {
           this.eventEmitter.emit(`scrape.${company.slug}`, company);
         }

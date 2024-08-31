@@ -10,7 +10,7 @@ export class AppService {
   constructor(@InjectQueue('scraper') private scraperQueue: Queue) {}
   @Cron(CronExpression.EVERY_30_SECONDS)
   handleCron() {
-    //   this.logger.debug('Called when the current second is 45');
+    this.logger.debug('Called when the current second is 45');
     this.scraperQueue.add('scrape', {});
   }
 }

@@ -18,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AiModule } from './services/ai/ai.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -41,6 +42,10 @@ import { AiModule } from './services/ai/ai.module';
         connection: {
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
+          // Add retry strategy and error handling
+          retryStrategy: (times) => {
+            return Math.min(times * 50, 2000); // Adjust retry strategy as needed
+          },
         },
       }),
       inject: [ConfigService],
@@ -53,11 +58,22 @@ import { AiModule } from './services/ai/ai.module';
       imports: [ConfigModule],
       useFactory: async (
         configService: ConfigService<EnvironmentVariables>,
-      ) => ({
-        store: redisStore,
-        ttl: configService.get('CACHE_TTL'),
-        url: `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
-      }),
+      ) => {
+        const store = await redisStore({
+          url: `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
+          ttl: configService.get<number>('CACHE_TTL'),
+        });
+
+        return {
+          store: () => store,
+          // Add error handling here
+          onClientReady: (client) => {
+            client.on('error', (err) =>
+              console.error('Redis Client Error', err),
+            );
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     UserModule,

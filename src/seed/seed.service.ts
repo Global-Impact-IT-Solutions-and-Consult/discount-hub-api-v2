@@ -52,45 +52,45 @@ export class SeedService implements OnApplicationBootstrap {
     }
   }
 
-  // async seedCompanies() {
-  //   for (const company of defaultCompanies) {
-  //     let foundCompany: CompanyDocument = null;
-  //     try {
-  //       foundCompany = await this.companyService.findOneBySlug(company.slug);
-  //       if (foundCompany.urls !== company.urls) {
-  //         foundCompany.urls = company.urls;
-  //         await foundCompany.save();
-  //         this.logger.log(`Company : ${company.name} updated`);
-  //       }
-  //     } catch (error) {}
-  //     if (!foundCompany) {
-  //       const superAdmin = await this.userService.findOneByEmail(
-  //         defaultSuperAdmin.email,
-  //       );
-  //       await this.companyService.create({
-  //         ...company,
-  //         adminId: superAdmin.id,
-  //       } as CreateCompanyDto);
-  //       this.logger.log(`Company : ${company.name} Seeded`);
-  //     }
-  //   }
-  // }
-
   async seedCompanies() {
     for (const company of defaultCompanies) {
       let foundCompany: CompanyDocument = null;
       try {
         foundCompany = await this.companyService.findOneBySlug(company.slug);
-        if (
-          JSON.stringify(foundCompany.urls) !== JSON.stringify(company.urls)
-        ) {
+        if (foundCompany.urls !== company.urls) {
           foundCompany.urls = company.urls;
           await foundCompany.save();
           this.logger.log(`Company : ${company.name} updated`);
         }
-      } catch (error) {
-        this.logger.error(`Error seeding company: ${company.name}`, error);
+      } catch (error) {}
+      if (!foundCompany) {
+        const superAdmin = await this.userService.findOneByEmail(
+          defaultSuperAdmin.email,
+        );
+        await this.companyService.create({
+          ...company,
+          adminId: superAdmin.id,
+        } as CreateCompanyDto);
+        this.logger.log(`Company : ${company.name} Seeded`);
       }
     }
   }
+
+  // async seedCompanies() {
+  //   for (const company of defaultCompanies) {
+  //     let foundCompany: CompanyDocument = null;
+  //     try {
+  //       foundCompany = await this.companyService.findOneBySlug(company.slug);
+  //       if (
+  //         JSON.stringify(foundCompany.urls) !== JSON.stringify(company.urls)
+  //       ) {
+  //         foundCompany.urls = company.urls;
+  //         await foundCompany.save();
+  //         this.logger.log(`Company : ${company.name} updated`);
+  //       }
+  //     } catch (error) {
+  //       this.logger.error(`Error seeding company: ${company.name}`, error);
+  //     }
+  //   }
+  // }
 }
