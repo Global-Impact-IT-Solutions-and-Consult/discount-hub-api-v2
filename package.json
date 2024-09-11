@@ -51,6 +51,7 @@
     "class-validator": "^0.14.1",
     "cloudinary": "^2.3.0",
     "date-fns": "^3.6.0",
+    "groq-sdk": "^0.7.0",
     "ioredis": "^5.4.1",
     "mongoose": "^8.5.0",
     "openai": "^4.55.0",

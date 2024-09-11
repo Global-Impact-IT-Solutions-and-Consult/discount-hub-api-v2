@@ -42,16 +42,17 @@ export class ProductService {
 
   // async categorize(aiCategorizeDto: AiCategorizeDto) {
   async categorize(body: any) {
+    console.log('🚀 ~ categorize ~ body:', body);
     // const product = await this.aiService.categorizeWords();
     // const product = await this.aiService.categorizeWords(
     //   aiCategorizeDto.categories,
     //   aiCategorizeDto.words,
     // );
-    const product = await this.aiService.categorizeProducts({
-      categories: body.categories,
-      brands: body.brands,
-      products: body.products,
-    });
-    return product;
+    // const product = await this.aiService.categorizeProducts({
+    //   categories: body.categories,
+    //   brands: body.brands,
+    //   products: body.products,
+    // });
+    // return product;
   }
 }
