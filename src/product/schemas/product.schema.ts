@@ -36,6 +36,9 @@ export class Product {
   specifications: string;
 
   @Prop()
+  keyFeatures: string;
+
+  @Prop()
   description: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })

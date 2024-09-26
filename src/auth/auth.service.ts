@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserDocument } from 'src/user/schemas/user.schema';
 import { UserService } from 'src/user/user.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { RegisterDto } from './dto/register.dto';
+// import { RegisterDto } from './dto/register.dto';
 import { IGoogleUser } from './strategy/google.strategy';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { RegistrationTypeEnum } from 'src/utils/constants';
@@ -22,7 +22,7 @@ export class AuthService {
     private configService: ConfigService<EnvironmentVariables>,
   ) {}
 
-  async register(registerDto: RegisterDto) {
+  async register(registerDto: CreateUserDto) {
     const user = await this.userService.create(registerDto);
     return user;
   }

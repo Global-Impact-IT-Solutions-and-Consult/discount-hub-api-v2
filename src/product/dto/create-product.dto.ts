@@ -7,6 +7,7 @@ import {
   ArrayMinSize,
   IsMongoId,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -21,43 +22,62 @@ export class CreateProductDto {
   @IsNumber()
   discountPrice: number;
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  discount?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  rating?: string;
+
+  @ApiProperty({ type: [String], required: false })
   @IsArray()
   @ArrayMinSize(1)
   @IsString({ each: true })
   @IsOptional()
-  images: string[];
+  images?: string[];
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   specifications?: string;
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  keyFeatures?: string;
+
+  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({ type: [String], required: false })
   @IsArray()
   @IsMongoId({ each: true })
   @IsOptional()
   tags?: string[];
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({ type: [String], required: false })
   @IsArray()
   @IsMongoId({ each: true })
   @IsOptional()
   tagAttributes?: string[];
 
-  @ApiProperty()
+  @ApiProperty({ required: false })
   @IsMongoId()
   @IsOptional()
-  brand?: string;
+  brand?: Types.ObjectId | string; // Allow ObjectId or string
 
-  @ApiProperty({ type: [String] })
+  @ApiProperty({ type: [String], required: false })
   @IsArray()
   @IsMongoId({ each: true })
   @IsOptional()
-  categories?: string[];
+  categories?: (Types.ObjectId | string)[]; // Allow array of ObjectId or string
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  store?: string;
 }

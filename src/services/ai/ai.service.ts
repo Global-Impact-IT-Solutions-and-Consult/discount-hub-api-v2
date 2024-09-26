@@ -9,7 +9,7 @@ export class AiService {
 
   async categorizeProducts(input: {
     categories: string[];
-    brands: string[];
+    // brands: string[];
     product: string;
   }): Promise<any> {
     try {
@@ -21,23 +21,33 @@ export class AiService {
       const groq = new Groq({ apiKey: this.configService.get('AI_API_KEY') });
 
       // Convert the input object into a string format suitable for the AI model
-      const { categories, brands, product } = input;
-      // const productsString = products
-      //   .map((p) => `Name: ${p.name}, Brand: ${p.brand}, Color: ${p.color}`)
-      //   .join('; ');
+      // const { categories, brands, product } = input;
+      const { categories, product } = input;
 
       const prompt = `
-        You are an AI model trained to categorize a product based on given categories and brands.
+        You are an AI model trained to categorize a product based on given categories and also suggests brands from the product name.
         Categories: ${categories.join(', ')}
-        Brands: ${brands.join(', ')}
         Product: ${product}
         decide which categories and brands the product falls under and return the product categorized under the given categories and brands in this format:
         {
           "categories": ["Category1", "Category2", ...],
           "brands": ["Brand1", "Brand2", ... ]
         }
-        Do not include any other explanations. suggest new categories for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
+        Do not include any other explanations. suggest new categories and brands for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
       `;
+
+      // const prompt = `
+      //   You are an AI model trained to categorize a product based on given categories and brands.
+      //   Categories: ${categories.join(', ')}
+      //   Brands: ${brands.join(', ')}
+      //   Product: ${product}
+      //   decide which categories and brands the product falls under and return the product categorized under the given categories and brands in this format:
+      //   {
+      //     "categories": ["Category1", "Category2", ...],
+      //     "brands": ["Brand1", "Brand2", ... ]
+      //   }
+      //   Do not include any other explanations. suggest new categories for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
+      // `;
 
       const chatCompletion = await groq.chat.completions.create({
         // const chatCompletion = await openai.chat.completions.create({

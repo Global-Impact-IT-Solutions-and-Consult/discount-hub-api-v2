@@ -7,7 +7,7 @@ services:
     ports:
       - '27017:27017'
     volumes:
-      - db
+      - db:/data/db # specify the absolute path inside the container
     networks:
       - discount-hub-network
 

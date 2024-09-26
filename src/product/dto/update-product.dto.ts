@@ -37,6 +37,11 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @ApiProperty()
   @IsString()
   @IsOptional()
+  keyFeatures?: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
   description?: string;
 
   @ApiProperty({ type: [String] })
@@ -61,4 +66,8 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @IsMongoId({ each: true })
   @IsOptional()
   categories?: string[];
+
+  @ApiProperty()
+  @IsOptional()
+  source?: string;
 }
