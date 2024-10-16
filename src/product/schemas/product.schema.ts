@@ -27,10 +27,10 @@ export class Product {
     required: true,
     type: [{ type: String }],
   })
-  images: string;
+  images: string[];
 
   @Prop()
-  rating: number;
+  rating: string;
 
   @Prop()
   specifications: string;

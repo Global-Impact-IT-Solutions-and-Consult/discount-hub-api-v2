@@ -77,8 +77,8 @@ export class ScraperService {
           description: '',
           tags: [],
           tagAttributes: [],
-          brand: product.brand,
-          categories: product.category,
+          brands: product.brands,
+          categories: product.categories,
         };
 
         // Save the product using ProductService

@@ -250,7 +250,7 @@ export class KongaScraperService extends WorkerHost {
           description: '', // Add description if available
           tags: [], // Add tags if available
           tagAttributes: [], // Add tag attributes if available
-          brand: product.brand, // Add brand if available
+          brands: product.brand, // Add brand if available
           categories: [product.category], // Ensure categories is an array
         };
 

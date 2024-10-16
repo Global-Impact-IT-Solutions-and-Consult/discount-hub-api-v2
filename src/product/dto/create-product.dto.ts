@@ -54,6 +54,11 @@ export class CreateProductDto {
   @IsOptional()
   description?: string;
 
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  link?: string;
+
   @ApiProperty({ type: [String], required: false })
   @IsArray()
   @IsMongoId({ each: true })
@@ -69,7 +74,7 @@ export class CreateProductDto {
   @ApiProperty({ required: false })
   @IsMongoId()
   @IsOptional()
-  brand?: Types.ObjectId | string; // Allow ObjectId or string
+  brands?: Types.ObjectId | string; // Allow ObjectId or string
 
   @ApiProperty({ type: [String], required: false })
   @IsArray()

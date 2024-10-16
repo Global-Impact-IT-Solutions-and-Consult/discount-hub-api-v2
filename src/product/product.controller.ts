@@ -64,6 +64,16 @@ export class ProductController {
     };
   }
 
+  // delete all
+  @Delete()
+  async removeAll() {
+    await this.productService.removeAll();
+    return {
+      success: true,
+      message: 'All products deleted successfully',
+    };
+  }
+
   @Post('categorize')
   // async categorize(@Body() aiCategorizeDto: AiCategorizeDto) {
   async categorize(@Body() body: any) {

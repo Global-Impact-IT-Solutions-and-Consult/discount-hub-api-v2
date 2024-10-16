@@ -85,6 +85,16 @@ export class ProductService {
     await this.cacheManager.del('products');
   }
 
+  // Delete all the products
+  async removeAll(): Promise<{ message: string }> {
+    await this.productModel.deleteMany({}).exec();
+
+    // Clear related caches
+    await this.cacheManager.del('products');
+
+    return { message: 'All products have been deleted' };
+  }
+
   // Category functions
   async findCategoryByName(name: string): Promise<CategoryDocument> {
     const cacheKey = `category_${name.toLowerCase()}`;

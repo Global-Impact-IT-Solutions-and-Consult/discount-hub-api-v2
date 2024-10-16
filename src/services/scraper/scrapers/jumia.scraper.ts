@@ -139,8 +139,8 @@ export class JumiaScraperService extends WorkerHost {
                     description: '', // Initialize description (will be populated later)
                     keyFeatures: '', // Initialize key features (will be populated later)
                     specifications: '', // Initialize specifications (will be populated later)
-                    category: [''], // Initialize category (will be populated by AI service)
-                    brand: [''], // Initialize brand (will be populated by AI service)
+                    categories: [''], // Initialize category (will be populated by AI service)
+                    brands: [''], // Initialize brand (will be populated by AI service)
                   };
                 })
                 .filter((product) => product !== null);
@@ -237,11 +237,11 @@ export class JumiaScraperService extends WorkerHost {
                   const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
 
                   // Set the category and brand from AI response
-                  product.category = categoryIds; // Set the category from AI response
-                  product.brand = brandId; // Set the brand from AI response
-                  this.logger.log(
-                    `Categorized product: ${JSON.stringify(product)}`,
-                  );
+                  product.categories = categoryIds; // Set the category from AI response
+                  product.brands = brandId; // Set the brand from AI response
+                  // this.logger.log(
+                  //   `Categorized product: ${JSON.stringify(product)}`,
+                  // );
                 } catch (aiError) {
                   this.logger.error('Error categorizing product:', aiError);
                 }
@@ -305,22 +305,47 @@ export class JumiaScraperService extends WorkerHost {
 
     for (const category of scrapedData) {
       for (const product of category.products) {
+        console.log(
+          '🚀 ~ JumiaScraperService ~ saveProducts ~ product:',
+          product,
+        );
         const createProductDto: CreateProductDto = {
           name: product.name,
           price: this.parsePrice(product.price),
           discountPrice: this.parsePrice(product.discountPrice),
-          images: [product.image],
-          specifications: '',
-          description: '',
-          tags: [],
-          tagAttributes: [],
-          brand: product.brand,
-          categories: [product.category],
+          // images: [product.images],
+          images: product.images,
+          specifications: product.specifications,
+          description: product.description,
+          // tags: [],
+          // tagAttributes: [],
+          brands: product.brands,
+          categories: [product.categories],
+          link: product.link,
+          discount: product.discount,
+          rating: product.rating,
+          store: product.store,
+          keyFeatures: product.keyFeatures,
         };
+
+        //  const createProductDto: CreateProductDto = {
+        //           name: product.name,
+        //           price: product.price,
+        //           discountPrice: product.discountPrice,
+        //           discount: product.discount,
+        //           rating: product.rating,
+        //           images: product.images,
+        //           description: product.description,
+        //           keyFeatures: product.keyFeatures,
+        //           specifications: product.specifications,
+        //           categories: [categoryId], // Associate category ID
+        //           brand: brandId, // Associate brand ID
+        //           store: product.store,
+        //         };
 
         try {
           await this.productService.create(createProductDto);
-          this.logger.log(`Product saved: ${createProductDto.name}`);
+          // this.logger.log(`Product saved: ${createProductDto.name}`);
         } catch (error) {
           this.logger.error('Error saving product:', error);
         }
