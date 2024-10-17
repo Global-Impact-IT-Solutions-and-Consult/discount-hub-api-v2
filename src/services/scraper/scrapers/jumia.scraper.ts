@@ -320,7 +320,7 @@ export class JumiaScraperService extends WorkerHost {
           // tags: [],
           // tagAttributes: [],
           brands: product.brands,
-          categories: [product.categories],
+          categories: product.categories,
           link: product.link,
           discount: product.discount,
           rating: product.rating,

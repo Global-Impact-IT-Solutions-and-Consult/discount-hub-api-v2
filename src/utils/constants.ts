@@ -16,8 +16,8 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Jumia',
     slug: 'jumia_',
     urls: [
-      // 'https://www.jumia.com.ng',
-      'https://www.jumia.com.ng/flash-sales',
+      'https://www.jumia.com.ng',
+      // 'https://www.jumia.com.ng/flash-sales',
       // 'https://www.jumia.com.ng/mlp-clearance-sale',
       // 'https://www.jumia.com.ng/mlp-global-best-deal',
       // 'https://www.jumia.com.ng/mlp-appliances',

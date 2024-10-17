@@ -125,6 +125,31 @@ export class ProductService {
     return await newCategory.save();
   }
 
+  async getCategoriesWithProductCount() {
+    const categories = await this.categoryModel.find();
+    const products = await this.productModel.find();
+
+    const categoriesWithCounts = [];
+
+    categories.forEach((categoryItem: any) => {
+      const categoryVar = {
+        category: categoryItem,
+        productCount: 0,
+      };
+
+      products.forEach((productItem: any) => {
+        // Ensure IDs are compared as strings
+        if (productItem.categories.includes(categoryItem._id.toString())) {
+          categoryVar.productCount++;
+        }
+      });
+
+      categoriesWithCounts.push(categoryVar);
+    });
+
+    return categoriesWithCounts;
+  }
+
   // Brand functions
   async findBrandByName(name: string): Promise<BrandDocument> {
     const cacheKey = `brand_${name.toLowerCase()}`;

@@ -90,4 +90,15 @@ export class ProductController {
       data: categorizedProducts,
     };
   }
+
+  // Categories
+  @Get('categories/product-count')
+  async getCategoriesWithProductCount() {
+    const data = await this.productService.getCategoriesWithProductCount();
+    return {
+      success: true,
+      message: 'Categories with product counts fetched successfully',
+      data,
+    };
+  }
 }

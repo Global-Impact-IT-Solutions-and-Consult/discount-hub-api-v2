@@ -39,6 +39,9 @@ export class Product {
   keyFeatures: string;
 
   @Prop()
+  store: string;
+
+  @Prop()
   description: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })
