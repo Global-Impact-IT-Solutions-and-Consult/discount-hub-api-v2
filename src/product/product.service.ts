@@ -45,6 +45,23 @@ export class ProductService {
     return products;
   }
 
+  // async findByCategory(id: any): Promise<Product[]> {
+  //   const cachedProducts = await this.cacheManager.get<Product[]>('products');
+  //   if (cachedProducts) {
+  //     console.log('Fetching products from cache');
+  //     return cachedProducts;
+  //   }
+
+  //   console.log('Fetching products from database');
+  //   const products = await this.productModel.find({
+
+  //   }).exec();
+
+  //   // Corrected: Passing ttl as a number, not an object
+  //   await this.cacheManager.set('products', products, 3600); // TTL is 3600 seconds (1 hour)
+  //   return products;
+  // }
+
   async findOne(id: string): Promise<Product> {
     const cacheKey = `product_${id}`;
     const cachedProduct = await this.cacheManager.get<Product>(cacheKey);
@@ -130,17 +147,20 @@ export class ProductService {
     const products = await this.productModel.find();
 
     const categoriesWithCounts = [];
+    // const productsInCategory = [];
 
     categories.forEach((categoryItem: any) => {
       const categoryVar = {
         category: categoryItem,
         productCount: 0,
+        productsInCategory: [],
       };
 
       products.forEach((productItem: any) => {
         // Ensure IDs are compared as strings
         if (productItem.categories.includes(categoryItem._id.toString())) {
           categoryVar.productCount++;
+          categoryVar.productsInCategory.push(productItem);
         }
       });
 
