@@ -122,10 +122,10 @@ export class JumiaScraperService extends WorkerHost {
                     anchor
                       .querySelector('div.info div.rev')
                       ?.textContent.trim() || 'No rating';
-                  const store =
-                    anchor
-                      .querySelector('svg use')
-                      ?.getAttribute('xlink:href') || 'No store';
+                  // const store =
+                  //   anchor
+                  //     .querySelector('svg use')
+                  //     ?.getAttribute('xlink:href') || 'No store';
 
                   return {
                     link,
@@ -135,7 +135,8 @@ export class JumiaScraperService extends WorkerHost {
                     price,
                     discount,
                     rating,
-                    store,
+                    // store,
+                    store: 'jumia',
                     description: '', // Initialize description (will be populated later)
                     keyFeatures: '', // Initialize key features (will be populated later)
                     specifications: '', // Initialize specifications (will be populated later)
@@ -158,9 +159,13 @@ export class JumiaScraperService extends WorkerHost {
                 // Fetch additional product images
                 const additionalImages = await productPage.evaluate(() => {
                   const imageUrls = [];
-                  const imgElements = document.querySelectorAll('img.-fw._ni'); // Target images with class '-fw _ni'
+                  // const imgElements = document.querySelectorAll('img.-fw._ni'); // Target images with class '-fw _ni'
+                  const imgElements =
+                    document.querySelectorAll('label.itm-sel._on'); // Target images with class '-fw _ni'
                   imgElements.forEach((img) => {
-                    const src = img.getAttribute('src');
+                    // const src = img.getAttribute('src');
+                    const element = img.querySelector('img.-fw._ni');
+                    const src = element.getAttribute('data-src');
                     if (src) imageUrls.push(src);
                   });
                   return imageUrls;

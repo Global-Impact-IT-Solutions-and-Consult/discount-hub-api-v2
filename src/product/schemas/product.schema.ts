@@ -39,6 +39,9 @@ export class Product {
   keyFeatures: string;
 
   @Prop()
+  link: string;
+
+  @Prop()
   store: string;
 
   @Prop()

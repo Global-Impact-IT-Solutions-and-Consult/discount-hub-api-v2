@@ -11,6 +11,7 @@ export class AppService {
     private readonly scraperService: ScraperService,
     private schedulerRegistry: SchedulerRegistry,
   ) {}
+  // @Cron(CronExpression.EVERY_30_MINUTES, {
   @Cron(CronExpression.EVERY_5_MINUTES, {
     // @Cron(CronExpression.EVERY_HOUR, {
     // @Cron(CronExpression.EVERY_30_SECONDS, {
