@@ -1,23 +1,45 @@
-# Use the official Node.js image.
-# https://hub.docker.com/_/node
-FROM node:14
+# Build stage
+FROM node:latest as build
 
-# Create and change to the app directory.
 WORKDIR /usr/src/app
 
-# Copy application dependency manifests to the container image.
-# A wildcard is used to ensure both package.json AND package-lock.json are copied.
-# Copying this separately prevents re-running npm install on every code change.
+# Install build dependencies for Alpine and your project dependencies
+RUN npm install -g @swc/core  @nestjs/cli
+
 COPY package*.json ./
 
-# Install dependencies.
 RUN npm install
 
-# Copy local code to the container image.
+# Copy the rest of your application's source code
 COPY . .
 
-# Expose the port the app runs on
-EXPOSE 3030
+# Build your application
+RUN npm run build
 
-# Run the web service on container startup.
-CMD [ "npm", "run", "start:dev" ]
+# Production stage
+FROM node:latest as production
+
+ENV NODE_ENV=production
+ENV PORT=5000
+
+
+# Set working directory
+WORKDIR /usr/src/app
+
+
+# # Copy built assets from the 'build' stage
+COPY --from=build /usr/src/app /usr/src/app
+
+
+# Expose port (same as in ENV)
+EXPOSE ${PORT}
+
+
+# RUN chown -R app:app /home/app
+
+# RUN chmod -R 777 /home/app
+
+# USER app
+
+# Run your app
+CMD ["npm", "run" , "start:prod"]
