@@ -36,6 +36,14 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     logoUrl:
       'https://logos-world.net/wp-content/uploads/2022/12/Jumia-Logo-500x281.png',
   },
+  {
+    name: 'Konga',
+    slug: 'konga',
+    urls: ['https://www.konga.com/deals/daily'],
+    website: 'https://www.konga.com/',
+    logoUrl:
+      'https://www.konga.com/_next/static/images/62f8a0d88e07573b4d46735aa24f3f04.png',
+  },
 ];
 
 export enum RegistrationTypeEnum {
