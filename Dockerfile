@@ -35,5 +35,11 @@ COPY --from=build /usr/src/app /usr/src/app
 EXPOSE ${PORT}
 
 
+# RUN chown -R app:app /home/app
+
+# RUN chmod -R 777 /home/app
+
+# USER app
+
 # Run your app
 CMD ["npm", "run" , "start:prod"]
