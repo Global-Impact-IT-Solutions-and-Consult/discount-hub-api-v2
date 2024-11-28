@@ -4,7 +4,7 @@ import { Cache } from 'cache-manager';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product } from './schemas/product.schema';
+import { Product, ProductDocument } from './schemas/product.schema';
 import { Model } from 'mongoose';
 import { AiService } from 'src/services/ai/ai.service';
 import { Category, CategoryDocument } from './schemas/category.schema';
@@ -30,15 +30,22 @@ export class ProductService {
     return product;
   }
 
-  async findAll(): Promise<Product[]> {
-    const cachedProducts = await this.cacheManager.get<Product[]>('products');
+  async findAll(): Promise<ProductDocument[]> {
+    const cachedProducts =
+      await this.cacheManager.get<ProductDocument[]>('products');
     if (cachedProducts) {
       console.log('Fetching products from cache');
       return cachedProducts;
     }
 
     console.log('Fetching products from database');
-    const products = await this.productModel.find().exec();
+    const products = await this.productModel
+      .find()
+      .populate('brand')
+      .populate('categories')
+      .populate('tags')
+      .populate('tagAtrributes')
+      .exec();
 
     // Corrected: Passing ttl as a number, not an object
     await this.cacheManager.set('products', products, 3600); // TTL is 3600 seconds (1 hour)

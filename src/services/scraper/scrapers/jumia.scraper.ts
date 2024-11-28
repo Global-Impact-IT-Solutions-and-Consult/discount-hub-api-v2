@@ -146,7 +146,6 @@ export class JumiaScraperService extends WorkerHost {
                 })
                 .filter((product) => product !== null);
             });
-            console.log(products);
 
             // Fetch additional images, description, key features, and specifications from the product link
             for (const product of products) {

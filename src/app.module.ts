@@ -18,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AiModule } from './services/ai/ai.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { AiModule } from './services/ai/ai.module';
       delimiter: '.',
     }),
     AiModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
