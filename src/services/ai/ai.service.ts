@@ -132,7 +132,7 @@ export class AiService {
         Store: ${product.store},
         Description: ${product.description},
         Tags: ${product.tags.map((tag, index) => `${index}-${tag.name}`)},
-        Brand: ${product.brand.name} 
+        Brands: ${product.brands.map((brand, index) => `${index}-${brand.name}`)},
         Categories: ${product.categories.map((category, index) => `${index}-${category.name}`)}
         `;
       };

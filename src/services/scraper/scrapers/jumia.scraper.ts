@@ -118,10 +118,26 @@ export class JumiaScraperService extends WorkerHost {
                     anchor
                       .querySelector('div.s-prc-w div.old')
                       ?.textContent.trim() || 'No old price';
-                  const rating =
+                  // const rating =
+                  //   anchor
+                  //     .querySelector('div.info div.rev')
+                  //     ?.textContent.trim() || 'No rating';
+                  const reviewText =
                     anchor
                       .querySelector('div.info div.rev')
                       ?.textContent.trim() || 'No rating';
+
+                  // Extract "3 out of 5" and "2343" from the reviewText
+                  let rating = 'No rating';
+                  let numberOfRatings = 'No rating';
+
+                  if (reviewText !== 'No rating') {
+                    const match = reviewText.match(/^(.*)\s\((\d+)\)$/);
+                    if (match) {
+                      rating = match[1]; // Extracts "3 out of 5"
+                      numberOfRatings = match[2]; // Extracts "2343"
+                    }
+                  }
                   // const store =
                   //   anchor
                   //     .querySelector('svg use')
@@ -135,6 +151,7 @@ export class JumiaScraperService extends WorkerHost {
                     price,
                     discount,
                     rating,
+                    numberOfRatings,
                     // store,
                     store: 'jumia',
                     description: '', // Initialize description (will be populated later)
@@ -239,11 +256,11 @@ export class JumiaScraperService extends WorkerHost {
                   );
 
                   // Save the brand to the database
-                  const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
+                  const brandIds = await this.getCreateBrand(aiBrandName); // Find or create brand
 
                   // Set the category and brand from AI response
                   product.categories = categoryIds; // Set the category from AI response
-                  product.brands = brandId; // Set the brand from AI response
+                  product.brands = brandIds; // Set the brand from AI response
                   // this.logger.log(
                   //   `Categorized product: ${JSON.stringify(product)}`,
                   // );
@@ -329,6 +346,7 @@ export class JumiaScraperService extends WorkerHost {
           link: product.link,
           discount: product.discount,
           rating: product.rating,
+          numberOfRatings: product.numberOfRatings,
           store: product.store,
           keyFeatures: product.keyFeatures,
         };

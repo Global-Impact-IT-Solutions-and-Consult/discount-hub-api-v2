@@ -33,6 +33,9 @@ export class Product {
   rating: string;
 
   @Prop()
+  numberOfRatings: string;
+
+  @Prop()
   specifications: string;
 
   @Prop()
@@ -53,8 +56,8 @@ export class Product {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'TagAttributes' }] })
   tagAtrributes: TagDocument[];
 
-  @Prop({ type: Types.ObjectId, ref: 'Brand' })
-  brand: BrandDocument;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Brand' }] })
+  brands: BrandDocument[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Category' }] })
   categories: CategoryDocument[];

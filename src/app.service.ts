@@ -12,6 +12,7 @@ export class AppService {
     private schedulerRegistry: SchedulerRegistry,
   ) {}
   // @Cron(CronExpression.EVERY_30_MINUTES, {
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
   @Cron(CronExpression.EVERY_5_MINUTES, {
     // @Cron(CronExpression.EVERY_HOUR, {
     // @Cron(CronExpression.EVERY_30_SECONDS, {
@@ -32,6 +33,107 @@ export class AppService {
     this.jobHasRun = true; // Set the flag to indicate the job has run once
   }
 }
+
+// ***************************** //
+// ***************************** //
+// ***************************** //
+// ***************************** //
+// ***************************** //
+// ***************************** //
+// ***************************** //
+
+// import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+// import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+// import { ScraperService } from './services/scraper/scraper.service';
+
+// @Injectable()
+// export class AppService implements OnModuleInit {
+//   private readonly logger = new Logger(AppService.name);
+
+//   constructor(
+//     private readonly scraperService: ScraperService,
+//     private schedulerRegistry: SchedulerRegistry,
+//   ) {}
+
+//   /**
+//    * Method that runs once when the server starts.
+//    */
+//   async onModuleInit() {
+//     this.logger.debug('Server started, running initial scrape job...');
+//     await this.runScrapeJob();
+//   }
+
+//   /**
+//    * Cron job to run every midnight.
+//    */
+//   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+//     name: 'scraperJobMidnight',
+//   })
+//   async handleMidnightCron() {
+//     this.logger.debug('Running midnight scrape job...');
+//     await this.runScrapeJob();
+//   }
+
+//   /**
+//    * Method to execute the scrape job.
+//    */
+//   private async runScrapeJob() {
+//     this.logger.debug('Starting scrape job...');
+//     await this.scraperService.startAllCompanyScrapers();
+//     this.logger.debug('Scrape job completed.');
+//   }
+// }
+
+//  *********************** //
+//  *********************** //
+//  *********************** //
+//  *********************** //
+//  *********************** //
+//  *********************** //
+// Experimental
+
+// import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+// import { Cron, CronExpression } from '@nestjs/schedule';
+// import { ScraperService } from './services/scraper/scraper.service';
+
+// @Injectable()
+// export class AppService implements OnModuleInit {
+//   private readonly logger = new Logger(AppService.name);
+
+//   constructor(private readonly scraperService: ScraperService) {}
+
+//   /**
+//    * This method runs once when the app starts.
+//    */
+//   async onModuleInit() {
+//     this.logger.debug('App started: Running initial scrape job.');
+//     await this.runScrapeJob(); // Execute the scrape logic on app startup
+//   }
+
+//   /**
+//    * This cron job runs every day at midnight.
+//    */
+//   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+//     name: 'scraperJob',
+//   })
+//   async handleMidnightCron() {
+//     this.logger.debug('Midnight job: Running scheduled scrape job.');
+//     await this.runScrapeJob(); // Execute the scrape logic at midnight
+//   }
+
+//   /**
+//    * Shared logic for running the scrape job.
+//    */
+//   private async runScrapeJob() {
+//     try {
+//       this.logger.debug('Starting scrape job...');
+//       await this.scraperService.startAllCompanyScrapers();
+//       this.logger.debug('Scrape job completed successfully.');
+//     } catch (error) {
+//       this.logger.error('Scrape job failed:', error);
+//     }
+//   }
+// }
 
 // ***************************** //
 // ***************************** //

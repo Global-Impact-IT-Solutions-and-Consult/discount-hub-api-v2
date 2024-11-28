@@ -118,6 +118,7 @@ export class KongaScraperService extends WorkerHost {
                     price,
                     discount,
                     rating,
+                    numberOfRatings: '0',
                     store: 'konga',
                     description: '', // Initialize description (will be populated later)
                     keyFeatures: '', // Initialize key features (will be populated later)
@@ -178,6 +179,14 @@ export class KongaScraperService extends WorkerHost {
                   return formattedRating;
                 });
 
+                const numberOfRatings = await productPage.evaluate(() => {
+                  const getRating = document
+                    .querySelector('div._2e1f8_1qKx- p')
+                    .textContent.trim();
+                  const formattedRating = getRating.match(/\((\d+)\)$/);
+                  return formattedRating[1];
+                });
+
                 // Scraping product description
                 const description = await productPage.evaluate(() => {
                   const descriptionElement =
@@ -210,6 +219,7 @@ export class KongaScraperService extends WorkerHost {
                 product.images.push(...additionalImages); // Append additional images to the existing array
                 product.name = name; // Set the product name
                 product.rating = rating; // Set the product rating
+                product.numberOfRatings = numberOfRatings; // Set the product rating
                 product.description = description; // Set the product description
                 // product.keyFeatures = keyFeatures; // Set the key features
                 // product.specifications = specifications; // Set the specifications
@@ -247,11 +257,11 @@ export class KongaScraperService extends WorkerHost {
                   );
 
                   // Save the brand to the database
-                  const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
+                  const brandIds = await this.getCreateBrand(aiBrandName); // Find or create brand
 
                   // Set the category and brand from AI response
                   product.categories = categoryIds; // Set the category from AI response
-                  product.brands = brandId; // Set the brand from AI response
+                  product.brands = brandIds; // Set the brand from AI response
                   // this.logger.log(
                   //   `Categorized product: ${JSON.stringify(product)}`,
                   // );
@@ -322,6 +332,7 @@ export class KongaScraperService extends WorkerHost {
         link: product.link,
         discount: product.discount,
         rating: product.rating,
+        numberOfRatings: product.numberOfRatings,
         store: product.store,
         keyFeatures: product.keyFeatures,
       };
