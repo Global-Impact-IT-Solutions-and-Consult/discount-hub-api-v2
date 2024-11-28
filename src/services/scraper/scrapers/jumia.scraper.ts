@@ -87,7 +87,7 @@ export class JumiaScraperService extends WorkerHost {
 
             const products = await page.evaluate(() => {
               const productElements = Array.from(
-                document.querySelectorAll('section.card.-fh div > article'),
+                document.querySelectorAll('section.card div > article.prd'),
               );
               return productElements
                 .map((article) => {
@@ -146,6 +146,7 @@ export class JumiaScraperService extends WorkerHost {
                 })
                 .filter((product) => product !== null);
             });
+            console.log(products);
 
             // Fetch additional images, description, key features, and specifications from the product link
             for (const product of products) {

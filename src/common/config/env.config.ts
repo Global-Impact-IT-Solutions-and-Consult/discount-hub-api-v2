@@ -76,6 +76,15 @@ export class EnvironmentVariables {
 
   @IsString()
   AI_API_KEY: string;
+
+  @IsString()
+  EMAIL_HOST: string;
+
+  @IsString()
+  EMAIL_USER: string;
+
+  @IsString()
+  EMAIL_PASSWORD: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {
