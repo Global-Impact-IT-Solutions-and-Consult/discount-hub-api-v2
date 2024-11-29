@@ -67,25 +67,32 @@ export class ChatService {
   async addMessage(chatId: string, addMessageDto: AddMessageDto) {
     const chat = await this.chatModel.findById(chatId);
     const memoryCollection = this.chatMemoryModel.collection;
-    const userMessage = await this.messageModel.create({
-      chat,
-      content: addMessageDto.content,
-      type: MessageTypeEnum.USER,
-    });
+    // const userMessage = await this.messageModel.create({
+    //   chat: chat._id,
+    //   content: addMessageDto.content,
+    //   type: MessageTypeEnum.USER,
+    // });
     const products = await this.productService.findAll();
-    const response = await this.aiService.handleQuery(
-      userMessage.content,
+    // const response = await this.aiService.handleQuery(
+    //   userMessage.content,
+    //   chat.id,
+    //   memoryCollection,
+    //   products,
+    // );
+    // const AIMessage = await this.messageModel.create({
+    //   chat: chat._id,
+    //   content: response,
+    //   type: MessageTypeEnum.AI,
+    // });
+
+    // chat.messages.push(userMessage, AIMessage);
+    // await chat.save();
+    return this.aiService.handleQuery(
+      addMessageDto.content,
+      chat.id,
+      memoryCollection,
       products,
     );
-    const AIMessage = await this.messageModel.create({
-      chat,
-      content: response,
-      type: MessageTypeEnum.AI,
-    });
-
-    chat.messages.push(userMessage, AIMessage);
-    await chat.save();
-    return chat;
   }
 
   async remove(id: string) {

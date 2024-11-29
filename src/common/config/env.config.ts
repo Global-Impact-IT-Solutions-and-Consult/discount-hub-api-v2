@@ -42,10 +42,12 @@ export class EnvironmentVariables {
   REDIS_HOST: string;
 
   @IsString()
-  REDIS_PASSWORD: string;
+  @IsOptional()
+  REDIS_PASSWORD?: string;
 
   @IsString()
-  REDIS_USERNAME: string;
+  @IsOptional()
+  REDIS_USERNAME?: string;
 
   @IsString()
   CLIENT_URL: string;

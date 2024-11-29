@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
 import { MessageTypeEnum } from 'src/utils/constants';
 import { ChatDocument } from './chat.schema';
 
@@ -7,7 +7,7 @@ export type MessageDocument = HydratedDocument<Message>;
 
 @Schema({ timestamps: true })
 export class Message {
-  @Prop({ type: Types.ObjectId, ref: 'Chat' })
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Chat' })
   chat: ChatDocument;
 
   @Prop({
@@ -22,7 +22,9 @@ export class Message {
   })
   type: MessageTypeEnum;
 
-  @Prop({})
+  @Prop({
+    type: SchemaTypes.Mixed,
+  })
   metaData: any;
 }
 

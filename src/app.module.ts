@@ -43,8 +43,8 @@ import { ChatModule } from './chat/chat.module';
         connection: {
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
-          password: configService.get('REDIS_PASSWORD'),
-          username: configService.get('REDIS_USERNAME'),
+          password: configService.get('REDIS_PASSWORD') ?? undefined,
+          username: configService.get('REDIS_USERNAME') ?? undefined,
           // Add retry strategy and error handling
           retryStrategy: (times) => {
             return Math.min(times * 50, 2000); // Adjust retry strategy as needed
@@ -63,7 +63,9 @@ import { ChatModule } from './chat/chat.module';
         configService: ConfigService<EnvironmentVariables>,
       ) => {
         const store = await redisStore({
-          url: `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
+          url: configService.get('REDIS_USERNAME')
+            ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
+            : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
           ttl: configService.get<number>('CACHE_TTL'),
         });
 

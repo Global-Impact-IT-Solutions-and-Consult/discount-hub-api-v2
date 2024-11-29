@@ -41,7 +41,6 @@ export class ProductService {
     console.log('Fetching products from database');
     const products = await this.productModel
       .find()
-      .populate('brand')
       .populate('categories')
       .populate('tags')
       .populate('tagAtrributes')
