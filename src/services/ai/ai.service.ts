@@ -60,15 +60,15 @@ export class AiService {
       const { categories, product } = input;
 
       const prompt = `
-        You are an AI model trained to categorize a product based on given categories and also suggests brands from the product name.
+        You are an AI model trained to categorize a product based on given categories and also suggest a brand from the product name.
         Categories: ${categories.join(', ')}
         Product: ${product}
-        decide which categories and brands the product falls under and return the product categorized under the given categories and brands in this format:
+        decide which categories and brand the product falls under and return the product categorized under the given categories and brand in this format:
         {
           "categories": ["Category1", "Category2", ...],
-          "brands": ["Brand1", "Brand2", ... ]
+          "brand": "Brand"
         }
-        Do not include any other explanations. suggest new categories and brands for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
+        Do not include any other explanations. suggest new categories and the brand for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
       `;
 
       // const prompt = `

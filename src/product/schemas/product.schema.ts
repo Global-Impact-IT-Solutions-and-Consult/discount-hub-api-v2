@@ -56,8 +56,8 @@ export class Product {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'TagAttributes' }] })
   tagAtrributes: TagDocument[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Brand' }] })
-  brands: BrandDocument[];
+  @Prop({ type: Types.ObjectId, ref: 'Brand' })
+  brand: BrandDocument;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Category' }] })
   categories: CategoryDocument[];
