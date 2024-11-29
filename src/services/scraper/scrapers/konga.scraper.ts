@@ -124,7 +124,7 @@ export class KongaScraperService extends WorkerHost {
                     keyFeatures: '', // Initialize key features (will be populated later)
                     specifications: '', // Initialize specifications (will be populated later)
                     categories: [''], // Initialize category (will be populated by AI service)
-                    brands: [''], // Initialize brand (will be populated by AI service)
+                    brand: '', // Initialize brand (will be populated by AI service)
                   };
                 })
                 .filter((product) => product !== null)
@@ -226,14 +226,14 @@ export class KongaScraperService extends WorkerHost {
 
                 await productPage.close(); // Close the new page
 
-                // AI Categorization (categories and brands)
+                // AI Categorization (categories and brand)
                 const categories = [
                   'Kitchen utensils',
                   'Home appliances',
                   'Furniture',
                   'Electronics',
                 ];
-                // const brands = [
+                // const brand = [
                 //   'LG',
                 //   'Panasonic',
                 //   'Dell',
@@ -244,12 +244,12 @@ export class KongaScraperService extends WorkerHost {
                 try {
                   const category = await this.aiService.categorizeProducts({
                     categories,
-                    // brands,
+                    // brand,
                     product: product.name,
                   });
 
-                  // Use AI categorization for categories and brands
-                  const aiBrandName = category.brands; // Brand name from AI service
+                  // Use AI categorization for categories and brand
+                  const aiBrandName = category.brand; // Brand name from AI service
 
                   // Create or find the categories in the database
                   const categoryIds = await this.getCreateCategory(
@@ -257,11 +257,11 @@ export class KongaScraperService extends WorkerHost {
                   );
 
                   // Save the brand to the database
-                  const brandIds = await this.getCreateBrand(aiBrandName); // Find or create brand
+                  const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
 
                   // Set the category and brand from AI response
                   product.categories = categoryIds; // Set the category from AI response
-                  product.brands = brandIds; // Set the brand from AI response
+                  product.brand = brandId; // Set the brand from AI response
                   // this.logger.log(
                   //   `Categorized product: ${JSON.stringify(product)}`,
                   // );
@@ -327,7 +327,7 @@ export class KongaScraperService extends WorkerHost {
         images: product.images,
         specifications: product.specifications,
         description: product.description,
-        brands: product.brands,
+        brand: product.brand,
         categories: product.categories,
         link: product.link,
         discount: product.discount,
@@ -372,26 +372,26 @@ export class KongaScraperService extends WorkerHost {
     return categoryIds;
   }
 
-  private async getCreateBrand(brandNames: string[]): Promise<string[]> {
-    const brandIds: string[] = [];
+  private async getCreateBrand(brandName: string): Promise<string> {
+    const brandId: string = '';
 
-    for (const brandName of brandNames) {
-      const lowercaseBrand = brandName.toLowerCase();
-      let brand = await this.productService.findBrandByName(lowercaseBrand);
+    // for (const brandName of brandNames) {
+    const lowercaseBrand = brandName.toLowerCase();
+    let brand = await this.productService.findBrandByName(lowercaseBrand);
 
-      if (!brand) {
-        brand = await this.productService.createBrand({
-          name: lowercaseBrand,
-        });
-        this.logger.log(`Created new brand: ${lowercaseBrand}`);
-      } else {
-        this.logger.log(`Brand already exists: ${lowercaseBrand}`);
-      }
-
-      brandIds.push(brand._id.toString());
+    if (!brand) {
+      brand = await this.productService.createBrand({
+        name: lowercaseBrand,
+      });
+      this.logger.log(`Created new brand: ${lowercaseBrand}`);
+    } else {
+      this.logger.log(`Brand already exists: ${lowercaseBrand}`);
     }
 
-    return brandIds;
+    // brandIds.push(brand._id.toString());
+    // }
+
+    return brandId;
   }
 }
 
@@ -730,7 +730,7 @@ export class KongaScraperService extends WorkerHost {
 //                     keyFeatures: '', // Initialize key features (will be populated later)
 //                     specifications: '', // Initialize specifications (will be populated later)
 //                     categories: [''], // Initialize category (will be populated by AI service)
-//                     brands: [''], // Initialize brand (will be populated by AI service)
+//                     brand: [''], // Initialize brand (will be populated by AI service)
 //                   };
 //                 })
 //                 .filter((product) => product !== null);
@@ -797,14 +797,14 @@ export class KongaScraperService extends WorkerHost {
 
 //                 await productPage.close(); // Close the new page
 
-//                 // AI Categorization (categories and brands)
+//                 // AI Categorization (categories and brand)
 //                 const categories = [
 //                   'Kitchen utensils',
 //                   'Home appliances',
 //                   'Furniture',
 //                   'Electronics',
 //                 ];
-//                 // const brands = [
+//                 // const brand = [
 //                 //   'LG',
 //                 //   'Panasonic',
 //                 //   'Dell',
@@ -815,12 +815,12 @@ export class KongaScraperService extends WorkerHost {
 //                 try {
 //                   const category = await this.aiService.categorizeProducts({
 //                     categories,
-//                     // brands,
+//                     // brand,
 //                     product: product.name,
 //                   });
 
-//                   // Use AI categorization for categories and brands
-//                   const aiBrandName = category.brands; // Brand name from AI service
+//                   // Use AI categorization for categories and brand
+//                   const aiBrandName = category.brand; // Brand name from AI service
 
 //                   // Create or find the categories in the database
 //                   const categoryIds = await this.getCreateCategory(
@@ -832,7 +832,7 @@ export class KongaScraperService extends WorkerHost {
 
 //                   // Set the category and brand from AI response
 //                   product.categories = categoryIds; // Set the category from AI response
-//                   product.brands = brandId; // Set the brand from AI response
+//                   product.brand = brandId; // Set the brand from AI response
 //                   // this.logger.log(
 //                   //   `Categorized product: ${JSON.stringify(product)}`,
 //                   // );
@@ -913,7 +913,7 @@ export class KongaScraperService extends WorkerHost {
 //           description: product.description,
 //           // tags: [],
 //           // tagAttributes: [],
-//           brands: product.brands,
+//           brand: product.brand,
 //           categories: product.categories,
 //           link: product.link,
 //           discount: product.discount,
@@ -964,7 +964,7 @@ export class KongaScraperService extends WorkerHost {
 //     return categoryIds; // Return the array of category IDs
 //   }
 
-//   // Method to find or create brands by name
+//   // Method to find or create brand by name
 //   private async getCreateBrand(brandNames: string[]): Promise<string[]> {
 //     const brandIds: string[] = [];
 

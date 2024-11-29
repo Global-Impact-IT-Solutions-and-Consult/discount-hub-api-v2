@@ -76,11 +76,10 @@ export class CreateProductDto {
   @IsOptional()
   tagAttributes?: string[];
 
-  @ApiProperty({ type: [String], required: false })
-  @IsArray()
-  @IsMongoId({ each: true })
+  @ApiProperty({ required: false })
+  @IsMongoId()
   @IsOptional()
-  brands?: Types.ObjectId | string; // Allow ObjectId or string
+  brand?: Types.ObjectId | string; // Allow ObjectId or string
 
   @ApiProperty({ type: [String], required: false })
   @IsArray()
