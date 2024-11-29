@@ -6,6 +6,6 @@ import { AiModule } from './ai/ai.module';
 @Global()
 @Module({
   imports: [ScraperModule, CloudinaryModule, AiModule],
-  exports: [ScraperModule, CloudinaryModule],
+  exports: [ScraperModule, CloudinaryModule, AiModule],
 })
 export class ServicesModule {}

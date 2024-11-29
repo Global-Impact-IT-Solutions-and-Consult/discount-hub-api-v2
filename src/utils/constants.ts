@@ -74,3 +74,9 @@ export enum AppNotificationEnum {
 export enum CloudinaryFoldersEnum {
   COMPANY_LOGO = 'discount-hub-company-logo',
 }
+
+export enum MessageTypeEnum {
+  SYSTEM = 'SYSTEM',
+  AI = 'AI',
+  USER = 'USER',
+}
