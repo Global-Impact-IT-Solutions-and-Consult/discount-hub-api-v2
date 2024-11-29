@@ -18,6 +18,7 @@ export class ChatService {
   constructor(
     @InjectModel('Chat') private readonly chatModel: Model<Chat>,
     @InjectModel('Message') private readonly messageModel: Model<Message>,
+    @InjectModel('ChatMemory') private readonly chatMemoryModel: Model<Message>,
     private productService: ProductService,
     private aiService: AiService,
     private userService: UserService,
@@ -65,7 +66,7 @@ export class ChatService {
 
   async addMessage(chatId: string, addMessageDto: AddMessageDto) {
     const chat = await this.chatModel.findById(chatId);
-
+    const memoryCollection = this.chatMemoryModel.collection;
     const userMessage = await this.messageModel.create({
       chat,
       content: addMessageDto.content,
