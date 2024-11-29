@@ -8,13 +8,22 @@ import { ProductDocument } from 'src/product/schemas/product.schema';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { FaissStore } from '@langchain/community/vectorstores/faiss';
 import { createRetrieverTool } from 'langchain/tools/retriever';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+// import { createReactAgent } from '@langchain/langgraph/prebuilt';
+import { createRetrievalChain } from 'langchain/chains/retrieval';
+import { createStuffDocumentsChain } from 'langchain/chains/combine_documents';
 import { PromptTemplate } from '@langchain/core/prompts';
-// import {
-//   HumanMessage,
-//   AIMessage,
-//   SystemMessage,
-// } from '@langchain/core/messages';
+import { MongoDBChatMessageHistory } from '@langchain/mongodb';
+import { BufferMemory } from 'langchain/memory';
+import { MemorySaver } from '@langchain/langgraph';
+import {
+  HumanMessage,
+  AIMessage,
+  SystemMessage,
+} from '@langchain/core/messages';
 import {} from 'langchain/chains';
+import { Collection } from 'mongoose';
+import { createReactAgent } from '@langchain/langgraph/prebuilt';
 
 @Injectable()
 export class AiService {
@@ -109,8 +118,15 @@ export class AiService {
     }
   }
 
-  async handleQuery(query: string, products: ProductDocument[]) {
+  async handleQuery(
+    query: string,
+    chatId: string,
+    collection: Collection,
+    products: ProductDocument[],
+  ) {
+    const memory = new Mon();
     try {
+      console.log(products);
       const llm = new ChatGroq({
         // model: "mixtral-8x7b-32768",
         model: 'llama3-70b-8192',
@@ -132,7 +148,7 @@ export class AiService {
         Store: ${product.store},
         Description: ${product.description},
         Tags: ${product.tags.map((tag, index) => `${index}-${tag.name}`)},
-        Brand: ${product.brand.name} 
+        Brand: ${product?.brand?.name || ''} 
         Categories: ${product.categories.map((category, index) => `${index}-${category.name}`)}
         `;
       };
@@ -154,7 +170,17 @@ export class AiService {
         embeddings,
       );
 
-      const productRetriever = productVectorStore.asRetriever(5);
+      const productRetriever = productVectorStore.asRetriever();
+
+      // const questionAnswerChain = await createStuffDocumentsChain({
+      //   llm,
+      //   prompt,
+      // });
+
+      // const ragChain = await createRetrievalChain({
+      //   retriever,
+      //   combineDocsChain: questionAnswerChain,
+      // });
 
       const tool = createRetrieverTool(productRetriever, {
         name: 'product_retriever',
@@ -162,16 +188,52 @@ export class AiService {
       });
       const tools = [tool];
 
-      return await tool.invoke({ query: 'fridges' });
+      const agentExecutor = createReactAgent({
+        llm,
+        tools,
+        checkpointSaver: memory,
+      });
+
+      // return await tool.invoke({ query: 'fridges' });
       // const chatHistory = [
       //   new SystemMessage({
       //     content: `
-      //       You are a rqust processing engine,
+      //       You are a requst processing engine,
       //       Our customers would make requests about products that they want to get and you ar return your recomendation and a list of the products you recommend to the user,
       //       if you determine that the user did not make a request please prompt the user to make a request
       //     `,
       //   }),
       // ];
+
+      // const systemPrompt =
+      //   'You are an assistant for question-answering tasks. ' +
+      //   'Use the following pieces of retrieved context to answer ' +
+      //   "the question. If you don't know the answer, say that you " +
+      //   "don't know. Use three sentences maximum and keep the " +
+      //   'answer concise.' +
+      //   '\n\n' +
+      //   '{context}';
+
+      // const prompt = ChatPromptTemplate.fromMessages([
+      //   ['system', systemPrompt],
+      //   ['human', '{input}'],
+      // ]);
+
+      // const questionAnswerChain = await createStuffDocumentsChain({
+      //   llm,
+      //   prompt,
+      // });
+
+      // const ragChain = await createRetrievalChain({
+      //   retriever: productRetriever,
+      //   combineDocsChain: questionAnswerChain,
+      // });
+
+      // const response = await ragChain.invoke({
+      //   input: query,
+      // });
+
+      // return response.answer;
 
       // const prompt = PromptTemplate.fromTemplate(
       //   `You are a rqust processing engine,
@@ -181,6 +243,8 @@ export class AiService {
       // );
 
       // const ragChain =
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 }
