@@ -411,7 +411,7 @@ export class JumiaScraperService extends WorkerHost {
 
   // Method to find or create brand by name
   private async getCreateBrand(brandName: string): Promise<string> {
-    const brandId: string = '';
+    let brandId: string = '';
 
     // for (const brandName of brandNames) {
     const lowercaseBrand = brandName.toLowerCase();
@@ -428,6 +428,7 @@ export class JumiaScraperService extends WorkerHost {
 
     // brandIds.push(brand._id.toString());
     // }
+    brandId = brand._id.toString();
 
     return brandId;
   }
