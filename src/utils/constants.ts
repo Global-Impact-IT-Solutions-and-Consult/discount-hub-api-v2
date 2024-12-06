@@ -17,7 +17,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     slug: 'jumia_',
     urls: [
       // 'https://www.jumia.com.ng',
-      // 'https://www.jumia.com.ng/flash-sales',
+      'https://www.jumia.com.ng/flash-sales',
       // 'https://www.jumia.com.ng/mlp-clearance-sale',
       // 'https://www.jumia.com.ng/mlp-global-best-deal',
       // 'https://www.jumia.com.ng/mlp-appliances',
@@ -39,7 +39,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
   {
     name: 'Konga',
     slug: 'konga',
-    // urls: ['https://www.konga.com/deals/daily'],
+    urls: ['https://www.konga.com/deals/daily'],
     website: 'https://www.konga.com/',
     logoUrl:
       'https://www.konga.com/_next/static/images/62f8a0d88e07573b4d46735aa24f3f04.png',
