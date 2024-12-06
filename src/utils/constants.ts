@@ -12,34 +12,34 @@ export const defaultRoles: CreateRoleDto[] = [
 ];
 
 export const defaultCompanies: Partial<CreateCompanyDto>[] = [
-  // {
-  //   name: 'Jumia',
-  //   slug: 'jumia_',
-  //   urls: [
-  //     // 'https://www.jumia.com.ng',
-  //     'https://www.jumia.com.ng/flash-sales',
-  //     // 'https://www.jumia.com.ng/mlp-clearance-sale',
-  //     // 'https://www.jumia.com.ng/mlp-global-best-deal',
-  //     // 'https://www.jumia.com.ng/mlp-appliances',
-  //     // 'https://www.jumia.com.ng/health-beauty',
-  //     // 'https://www.jumia.com.ng/electronics',
-  //     // 'https://www.jumia.com.ng/mlp-beauty-essentials',
-  //     // 'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
-  //     // 'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
-  //     // 'https://www.jumia.com.ng/category-fashion-by-jumia',
-  //     // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
-  //     // 'https://www.jumia.com.ng/mlp-beverages-drinks',
-  //     // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
-  //     // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
-  //   ],
-  //   website: 'https://www.jumia.com.ng/',
-  //   logoUrl:
-  //     'https://logos-world.net/wp-content/uploads/2022/12/Jumia-Logo-500x281.png',
-  // },
+  {
+    name: 'Jumia',
+    slug: 'jumia_',
+    urls: [
+      // 'https://www.jumia.com.ng',
+      // 'https://www.jumia.com.ng/flash-sales',
+      // 'https://www.jumia.com.ng/mlp-clearance-sale',
+      // 'https://www.jumia.com.ng/mlp-global-best-deal',
+      // 'https://www.jumia.com.ng/mlp-appliances',
+      // 'https://www.jumia.com.ng/health-beauty',
+      // 'https://www.jumia.com.ng/electronics',
+      // 'https://www.jumia.com.ng/mlp-beauty-essentials',
+      // 'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
+      // 'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
+      // 'https://www.jumia.com.ng/category-fashion-by-jumia',
+      // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
+      // 'https://www.jumia.com.ng/mlp-beverages-drinks',
+      // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
+      // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
+    ],
+    website: 'https://www.jumia.com.ng/',
+    logoUrl:
+      'https://logos-world.net/wp-content/uploads/2022/12/Jumia-Logo-500x281.png',
+  },
   {
     name: 'Konga',
     slug: 'konga',
-    urls: ['https://www.konga.com/deals/daily'],
+    // urls: ['https://www.konga.com/deals/daily'],
     website: 'https://www.konga.com/',
     logoUrl:
       'https://www.konga.com/_next/static/images/62f8a0d88e07573b4d46735aa24f3f04.png',

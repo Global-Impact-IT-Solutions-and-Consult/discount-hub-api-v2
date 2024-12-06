@@ -85,6 +85,16 @@ export class CompanyController {
     };
   }
 
+  @Get('/find-by-key/:key')
+  async findByKey(@Param('key') apiKey: string) {
+    const data = await this.companyService.findOneByApiKey(apiKey);
+    return {
+      success: true,
+      message: 'Company fetched successfully',
+      data,
+    };
+  }
+
   @Delete(':id')
   async remove(@Param('id') id: string) {
     await this.companyService.remove(id);

@@ -25,6 +25,9 @@ export class Company {
   @Prop({ required: true })
   website: string;
 
+  @Prop({ required: true })
+  apiKey: string;
+
   @Prop()
   logo: string;
 

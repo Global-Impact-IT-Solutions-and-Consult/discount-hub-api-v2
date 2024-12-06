@@ -19,6 +19,9 @@ export class CreateCompanyDto {
   @IsString()
   website: string;
 
+  // @IsString()
+  // apiKey: string;
+
   @IsString({ each: true })
   urls: string[];
 }

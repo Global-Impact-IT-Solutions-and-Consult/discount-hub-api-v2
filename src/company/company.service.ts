@@ -27,6 +27,135 @@ export class CompanyService {
       );
     }
 
+    // Generate voucher code
+    const alphabets = [
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+      'h',
+      'i',
+      'j',
+      'k',
+      'l',
+      'm',
+      'n',
+      'o',
+      'p',
+      'q',
+      'r',
+      's',
+      't',
+      'u',
+      'v',
+      'w',
+      'x',
+      'y',
+      'z',
+      'A',
+      'B',
+      'C',
+      'D',
+      'E',
+      'F',
+      'G',
+      'H',
+      'I',
+      'J',
+      'K',
+      'L',
+      'M',
+      'N',
+      'O',
+      'P',
+      'Q',
+      'R',
+      'S',
+      'T',
+      'U',
+      'V',
+      'W',
+      'X',
+      'Y',
+      'Z',
+    ];
+
+    const rand = Math.floor(Math.random() * 48);
+    const rand2 = Math.floor(Math.random() * 48);
+    const rand3 = Math.floor(Math.random() * 48);
+    const rand4 = Math.floor(Math.random() * 48);
+
+    let apiKey = '';
+    apiKey = `${alphabets[rand]}${rand}${alphabets[rand3]}${alphabets[rand2]}${rand4}`;
+
+    const findKey = await this.companyModel.findOne({ apiKey: apiKey });
+    if (findKey) {
+      const alphabets = [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+        'm',
+        'n',
+        'o',
+        'p',
+        'q',
+        'r',
+        's',
+        't',
+        'u',
+        'v',
+        'w',
+        'x',
+        'y',
+        'z',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+        'G',
+        'H',
+        'I',
+        'J',
+        'K',
+        'L',
+        'M',
+        'N',
+        'O',
+        'P',
+        'Q',
+        'R',
+        'S',
+        'T',
+        'U',
+        'V',
+        'W',
+        'X',
+        'Y',
+        'Z',
+      ];
+
+      const rand = Math.floor(Math.random() * 48);
+      const rand2 = Math.floor(Math.random() * 48);
+      const rand3 = Math.floor(Math.random() * 48);
+      const rand4 = Math.floor(Math.random() * 48);
+
+      apiKey = `${alphabets[rand]}${rand}${alphabets[rand3]}${alphabets[rand2]}${rand4}`;
+    }
+
     const company = this.companyModel.create({
       admin: user.id,
       logo: logoUrl,
@@ -34,6 +163,7 @@ export class CompanyService {
       slug: createCompanyDto.slug,
       urls: createCompanyDto.urls,
       website: createCompanyDto.website,
+      apiKey: apiKey,
     });
     return company;
   }
@@ -114,6 +244,16 @@ export class CompanyService {
     const company = await this.companyModel.findOne({ slug: slug });
     if (!company) {
       throw new NotFoundException(`Company not found for this slug: ${slug}`);
+    }
+    return company;
+  }
+
+  async findOneByApiKey(apiKey: string) {
+    const company = await this.companyModel.findOne({ apiKey: apiKey });
+    if (!company) {
+      throw new NotFoundException(
+        `Company not found for this apiKey: ${apiKey}`,
+      );
     }
     return company;
   }
