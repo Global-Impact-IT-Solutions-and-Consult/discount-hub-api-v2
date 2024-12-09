@@ -87,7 +87,7 @@ export class JumiaScraperService extends WorkerHost {
 
             const products = await page.evaluate(() => {
               const productElements = Array.from(
-                document.querySelectorAll('section.card.-fh div > article'),
+                document.querySelectorAll('section.card div > article.prd'),
               );
               return productElements
                 .map((article) => {
@@ -118,10 +118,26 @@ export class JumiaScraperService extends WorkerHost {
                     anchor
                       .querySelector('div.s-prc-w div.old')
                       ?.textContent.trim() || 'No old price';
-                  const rating =
+                  // const rating =
+                  //   anchor
+                  //     .querySelector('div.info div.rev')
+                  //     ?.textContent.trim() || 'No rating';
+                  const reviewText =
                     anchor
                       .querySelector('div.info div.rev')
                       ?.textContent.trim() || 'No rating';
+
+                  // Extract "3 out of 5" and "2343" from the reviewText
+                  let rating = 'No rating';
+                  let numberOfRatings = 'No rating';
+
+                  if (reviewText !== 'No rating') {
+                    const match = reviewText.match(/^(.*)\s\((\d+)\)$/);
+                    if (match) {
+                      rating = match[1]; // Extracts "3 out of 5"
+                      numberOfRatings = match[2]; // Extracts "2343"
+                    }
+                  }
                   // const store =
                   //   anchor
                   //     .querySelector('svg use')
@@ -135,13 +151,14 @@ export class JumiaScraperService extends WorkerHost {
                     price,
                     discount,
                     rating,
+                    numberOfRatings,
                     // store,
                     store: 'jumia',
                     description: '', // Initialize description (will be populated later)
                     keyFeatures: '', // Initialize key features (will be populated later)
                     specifications: '', // Initialize specifications (will be populated later)
                     categories: [''], // Initialize category (will be populated by AI service)
-                    brands: [''], // Initialize brand (will be populated by AI service)
+                    brand: '', // Initialize brand (will be populated by AI service)
                   };
                 })
                 .filter((product) => product !== null);
@@ -208,14 +225,14 @@ export class JumiaScraperService extends WorkerHost {
 
                 await productPage.close(); // Close the new page
 
-                // AI Categorization (categories and brands)
+                // AI Categorization (categories and brand)
                 const categories = [
                   'Kitchen utensils',
                   'Home appliances',
                   'Furniture',
                   'Electronics',
                 ];
-                // const brands = [
+                // const brand = [
                 //   'LG',
                 //   'Panasonic',
                 //   'Dell',
@@ -226,12 +243,12 @@ export class JumiaScraperService extends WorkerHost {
                 try {
                   const category = await this.aiService.categorizeProducts({
                     categories,
-                    // brands,
+                    // brand,
                     product: product.name,
                   });
 
-                  // Use AI categorization for categories and brands
-                  const aiBrandName = category.brands; // Brand name from AI service
+                  // Use AI categorization for categories and brand
+                  const aiBrandName = category.brand; // Brand name from AI service
 
                   // Create or find the categories in the database
                   const categoryIds = await this.getCreateCategory(
@@ -243,7 +260,7 @@ export class JumiaScraperService extends WorkerHost {
 
                   // Set the category and brand from AI response
                   product.categories = categoryIds; // Set the category from AI response
-                  product.brands = brandId; // Set the brand from AI response
+                  product.brand = brandId; // Set the brand from AI response
                   // this.logger.log(
                   //   `Categorized product: ${JSON.stringify(product)}`,
                   // );
@@ -324,11 +341,12 @@ export class JumiaScraperService extends WorkerHost {
           description: product.description,
           // tags: [],
           // tagAttributes: [],
-          brands: product.brands,
+          brand: product.brand,
           categories: product.categories,
           link: product.link,
           discount: product.discount,
           rating: product.rating,
+          numberOfRatings: product.numberOfRatings,
           store: product.store,
           keyFeatures: product.keyFeatures,
         };
@@ -391,27 +409,28 @@ export class JumiaScraperService extends WorkerHost {
     return categoryIds; // Return the array of category IDs
   }
 
-  // Method to find or create brands by name
-  private async getCreateBrand(brandNames: string[]): Promise<string[]> {
-    const brandIds: string[] = [];
+  // Method to find or create brand by name
+  private async getCreateBrand(brandName: string): Promise<string> {
+    let brandId: string = '';
 
-    for (const brandName of brandNames) {
-      const lowercaseBrand = brandName.toLowerCase();
-      let brand = await this.productService.findBrandByName(lowercaseBrand);
+    // for (const brandName of brandNames) {
+    const lowercaseBrand = brandName.toLowerCase();
+    let brand = await this.productService.findBrandByName(lowercaseBrand);
 
-      if (!brand) {
-        brand = await this.productService.createBrand({
-          name: lowercaseBrand,
-        });
-        this.logger.log(`Created new brand: ${lowercaseBrand}`);
-      } else {
-        this.logger.log(`Brand already exists: ${lowercaseBrand}`);
-      }
-
-      brandIds.push(brand._id.toString());
+    if (!brand) {
+      brand = await this.productService.createBrand({
+        name: lowercaseBrand,
+      });
+      this.logger.log(`Created new brand: ${lowercaseBrand}`);
+    } else {
+      this.logger.log(`Brand already exists: ${lowercaseBrand}`);
     }
 
-    return brandIds;
+    // brandIds.push(brand._id.toString());
+    // }
+    brandId = brand._id.toString();
+
+    return brandId;
   }
 }
 
@@ -630,7 +649,7 @@ export class JumiaScraperService extends WorkerHost {
 
 //                 await productPage.close(); // Close the new page
 
-//                 // AI Categorization (categories and brands)
+//                 // AI Categorization (categories and brand)
 //                 const categories = [
 //                   'Kitchen utensils',
 //                   'Home appliances',
@@ -644,8 +663,8 @@ export class JumiaScraperService extends WorkerHost {
 //                     product: product.name,
 //                   });
 
-//                   // Use AI categorization for categories and brands
-//                   const aiBrandName = category.brands; // Brand name from AI service
+//                   // Use AI categorization for categories and brand
+//                   const aiBrandName = category.brand; // Brand name from AI service
 
 //                   // Create or find the categories in the database
 //                   const categoryIds = await this.getOrCreateCategory(
@@ -660,7 +679,7 @@ export class JumiaScraperService extends WorkerHost {
 //                   product.brand = brandId; // Set the brand from AI response
 
 //                   // product.category = category.categories; // Set the category from AI response
-//                   // product.brand = category.brands; // Set the brand from AI response
+//                   // product.brand = category.brand; // Set the brand from AI response
 //                   this.logger.log(
 //                     `Categorized product: ${JSON.stringify(product)}`,
 //                   );
@@ -1022,14 +1041,14 @@ export class JumiaScraperService extends WorkerHost {
 
 //                 await productPage.close(); // Close the new page
 
-//                 // AI Categorization (categories and brands)
+//                 // AI Categorization (categories and brand)
 //                 const categories = [
 //                   'Kitchen utensils',
 //                   'Home appliances',
 //                   'Furniture',
 //                   'Electronics',
 //                 ];
-//                 // const brands = [
+//                 // const brand = [
 //                 //   'LG',
 //                 //   'Panasonic',
 //                 //   'Dell',
@@ -1040,12 +1059,12 @@ export class JumiaScraperService extends WorkerHost {
 //                 try {
 //                   const category = await this.aiService.categorizeProducts({
 //                     categories,
-//                     // brands,
+//                     // brand,
 //                     product: product.name,
 //                   });
 
 //                   product.category = category.categories; // Set the category from AI response
-//                   product.brand = category.brands; // Set the brand from AI response
+//                   product.brand = category.brand; // Set the brand from AI response
 //                   this.logger.log(
 //                     `Categorized product: ${JSON.stringify(product)}`,
 //                   );

@@ -18,19 +18,19 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     urls: [
       // 'https://www.jumia.com.ng',
       'https://www.jumia.com.ng/flash-sales',
-      'https://www.jumia.com.ng/mlp-clearance-sale',
-      'https://www.jumia.com.ng/mlp-global-best-deal',
-      'https://www.jumia.com.ng/mlp-appliances',
-      'https://www.jumia.com.ng/health-beauty',
-      'https://www.jumia.com.ng/electronics',
-      'https://www.jumia.com.ng/mlp-beauty-essentials',
-      'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
-      'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
-      'https://www.jumia.com.ng/category-fashion-by-jumia',
-      'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
-      'https://www.jumia.com.ng/mlp-beverages-drinks',
-      'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
-      'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
+      // 'https://www.jumia.com.ng/mlp-clearance-sale',
+      // 'https://www.jumia.com.ng/mlp-global-best-deal',
+      // 'https://www.jumia.com.ng/mlp-appliances',
+      // 'https://www.jumia.com.ng/health-beauty',
+      // 'https://www.jumia.com.ng/electronics',
+      // 'https://www.jumia.com.ng/mlp-beauty-essentials',
+      // 'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
+      // 'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
+      // 'https://www.jumia.com.ng/category-fashion-by-jumia',
+      // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
+      // 'https://www.jumia.com.ng/mlp-beverages-drinks',
+      // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
+      // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
     ],
     website: 'https://www.jumia.com.ng/',
     logoUrl:
@@ -73,4 +73,10 @@ export enum AppNotificationEnum {
 
 export enum CloudinaryFoldersEnum {
   COMPANY_LOGO = 'discount-hub-company-logo',
+}
+
+export enum MessageTypeEnum {
+  SYSTEM = 'SYSTEM',
+  AI = 'AI',
+  USER = 'USER',
 }

@@ -32,6 +32,11 @@ export class CreateProductDto {
   @IsOptional()
   rating?: string;
 
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsOptional()
+  numberOfRatings?: string;
+
   @ApiProperty({ type: [String], required: false })
   @IsArray()
   @ArrayMinSize(1)
@@ -74,7 +79,7 @@ export class CreateProductDto {
   @ApiProperty({ required: false })
   @IsMongoId()
   @IsOptional()
-  brands?: Types.ObjectId | string; // Allow ObjectId or string
+  brand?: Types.ObjectId | string; // Allow ObjectId or string
 
   @ApiProperty({ type: [String], required: false })
   @IsArray()

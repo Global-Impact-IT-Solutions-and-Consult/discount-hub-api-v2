@@ -1,15 +1,15 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo
-    container_name: mongo
-    ports:
-      - '27017:27017'
-    volumes:
-      - db:/data/db # specify the absolute path inside the container
-    networks:
-      - discount-hub-network
+  # mongo:
+  #   image: mongo
+  #   container_name: mongo
+  #   ports:
+  #     - '27017:27017'
+  #   volumes:
+  #     - db:/data/db # specify the absolute path inside the container
+  #   networks:
+  #     - discount-hub-network
 
   redis:
     image: redis

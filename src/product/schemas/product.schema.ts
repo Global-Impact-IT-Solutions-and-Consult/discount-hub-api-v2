@@ -33,6 +33,9 @@ export class Product {
   rating: string;
 
   @Prop()
+  numberOfRatings: string;
+
+  @Prop()
   specifications: string;
 
   @Prop()

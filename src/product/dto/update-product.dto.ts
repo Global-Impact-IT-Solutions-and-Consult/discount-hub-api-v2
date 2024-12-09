@@ -56,10 +56,11 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @IsOptional()
   tagAttributes?: string[];
 
-  @ApiProperty()
-  @IsMongoId()
+  @ApiProperty({ type: [String] })
+  @IsArray()
+  @IsMongoId({ each: true })
   @IsOptional()
-  brand?: string;
+  brands?: string;
 
   @ApiProperty({ type: [String] })
   @IsArray()
