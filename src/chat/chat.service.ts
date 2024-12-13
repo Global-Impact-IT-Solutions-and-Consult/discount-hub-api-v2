@@ -88,12 +88,13 @@ export class ChatService {
 
     // chat.messages.push(userMessage, AIMessage);
     // await chat.save();
-    return this.aiService.handleQuery(
-      addMessageDto.content,
-      chat.id,
-      memoryCollection,
-      products,
-    );
+    // return this.aiService.handleQuery(
+    //   addMessageDto.content,
+    //   chat.id,
+    //   memoryCollection,
+    //   products,
+    // );
+    return null;
   }
 
   async remove(id: string) {
