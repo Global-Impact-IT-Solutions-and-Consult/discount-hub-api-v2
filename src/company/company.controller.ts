@@ -97,7 +97,8 @@ export class CompanyController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    await this.companyService.remove(id);
+    // await this.companyService.remove(id);
+    await this.companyService.deleteById(id);
     return {
       success: true,
       message: 'Company deleted Successfully',

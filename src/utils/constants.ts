@@ -15,6 +15,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
   {
     name: 'Jumia',
     slug: 'jumia_',
+    badgeColor: 'blue',
     urls: [
       // 'https://www.jumia.com.ng',
       'https://www.jumia.com.ng/flash-sales',
@@ -39,6 +40,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
   {
     name: 'Konga',
     slug: 'konga',
+    badgeColor: 'emerald',
     urls: ['https://www.konga.com/deals/daily'],
     website: 'https://www.konga.com/',
     logoUrl:

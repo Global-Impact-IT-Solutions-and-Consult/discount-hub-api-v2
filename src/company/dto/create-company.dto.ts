@@ -19,6 +19,9 @@ export class CreateCompanyDto {
   @IsString()
   website: string;
 
+  @IsString()
+  badgeColor: string;
+
   // @IsString()
   // apiKey: string;
 

@@ -68,7 +68,7 @@ export class AiService {
           "categories": ["Category1", "Category2", ...],
           "brand": "Brand"
         }
-        Do not include any other explanations. suggest new categories and the brand for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
+        Do not include any other explanations. suggest new categories and the brand for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though. Only suggest new categories strictly when they there is no matching category.
       `;
 
       // const prompt = `
@@ -92,7 +92,7 @@ export class AiService {
           {
             role: 'system',
             content:
-              'You are an AI model trained to categorize products into provided categories and brands.',
+              'You are an AI model trained to categorize products into provided categories and assign brands.',
           },
           {
             role: 'user',

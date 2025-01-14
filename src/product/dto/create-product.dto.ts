@@ -90,4 +90,8 @@ export class CreateProductDto {
   @ApiProperty({ required: false })
   @IsOptional()
   store?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  badgeColor?: string;
 }

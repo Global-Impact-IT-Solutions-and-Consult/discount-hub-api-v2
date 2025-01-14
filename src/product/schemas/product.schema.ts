@@ -48,6 +48,9 @@ export class Product {
   store: string;
 
   @Prop()
+  badgeColor: string;
+
+  @Prop()
   description: string;
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })

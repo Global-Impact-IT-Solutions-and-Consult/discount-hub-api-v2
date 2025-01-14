@@ -31,6 +31,9 @@ export class Company {
   @Prop()
   logo: string;
 
+  @Prop()
+  badgeColor: string;
+
   @Prop({ type: [{ type: String }] })
   urls: string[];
 

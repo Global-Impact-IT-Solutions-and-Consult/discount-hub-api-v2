@@ -41,7 +41,7 @@ export class KongaScraperService extends WorkerHost {
       this.logger.log(`Scraped data count: ${scrapedData.length}`);
 
       // Save the scraped data using the ProductService
-      await this.saveProducts(scrapedData);
+      await this.saveProducts(scrapedData, company);
     } catch (error) {
       this.logger.error(`Error scraping company ${company.slug}:`, error);
     }
@@ -123,15 +123,13 @@ export class KongaScraperService extends WorkerHost {
                     description: '', // Initialize description (will be populated later)
                     keyFeatures: '', // Initialize key features (will be populated later)
                     specifications: '', // Initialize specifications (will be populated later)
-                    categories: [''], // Initialize category (will be populated by AI service)
+                    categories: [], // Initialize category (will be populated by AI service)
                     brand: '', // Initialize brand (will be populated by AI service)
                   };
                 })
                 .filter((product) => product !== null)
                 .filter((product) => product.discount !== 'No discount');
             });
-
-            // results.push(...products);
 
             // Fetch additional images, description, key features, and specifications from the product link
             for (const product of products) {
@@ -145,23 +143,14 @@ export class KongaScraperService extends WorkerHost {
                 // Fetch additional product images
                 const additionalImages = await productPage.evaluate(() => {
                   const imageUrls = [];
-                  // const imgElements = document.querySelectorAll('img.-fw._ni'); // Target images with class '-fw _ni'
                   const imgElements = document.querySelectorAll(
                     'li._7fdb1_1W4TA picture',
-                  ); // Target images with class '-fw _ni'
+                  );
                   imgElements.forEach((img) => {
-                    // const src = img.getAttribute('src');
-                    const element = img.querySelector(
-                      // 'img.f5e10_VzEXF.cld-responsive.lazyloaded',
-                      'img',
-                    );
+                    const element = img.querySelector('img');
                     const src = element.getAttribute('data-src');
                     if (src) imageUrls.push(src);
                   });
-                  console.log(
-                    '🚀 ~ KongaScraperService ~ additionalImages ~ imageUrls:',
-                    imageUrls,
-                  );
                   return imageUrls;
                 });
 
@@ -196,55 +185,42 @@ export class KongaScraperService extends WorkerHost {
                     : 'No description available';
                 });
 
-                // // Scraping key features
-                // const keyFeatures = await productPage.evaluate(() => {
-                //   const keyFeaturesElement =
-                //     document.querySelector('div.markup.-pam');
-                //   return keyFeaturesElement
-                //     ? keyFeaturesElement.textContent.trim()
-                //     : 'No key features available';
-                // });
-
-                // // Scraping specifications
-                // const specifications = await productPage.evaluate(() => {
-                //   const specificationsElement = document.querySelector(
-                //     'div.-pvs.-mvxs.-phm.-lsn',
-                //   );
-                //   return specificationsElement
-                //     ? specificationsElement.textContent.trim()
-                //     : 'No specifications available';
-                // });
-
                 // Merge additional images with the primary image
                 product.images.push(...additionalImages); // Append additional images to the existing array
                 product.name = name; // Set the product name
                 product.rating = rating; // Set the product rating
                 product.numberOfRatings = numberOfRatings; // Set the product rating
                 product.description = description; // Set the product description
-                // product.keyFeatures = keyFeatures; // Set the key features
-                // product.specifications = specifications; // Set the specifications
 
                 await productPage.close(); // Close the new page
 
                 // AI Categorization (categories and brand)
                 const categories = [
-                  'Kitchen utensils',
-                  'Home appliances',
-                  'Furniture',
-                  'Electronics',
+                  'electronics',
+                  'kitchen utensils',
+                  'home appliances',
+                  'personal care',
+                  'furnitures',
+                  'accessories',
+                  'health and beauty',
+                  'fashion',
+                  'groceries',
+                  'jewelries',
+                  'home and office',
+                  'books',
+                  'toys',
+                  'sports and outdoor',
+                  'gaming',
+                  'appliances',
+                  'sports and fitness',
+                  'beverages',
+                  'phones and tablets',
+                  'building and industrial',
                 ];
-                // const brand = [
-                //   'LG',
-                //   'Panasonic',
-                //   'Dell',
-                //   'Hisense',
-                //   'Supa master',
-                // ];
 
                 try {
                   const category = await this.aiService.categorizeProducts({
                     categories,
-                    // brand,
                     product: product.name,
                   });
 
@@ -262,9 +238,6 @@ export class KongaScraperService extends WorkerHost {
                   // Set the category and brand from AI response
                   product.categories = categoryIds; // Set the category from AI response
                   product.brand = brandId; // Set the brand from AI response
-                  // this.logger.log(
-                  //   `Categorized product: ${JSON.stringify(product)}`,
-                  // );
                 } catch (aiError) {
                   this.logger.error('Error categorizing product:', aiError);
                 }
@@ -277,12 +250,6 @@ export class KongaScraperService extends WorkerHost {
             }
 
             results.push(...products);
-
-            // Add products to the results
-            // if (!results[categoryHeading]) {
-            //   results[categoryHeading] = [];
-            // }
-            // results[categoryHeading].push(...products);
 
             // Check for next page and update the current URL
             const nextPageRelativeUrl = await page.evaluate(() => {
@@ -316,7 +283,7 @@ export class KongaScraperService extends WorkerHost {
     }
   }
 
-  private async saveProducts(scrapedData: any[]) {
+  private async saveProducts(scrapedData: any[], company: CompanyDocument) {
     this.logger.log(`Saving ${scrapedData.length} products...`);
 
     for (const product of scrapedData) {
@@ -333,7 +300,8 @@ export class KongaScraperService extends WorkerHost {
         discount: product.discount,
         rating: product.rating,
         numberOfRatings: product.numberOfRatings,
-        store: product.store,
+        store: company.name,
+        badgeColor: company.badgeColor, // Use badgeColor from company
         keyFeatures: product.keyFeatures,
       };
       try {
@@ -373,9 +341,6 @@ export class KongaScraperService extends WorkerHost {
   }
 
   private async getCreateBrand(brandName: string): Promise<string> {
-    const brandId: string = '';
-
-    // for (const brandName of brandNames) {
     const lowercaseBrand = brandName.toLowerCase();
     let brand = await this.productService.findBrandByName(lowercaseBrand);
 
@@ -388,10 +353,7 @@ export class KongaScraperService extends WorkerHost {
       this.logger.log(`Brand already exists: ${lowercaseBrand}`);
     }
 
-    // brandIds.push(brand._id.toString());
-    // }
-
-    return brandId;
+    return brand._id.toString(); // Return the brand ID
   }
 }
 
