@@ -14,7 +14,7 @@ export const defaultRoles: CreateRoleDto[] = [
 export const defaultCompanies: Partial<CreateCompanyDto>[] = [
   {
     name: 'Jumia',
-    slug: 'jumia_',
+    slug: 'jumia',
     badgeColor: 'blue',
     urls: [
       // 'https://www.jumia.com.ng',

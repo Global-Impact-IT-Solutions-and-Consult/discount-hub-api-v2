@@ -48,76 +48,70 @@ export class AiService {
     product: string;
   }): Promise<any> {
     try {
-      // const openai = new OpenAI({
-      //   apiKey: this.configService.get('AI_API_KEY'),
-      //   baseURL: this.configService.get('AI_URL'),
-      // });
-
       const groq = new Groq({ apiKey: this.configService.get('AI_API_KEY') });
 
-      // Convert the input object into a string format suitable for the AI model
-      // const { categories, brands, product } = input;
       const { categories, product } = input;
 
       const prompt = `
-        You are an AI model trained to categorize a product based on given categories and also suggest a brand from the product name.
+        You are an AI model trained to classify products into existing categories and suggest a brand from the product name.
         Categories: ${categories.join(', ')}
         Product: ${product}
-        decide which categories and brand the product falls under and return the product categorized under the given categories and brand in this format:
+
+        Your task is to:
+        1. Assign the product to the most relevant categories from the given list. Select as few categories as necessary.
+        2. Suggest a brand based on the product name.
+        3. Only create a new category if there is no close match among the existing categories.
+
+        Return the result in the following format:
         {
-          "categories": ["Category1", "Category2", ...],
+          "categories": ["Category1", "Category2"],
           "brand": "Brand"
         }
-        Do not include any other explanations. suggest new categories and the brand for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though. Only suggest new categories strictly when they there is no matching category.
+        Do not provide any additional explanations or outputs beyond the specified format.
       `;
 
-      // const prompt = `
-      //   You are an AI model trained to categorize a product based on given categories and brands.
-      //   Categories: ${categories.join(', ')}
-      //   Brands: ${brands.join(', ')}
-      //   Product: ${product}
-      //   decide which categories and brands the product falls under and return the product categorized under the given categories and brands in this format:
-      //   {
-      //     "categories": ["Category1", "Category2", ...],
-      //     "brands": ["Brand1", "Brand2", ... ]
-      //   }
-      //   Do not include any other explanations. suggest new categories for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though.
-      // `;
+      const model = this.configService.get('AI_MODEL') || 'llama3-8b-8192';
+      const maxTokens = prompt.length > 1000 ? 1024 : 512;
 
       const chatCompletion = await groq.chat.completions.create({
-        // const chatCompletion = await openai.chat.completions.create({
-        // model: 'mistralai/Mistral-7B-Instruct-v0.2',
-        model: 'llama3-8b-8192',
+        model,
         messages: [
           {
             role: 'system',
             content:
-              'You are an AI model trained to categorize products into provided categories and assign brands.',
+              'You are an AI trained to categorize products into a list of given categories and assign a brand from the product name. Always prioritize existing categories unless there is absolutely no match. Return only a JSON response.',
           },
-          {
-            role: 'user',
-            content: prompt,
-          },
+          { role: 'user', content: prompt },
         ],
-        temperature: 0.7,
-        max_tokens: 512, // Increased token limit to handle more complex responses
+        temperature: 0.6,
+        max_tokens: maxTokens,
       });
 
       const aiResponse = chatCompletion.choices[0].message.content.trim();
-      console.log(
-        '🚀 ~ AiService ~ categorizeProducts ~ aiResponse:',
-        aiResponse,
-      );
+      console.log('🚀 ~ AI Response:', aiResponse);
 
-      // Parse the AI response into a JavaScript object
       const formattedResponse = JSON.parse(
         aiResponse.replace(/(\r\n|\n|\r)/gm, ''),
+      );
+
+      // Validate AI response
+      if (
+        !formattedResponse.categories ||
+        !Array.isArray(formattedResponse.categories) ||
+        !formattedResponse.brand
+      ) {
+        throw new Error('AI response is missing required fields');
+      }
+
+      // Normalize categories
+      formattedResponse.categories = formattedResponse.categories.map(
+        (category) => category.trim().toLowerCase(),
       );
 
       console.log('Categorized Products:', formattedResponse);
       return formattedResponse;
     } catch (error) {
-      console.error('Error communicating with AIML API', error);
+      console.error('Error communicating with AI API', error);
       if (error.response) {
         console.error('Response data:', error.response.data);
         console.error('Response status:', error.response.status);
@@ -129,6 +123,111 @@ export class AiService {
       }
       throw new Error('Failed to categorize products');
     }
+
+    // try {
+    //   // const openai = new OpenAI({
+    //   //   apiKey: this.configService.get('AI_API_KEY'),
+    //   //   baseURL: this.configService.get('AI_URL'),
+    //   // });
+
+    //   const groq = new Groq({ apiKey: this.configService.get('AI_API_KEY') });
+
+    //   // Convert the input object into a string format suitable for the AI model
+    //   // const { categories, brands, product } = input;
+    //   const { categories, product } = input;
+
+    //   // const prompt = `
+    //   //   You are an AI model trained to categorize a product based on given categories and also suggest a brand from the product name.
+    //   //   Categories: ${categories.join(', ')}
+    //   //   Product: ${product}
+    //   //   decide which categories and brand the product falls under and return the product categorized under the given categories and brand in this format:
+    //   //   {
+    //   //     "categories": ["Category1", "Category2", ...],
+    //   //     "brand": "Brand"
+    //   //   }
+    //   //   Do not include any other explanations. suggest new categories and the brand for products that do not fit into any of the given categories and assign the products to them appropraitely but still under the categories key though. Only suggest new categories strictly when they there is no matching category.
+    //   // `;
+
+    //   // const chatCompletion = await groq.chat.completions.create({
+    //   //   // const chatCompletion = await openai.chat.completions.create({
+    //   //   // model: 'mistralai/Mistral-7B-Instruct-v0.2',
+    //   //   model: 'llama3-8b-8192',
+    //   //   messages: [
+    //   //     {
+    //   //       role: 'system',
+    //   //       content:
+    //   //         'You are an AI model trained to categorize products into provided categories and assign brands.',
+    //   //     },
+    //   //     {
+    //   //       role: 'user',
+    //   //       content: prompt,
+    //   //     },
+    //   //   ],
+    //   //   temperature: 0.7,
+    //   //   max_tokens: 512, // Increased token limit to handle more complex responses
+    //   // });
+
+    //   const prompt = `
+    //     You are an AI model trained to classify products into existing categories and suggest a brand from the product name.
+    //     Categories: ${categories.join(', ')}
+    //     Product: ${product}
+
+    //     Your task is to:
+    //     1. Assign the product to the most relevant categories from the given list. Select as few categories as necessary.
+    //     2. Suggest a brand based on the product name.
+    //     3. Only create a new category if there is no close match among the existing categories.
+
+    //     Return the result in the following format:
+    //     {
+    //       "categories": ["Category1", "Category2"],
+    //       "brand": "Brand"
+    //     }
+    //     Do not provide any additional explanations or outputs beyond the specified format.
+    //   `;
+
+    //   const chatCompletion = await groq.chat.completions.create({
+    //     model: 'llama3-8b-8192', // Ensure your model choice is appropriate for the task
+    //     messages: [
+    //       {
+    //         role: 'system',
+    //         content:
+    //           'You are an AI trained to categorize products into a list of given categories and assign a brand from the product name. Always prioritize existing categories unless there is absolutely no match. Return only a JSON response.',
+    //       },
+    //       {
+    //         role: 'user',
+    //         content: prompt,
+    //       },
+    //     ],
+    //     temperature: 0.6, // Adjusted for better consistency
+    //     max_tokens: 512, // Keep an eye on prompt length to avoid truncation
+    //   });
+
+    //   const aiResponse = chatCompletion.choices[0].message.content.trim();
+    //   console.log(
+    //     '🚀 ~ AiService ~ categorizeProducts ~ aiResponse:',
+    //     aiResponse,
+    //   );
+
+    //   // Parse the AI response into a JavaScript object
+    //   const formattedResponse = JSON.parse(
+    //     aiResponse.replace(/(\r\n|\n|\r)/gm, ''),
+    //   );
+
+    //   console.log('Categorized Products:', formattedResponse);
+    //   return formattedResponse;
+    // } catch (error) {
+    //   console.error('Error communicating with AIML API', error);
+    //   if (error.response) {
+    //     console.error('Response data:', error.response.data);
+    //     console.error('Response status:', error.response.status);
+    //     console.error('Response headers:', error.response.headers);
+    //   } else if (error.request) {
+    //     console.error('Request data:', error.request);
+    //   } else {
+    //     console.error('Error message:', error.message);
+    //   }
+    //   throw new Error('Failed to categorize products');
+    // }
   }
 
   async handleQuery(

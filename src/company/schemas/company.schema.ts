@@ -1,52 +1,30 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-import { UserDocument } from 'src/user/schemas/user.schema';
+import { Document } from 'mongoose';
 
-export type CompanyDocument = HydratedDocument<Company>;
-
-@Schema({ timestamps: true })
+@Schema()
 export class Company {
-  @Prop({
-    required: true,
-  })
+  @Prop({ required: true })
   name: string;
 
-  @Prop({
-    required: true,
-    unique: true,
-  })
+  @Prop({ required: false })
+  // logoUrl?: string;
+  logo?: string;
+
+  @Prop({ required: true })
   slug: string;
 
-  @Prop({
-    type: { type: Types.ObjectId, ref: 'User' },
-  })
-  admin: UserDocument;
+  @Prop({ required: false })
+  adminId?: string;
 
   @Prop({ required: true })
   website: string;
 
   @Prop({ required: true })
-  apiKey: string;
-
-  @Prop()
-  logo: string;
-
-  @Prop()
   badgeColor: string;
 
-  @Prop({ type: [{ type: String }] })
+  @Prop({ type: [String], required: true })
   urls: string[];
-
-  @Prop({ default: false })
-  isDeleted: boolean;
 }
 
+export type CompanyDocument = Company & Document;
 export const CompanySchema = SchemaFactory.createForClass(Company);
-
-CompanySchema.pre('find', function () {
-  this.where({ isDeleted: false });
-});
-
-CompanySchema.pre('findOne', function () {
-  this.where({ isDeleted: false });
-});

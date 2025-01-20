@@ -6,9 +6,12 @@ import {
   IsNumber,
   ArrayMinSize,
   IsMongoId,
+  // IsObject,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 import { CreateProductDto } from './create-product.dto';
+// import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
+import { Types } from 'mongoose';
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {
   @ApiProperty()
@@ -71,4 +74,30 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @ApiProperty()
   @IsOptional()
   source?: string;
+
+  // @ApiProperty({ type: CreateCompanyDto })
+  // @IsObject()
+  // store?: CreateCompanyDto; // Nested store object
+
+  @ApiProperty({ type: [String], required: false })
+  @IsArray()
+  @IsMongoId({ each: true })
+  @IsOptional()
+  store?: Types.ObjectId | string; // Allow array of ObjectId or string
+
+  // @ApiProperty({ type: CreateCompanyDto })
+  // @IsObject()
+  // store?: CreateCompanyDto; // Nested store object
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  storeName?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  storeLogo?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  storeBadgeColor?: string;
 }
