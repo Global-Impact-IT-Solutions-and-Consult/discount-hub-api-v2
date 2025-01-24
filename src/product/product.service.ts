@@ -17,7 +17,7 @@ export class ProductService {
     private readonly aiService: AiService,
     @InjectModel('Category') private readonly categoryModel: Model<Category>,
     @InjectModel('Brand') private readonly brandModel: Model<Brand>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache, // Corrected import
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createProduct: CreateProductDto): Promise<Product> {
@@ -46,27 +46,9 @@ export class ProductService {
       .populate('tagAtrributes')
       .exec();
 
-    // Corrected: Passing ttl as a number, not an object
     await this.cacheManager.set('products', products, 3600); // TTL is 3600 seconds (1 hour)
     return products;
   }
-
-  // async findByCategory(id: any): Promise<Product[]> {
-  //   const cachedProducts = await this.cacheManager.get<Product[]>('products');
-  //   if (cachedProducts) {
-  //     console.log('Fetching products from cache');
-  //     return cachedProducts;
-  //   }
-
-  //   console.log('Fetching products from database');
-  //   const products = await this.productModel.find({
-
-  //   }).exec();
-
-  //   // Corrected: Passing ttl as a number, not an object
-  //   await this.cacheManager.set('products', products, 3600); // TTL is 3600 seconds (1 hour)
-  //   return products;
-  // }
 
   async findOne(id: string): Promise<Product> {
     const cacheKey = `product_${id}`;
@@ -80,7 +62,6 @@ export class ProductService {
     const product = await this.productModel.findById(id).exec();
 
     if (product) {
-      // Corrected: Passing ttl as a number, not an object
       await this.cacheManager.set(cacheKey, product, 3600); // TTL is 3600 seconds (1 hour)
     }
 
@@ -111,9 +92,11 @@ export class ProductService {
   // Delete all the products
   async removeAll(): Promise<{ message: string }> {
     await this.productModel.deleteMany({}).exec();
+    await this.categoryModel.deleteMany({}).exec();
 
     // Clear related caches
     await this.cacheManager.del('products');
+    await this.cacheManager.del('categories');
 
     return { message: 'All products have been deleted' };
   }
@@ -148,12 +131,45 @@ export class ProductService {
     return await newCategory.save();
   }
 
+  async findAllCategories(): Promise<CategoryDocument[]> {
+    const cachedCategories =
+      await this.cacheManager.get<CategoryDocument[]>('categories');
+    if (cachedCategories) {
+      console.log('Fetching categories from cache');
+      return cachedCategories;
+    }
+
+    console.log('Fetching categories from database');
+    const categories = await this.categoryModel.find().exec();
+
+    await this.cacheManager.set('categories', categories, 3600); // Cache for 1 hour
+    return categories;
+  }
+
+  async findCategoryById(id: string): Promise<CategoryDocument> {
+    const cacheKey = `category_id_${id}`;
+    const cachedCategory =
+      await this.cacheManager.get<CategoryDocument>(cacheKey);
+    if (cachedCategory) {
+      console.log(`Fetching category ${id} from cache`);
+      return cachedCategory;
+    }
+
+    console.log(`Fetching category ${id} from database`);
+    const category = await this.categoryModel.findById(id).exec();
+
+    if (category) {
+      await this.cacheManager.set(cacheKey, category, 3600); // Cache for 1 hour
+    }
+
+    return category;
+  }
+
   async getCategoriesWithProductCount() {
     const categories = await this.categoryModel.find();
     const products = await this.productModel.find();
 
     const categoriesWithCounts = [];
-    // const productsInCategory = [];
 
     categories.forEach((categoryItem: any) => {
       const categoryVar = {
@@ -172,6 +188,8 @@ export class ProductService {
 
       categoriesWithCounts.push(categoryVar);
     });
+
+    await this.cacheManager.set('categories', categoriesWithCounts, 3600); // TTL is 3600 seconds (1 hour)
 
     return categoriesWithCounts;
   }
@@ -204,6 +222,68 @@ export class ProductService {
     return await newBrand.save();
   }
 
+  // Delete all categories
+  async removeAllCategories(): Promise<{ message: string }> {
+    try {
+      // Find all category IDs before deleting
+      const categories = await this.categoryModel.find({}, '_id');
+      const categoryIds = categories.map((category) => category._id);
+
+      // Remove references to categories in related products
+      await this.productModel.updateMany(
+        { categories: { $in: categoryIds } },
+        { $pull: { categories: { $in: categoryIds } } },
+      );
+
+      // Delete all categories
+      const result = await this.categoryModel.deleteMany({}).exec();
+
+      console.log(
+        `${result.deletedCount} categories deleted from the database`,
+      );
+
+      // Optionally clear related caches
+      await this.cacheManager.del('categories');
+
+      return { message: 'All categories have been deleted' };
+    } catch (error) {
+      console.error('Error deleting categories:', error);
+      throw new Error('Failed to delete categories. Please try again.');
+    }
+  }
+
+  // Search for products based on a search term
+  async searchProducts(searchTerm: string): Promise<ProductDocument[]> {
+    const cacheKey = `search_${searchTerm.toLowerCase()}`;
+    const cachedResults =
+      await this.cacheManager.get<ProductDocument[]>(cacheKey);
+
+    if (cachedResults) {
+      console.log(`Fetching search results for "${searchTerm}" from cache`);
+      return cachedResults;
+    }
+
+    console.log(`Searching for products matching "${searchTerm}" in database`);
+    const regex = new RegExp(searchTerm, 'i'); // Case-insensitive search
+    const products = await this.productModel
+      .find({
+        $or: [
+          { name: { $regex: regex } },
+          { description: { $regex: regex } },
+          { store: { $regex: regex } },
+          { tags: { $regex: regex } },
+          { categories: { $regex: regex } },
+        ],
+      })
+      .populate('categories')
+      .populate('tags')
+      .populate('tagAtrributes')
+      .exec();
+
+    await this.cacheManager.set(cacheKey, products, 3600); // Cache for 1 hour
+    return products;
+  }
+
   // AI categorization (example function, to be implemented)
   async categorize(body: any) {
     console.log('🚀 ~ categorize ~ body:', body);
@@ -216,83 +296,3 @@ export class ProductService {
     // return product;
   }
 }
-
-// import { Injectable } from '@nestjs/common';
-// import { CreateProductDto } from './dto/create-product.dto';
-// import { UpdateProductDto } from './dto/update-product.dto';
-// import { InjectModel } from '@nestjs/mongoose';
-// import { Product } from './schemas/product.schema';
-// import { Model } from 'mongoose';
-// import { AiService } from 'src/services/ai/ai.service';
-// import { Category, CategoryDocument } from './schemas/category.schema';
-// import { Brand, BrandDocument } from './schemas/brand.schema';
-
-// @Injectable()
-// export class ProductService {
-//   constructor(
-//     @InjectModel('Product') private readonly productModel: Model<Product>,
-//     private readonly aiService: AiService,
-//     @InjectModel('Category') private readonly categoryModel: Model<Category>,
-//     @InjectModel('Brand') private readonly brandModel: Model<Brand>,
-//   ) {}
-
-//   async create(createProduct: CreateProductDto): Promise<Product> {
-//     const product = new this.productModel(createProduct);
-//     return product.save();
-//   }
-
-//   async findAll(): Promise<Product[]> {
-//     return await this.productModel.find();
-//   }
-
-//   async findOne(id: string): Promise<Product> {
-//     return await this.productModel.findById(id);
-//   }
-
-//   async update(
-//     id: string,
-//     updateProductDto: UpdateProductDto,
-//   ): Promise<Product> {
-//     return this.productModel
-//       .findByIdAndUpdate(id, updateProductDto, { new: true })
-//       .exec();
-//   }
-
-//   async remove(id: string) {
-//     return await this.productModel.findByIdAndDelete(id);
-//   }
-
-//   // Category functions
-//   async findCategoryByName(name: string): Promise<CategoryDocument> {
-//     return await this.categoryModel.findOne({ name });
-//   }
-
-//   async createCategory(categoryData: {
-//     name: string;
-//   }): Promise<CategoryDocument> {
-//     const newCategory = new this.categoryModel(categoryData);
-//     return await newCategory.save();
-//   }
-
-//   // Brand functions
-//   async findBrandByName(name: string): Promise<BrandDocument> {
-//     return await this.brandModel.findOne({ name });
-//   }
-
-//   async createBrand(brandData: { name: string }): Promise<BrandDocument> {
-//     const newBrand = new this.brandModel(brandData);
-//     return await newBrand.save();
-//   }
-
-//   // AI categorization (example function, to be implemented)
-//   async categorize(body: any) {
-//     console.log('🚀 ~ categorize ~ body:', body);
-//     // Example usage of AI service for categorizing products
-//     // const product = await this.aiService.categorizeProducts({
-//     //   categories: body.categories,
-//     //   brands: body.brands,
-//     //   products: body.products,
-//     // });
-//     // return product;
-//   }
-// }

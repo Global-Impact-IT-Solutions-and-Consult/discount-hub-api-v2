@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { TagDocument } from './tag.schema';
 import { BrandDocument } from './brand.schema';
 import { CategoryDocument } from './category.schema';
+import { CompanyDocument } from 'src/company/schemas/company.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -44,8 +45,20 @@ export class Product {
   @Prop()
   link: string;
 
+  // @Prop()
+  // store: string;
+
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
+  store: CompanyDocument[];
+
   @Prop()
-  store: string;
+  storeName?: string;
+
+  @Prop()
+  storeLogo?: string;
+
+  @Prop()
+  storeBadgeColor?: string;
 
   @Prop()
   description: string;

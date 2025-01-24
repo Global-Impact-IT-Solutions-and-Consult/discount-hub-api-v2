@@ -6,8 +6,10 @@ import {
   IsNumber,
   ArrayMinSize,
   IsMongoId,
+  // IsObject,
 } from 'class-validator';
 import { Types } from 'mongoose';
+// import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 
 export class CreateProductDto {
   @ApiProperty()
@@ -87,7 +89,29 @@ export class CreateProductDto {
   @IsOptional()
   categories?: (Types.ObjectId | string)[]; // Allow array of ObjectId or string
 
+  // @ApiProperty({ required: false })
+  // @IsOptional()
+  // store?: string;
+
+  @ApiProperty({ required: false })
+  @IsString()
+  @IsMongoId({ each: true })
+  @IsOptional()
+  store?: Types.ObjectId | string; // Allow array of ObjectId or string
+
+  // @ApiProperty({ type: CreateCompanyDto })
+  // @IsObject()
+  // store?: CreateCompanyDto; // Nested store object
+
   @ApiProperty({ required: false })
   @IsOptional()
-  store?: string;
+  storeName?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  storeLogo?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  storeBadgeColor?: string;
 }

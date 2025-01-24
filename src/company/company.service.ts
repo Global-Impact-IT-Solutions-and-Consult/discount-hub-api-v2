@@ -15,6 +15,7 @@ export class CompanyService {
     private userService: UserService,
     private cloudinaryService: CloudinaryService,
   ) {}
+
   async create(
     createCompanyDto: CreateCompanyDto & { logo?: Express.Multer.File },
   ) {
@@ -93,61 +94,6 @@ export class CompanyService {
 
     const findKey = await this.companyModel.findOne({ apiKey: apiKey });
     if (findKey) {
-      const alphabets = [
-        'a',
-        'b',
-        'c',
-        'd',
-        'e',
-        'f',
-        'g',
-        'h',
-        'i',
-        'j',
-        'k',
-        'l',
-        'm',
-        'n',
-        'o',
-        'p',
-        'q',
-        'r',
-        's',
-        't',
-        'u',
-        'v',
-        'w',
-        'x',
-        'y',
-        'z',
-        'A',
-        'B',
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'H',
-        'I',
-        'J',
-        'K',
-        'L',
-        'M',
-        'N',
-        'O',
-        'P',
-        'Q',
-        'R',
-        'S',
-        'T',
-        'U',
-        'V',
-        'W',
-        'X',
-        'Y',
-        'Z',
-      ];
-
       const rand = Math.floor(Math.random() * 48);
       const rand2 = Math.floor(Math.random() * 48);
       const rand3 = Math.floor(Math.random() * 48);
@@ -155,6 +101,34 @@ export class CompanyService {
 
       apiKey = `${alphabets[rand]}${rand}${alphabets[rand3]}${alphabets[rand2]}${rand4}`;
     }
+
+    // badge color feature
+    const colors = [
+      'slate',
+      'gray',
+      'zinc',
+      'neutral',
+      'stone',
+      'red',
+      'orange',
+      'amber',
+      'yellow',
+      'lime',
+      'green',
+      'emerald',
+      'teal',
+      'cyan',
+      'sky',
+      'blue',
+      'indigo',
+      'violet',
+      'purple',
+      'fuchsia',
+      'pink',
+      'rose',
+    ];
+
+    const randColor = Math.floor(Math.random() * colors.length);
 
     const company = this.companyModel.create({
       admin: user.id,
@@ -164,68 +138,10 @@ export class CompanyService {
       urls: createCompanyDto.urls,
       website: createCompanyDto.website,
       apiKey: apiKey,
+      badgeColor: colors[randColor],
     });
     return company;
   }
-
-  // async create(
-  //   createCompanyDto: CreateCompanyDto & { logo?: Express.Multer.File },
-  // ) {
-  //   try {
-  //     // Check if a company with the same slug already exists
-  //     const existingCompany = await this.companyModel
-  //       .findOne({ slug: createCompanyDto.slug })
-  //       .exec();
-
-  //     if (existingCompany) {
-  //       // If company exists, return the existing company to avoid duplication
-  //       return existingCompany;
-  //     }
-
-  //     // Fetch the user based on adminId provided in DTO
-  //     const user = await this.userService.findOne(createCompanyDto.adminId);
-  //     if (!user) {
-  //       throw new Error('Admin user not found'); // Handle the case where the admin user is not found
-  //     }
-
-  //     // Upload logo to Cloudinary if a new logo is provided and logoUrl is not already set
-  //     let logoUrl = createCompanyDto.logoUrl;
-  //     if (!logoUrl && createCompanyDto.logo) {
-  //       logoUrl = await this.cloudinaryService.upload(
-  //         createCompanyDto.logo,
-  //         CloudinaryFoldersEnum.COMPANY_LOGO,
-  //       );
-  //     }
-
-  //     // Create new company object
-  //     const newCompany = new this.companyModel({
-  //       admin: user.id,
-  //       logo: logoUrl,
-  //       name: createCompanyDto.name,
-  //       slug: createCompanyDto.slug,
-  //       urls: createCompanyDto.urls,
-  //       website: createCompanyDto.website,
-  //     });
-
-  //     // Save new company to the database
-  //     const savedCompany = await newCompany.save();
-  //     return savedCompany;
-  //   } catch (error) {
-  //     // Handle duplicate key error (E11000)
-  //     if (error.code === 11000 && error.keyPattern?.slug) {
-  //       const existingCompany = await this.companyModel
-  //         .findOne({ slug: createCompanyDto.slug })
-  //         .exec();
-  //       if (existingCompany) {
-  //         return existingCompany; // Return existing company on duplicate slug error
-  //       }
-  //     }
-
-  //     // Log other errors and provide meaningful feedback
-  //     console.error('Error creating company:', error);
-  //     throw new Error('Failed to create company. Please try again later.');
-  //   }
-  // }
 
   async findAll() {
     const companies = await this.companyModel.find();
@@ -250,6 +166,7 @@ export class CompanyService {
 
   async findOneByApiKey(apiKey: string) {
     const company = await this.companyModel.findOne({ apiKey: apiKey });
+    console.log('🚀 ~ CompanyService ~ findOneByApiKey ~ company:', company);
     if (!company) {
       throw new NotFoundException(
         `Company not found for this apiKey: ${apiKey}`,
@@ -282,6 +199,15 @@ export class CompanyService {
     const company = await this.companyModel.findByIdAndUpdate(id, {
       isDeleted: true,
     });
+    if (!company) {
+      throw new NotFoundException(`No Company found for this id: ${id}`);
+    }
+    return true;
+  }
+
+  // New function to delete a company by Id
+  async deleteById(id: string) {
+    const company = await this.companyModel.findByIdAndDelete(id);
     if (!company) {
       throw new NotFoundException(`No Company found for this id: ${id}`);
     }

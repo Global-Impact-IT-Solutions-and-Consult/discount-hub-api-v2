@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -98,6 +99,29 @@ export class ProductController {
     return {
       success: true,
       message: 'Categories with product counts fetched successfully',
+      data,
+    };
+  }
+
+  // delete all
+  @Delete('categories')
+  async removeAllCategories() {
+    await this.productService.removeAllCategories();
+    return {
+      success: true,
+      message: 'All categories deleted successfully',
+    };
+  }
+
+  // New function to search products
+  // To call this endpoint externally, use: GET /products/search?term=<searchTerm>
+  @Get('search/v1')
+  async search(@Query('term') searchTerm: string) {
+    console.log('🚀 ~ search ~ searchTerm:', searchTerm);
+    const data = await this.productService.searchProducts(searchTerm);
+    return {
+      success: true,
+      message: 'Search results fetched successfully',
       data,
     };
   }

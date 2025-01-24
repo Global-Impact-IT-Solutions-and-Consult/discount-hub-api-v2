@@ -1,6 +1,7 @@
 import { IsMongoId, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { Company } from '../schemas/company.schema';
 
-export class CreateCompanyDto {
+export class CreateCompanyDto implements Partial<Company> {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -14,14 +15,20 @@ export class CreateCompanyDto {
   slug: string;
 
   @IsMongoId()
-  adminId: string;
+  @IsOptional()
+  adminId?: string;
 
   @IsString()
-  website: string;
+  @IsOptional()
+  website?: string;
+
+  @IsString()
+  badgeColor: string;
 
   // @IsString()
   // apiKey: string;
 
   @IsString({ each: true })
-  urls: string[];
+  @IsOptional()
+  urls?: string[];
 }
