@@ -112,7 +112,8 @@ export class JumiaScraperService extends WorkerHost {
           try {
             await page.goto(currentPageUrl, {
               waitUntil: 'domcontentloaded',
-              timeout: 30000,
+              // timeout: 30000,
+              timeout: 60000,
             });
 
             await page
