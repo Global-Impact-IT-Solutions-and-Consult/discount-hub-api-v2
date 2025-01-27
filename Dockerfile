@@ -1,5 +1,5 @@
 # Build stage
-FROM node:latest as build
+FROM node:latest AS build
 
 WORKDIR /usr/src/app
 
@@ -19,7 +19,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:latest as production
+FROM node:latest AS production
 
 ENV NODE_ENV=production
 ENV PORT=5000
