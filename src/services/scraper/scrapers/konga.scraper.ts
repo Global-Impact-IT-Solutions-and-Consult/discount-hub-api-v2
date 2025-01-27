@@ -97,7 +97,10 @@ export class KongaScraperService extends WorkerHost {
 
   private async scrapeCompany(payload: CompanyDocument): Promise<any> {
     this.logger.log(`Scraping data for company: ${payload.name}`);
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      ignoreDefaultArgs: ['--disable-extensions'],
+    });
     const results: any[] = [];
 
     try {
