@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, SchemaTypes, Types } from 'mongoose';
+import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { MessageTypeEnum } from 'src/utils/constants';
 import { ChatDocument } from './chat.schema';
 

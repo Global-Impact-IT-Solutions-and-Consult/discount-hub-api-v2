@@ -52,6 +52,7 @@ export class RoleService {
     //   throw new NotFoundException('Role not found for this ID');
     // }
     const role = await this.findOne(id);
-    return role.deleteOne();
+    await role.deleteOne();
+    return true;
   }
 }

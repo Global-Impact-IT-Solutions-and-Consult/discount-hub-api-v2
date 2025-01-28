@@ -1,5 +1,5 @@
 # Build stage
-FROM node:14-slim as build
+FROM node:latest AS build
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -22,7 +22,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:14-slim as production
+FROM node:latest AS production
 
 # Set environment variables
 ENV NODE_ENV=production
