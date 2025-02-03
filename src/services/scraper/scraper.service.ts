@@ -76,8 +76,9 @@ export class ScraperService {
           images: [product.image],
           specifications: '',
           description: '',
-          tags: [],
-          tagAttributes: [],
+          tag: '',
+          // tags: [],
+          // tagAttributes: [],
           brand: product.brand,
           categories: product.categories,
         };

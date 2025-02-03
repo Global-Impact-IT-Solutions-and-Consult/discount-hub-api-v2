@@ -11,6 +11,14 @@ import {
   TagAttributeSchema,
 } from './schemas/tagAttribute.schema';
 import { AiModule } from 'src/services/ai/ai.module';
+import {
+  FeaturedItem,
+  FeaturedItemSchema,
+} from './schemas/featuredItems.schema';
+import {
+  FeaturedCategory,
+  FeaturedCategorySchema,
+} from './schemas/featuredCategory.schema';
 
 @Module({
   imports: [
@@ -20,6 +28,8 @@ import { AiModule } from 'src/services/ai/ai.module';
       { name: Category.name, schema: CategorySchema },
       { name: Tag.name, schema: TagSchema },
       { name: TagAttribute.name, schema: TagAttributeSchema },
+      { name: FeaturedItem.name, schema: FeaturedItemSchema },
+      { name: FeaturedCategory.name, schema: FeaturedCategorySchema },
     ]),
     AiModule,
   ],

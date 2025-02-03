@@ -24,6 +24,22 @@ export class UpdateCompanyDto extends PartialType(CreateCompanyDto) {
   // @IsString()
   // apiKey?: string;
 
+  // @IsOptional()
+  // urls?: {
+  //   links?: string[];
+  //   special_links?: {
+  //     name: string;
+  //     urls: string[];
+  //   }[];
+  // };
+
+  @IsOptional()
+  special_links?: {
+    name: string;
+    urls: string[];
+  }[];
+
   @IsString({ each: true })
+  @IsOptional()
   urls?: string[];
 }

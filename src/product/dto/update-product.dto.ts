@@ -47,17 +47,22 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ type: [String] })
-  @IsArray()
-  @IsMongoId({ each: true })
-  @IsOptional()
-  tags?: string[];
+  // @ApiProperty({ type: [String] })
+  // @IsArray()
+  // @IsMongoId({ each: true })
+  // @IsOptional()
+  // tags?: string[];
 
-  @ApiProperty({ type: [String] })
-  @IsArray()
-  @IsMongoId({ each: true })
+  // @ApiProperty({ type: [String] })
+  // @IsArray()
+  // @IsMongoId({ each: true })
+  // @IsOptional()
+  // tagAttributes?: string[];
+
+  @ApiProperty({ required: false })
+  @IsString()
   @IsOptional()
-  tagAttributes?: string[];
+  tag?: string;
 
   @ApiProperty({ type: [String] })
   @IsArray()

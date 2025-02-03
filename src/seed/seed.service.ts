@@ -54,11 +54,18 @@ export class SeedService implements OnApplicationBootstrap {
 
   async seedCompanies() {
     for (const company of defaultCompanies) {
+      // this.logger.log(`Company : ${company.special_links}`);
+      // console.log(`Company 2 : ${company.special_links?.[0]?.name}`);
       let foundCompany: CompanyDocument = null;
       try {
         foundCompany = await this.companyService.findOneBySlug(company.slug);
         if (foundCompany.urls !== company.urls) {
           foundCompany.urls = company.urls;
+          await foundCompany.save();
+          this.logger.log(`Company : ${company.name} updated`);
+        }
+        if (foundCompany.special_links !== company.special_links) {
+          foundCompany.special_links = company.special_links;
           await foundCompany.save();
           this.logger.log(`Company : ${company.name} updated`);
         }
@@ -69,6 +76,7 @@ export class SeedService implements OnApplicationBootstrap {
         );
         await this.companyService.create({
           ...company,
+          special_links: company.special_links,
           adminId: superAdmin.id,
         } as CreateCompanyDto);
         this.logger.log(`Company : ${company.name} Seeded`);

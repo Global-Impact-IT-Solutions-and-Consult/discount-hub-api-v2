@@ -81,7 +81,7 @@ export class JumiaScraperService extends WorkerHost {
     return Promise.resolve();
   }
 
-  @OnEvent('scrape.company.jumia_') // Listening for the specific company's event
+  @OnEvent('scrape.company.jumia') // Listening for the specific company's event
   async handleJumiaScrape(company: CompanyDocument): Promise<void> {
     this.logger.log(`Starting scrape for company: ${company.slug}`);
     try {
@@ -97,227 +97,465 @@ export class JumiaScraperService extends WorkerHost {
 
   private async scrapeCompany(payload: CompanyDocument): Promise<any> {
     this.logger.log(`Scraping data for company: ${payload.name}`);
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      ignoreDefaultArgs: ['--disable-extensions'],
+    });
 
     try {
       const page = await browser.newPage();
       const results = {};
 
-      for (const url of payload.urls) {
-        let currentPageUrl = url;
+      if (payload.urls) {
+        for (const url of payload.urls) {
+          let currentPageUrl = url;
 
-        while (currentPageUrl) {
-          this.logger.log(`Scraping URL: ${currentPageUrl}`);
+          while (currentPageUrl) {
+            this.logger.log(`Scraping URL: ${currentPageUrl}`);
 
-          try {
-            await page.goto(currentPageUrl, {
-              waitUntil: 'domcontentloaded',
-              // timeout: 30000,
-              timeout: 60000,
-            });
-
-            await page
-              .waitForSelector('section.card.-fh', { timeout: 10000 })
-              .catch(() => {
-                this.logger.error(
-                  `Selector 'section.card.-fh' not found at URL ${currentPageUrl}. Skipping to next link.`,
-                );
-                currentPageUrl = null;
-                return;
+            try {
+              await page.goto(currentPageUrl, {
+                waitUntil: 'domcontentloaded',
+                // timeout: 30000,
+                timeout: 60000,
               });
 
-            const categoryHeading = await page.evaluate(() => {
-              const header = document.querySelector('section.card.-fh header');
-              const heading = header
-                ?.querySelector('div h1')
-                ?.textContent.trim();
-              return heading || 'Unknown Category';
-            });
-
-            const products = await page.evaluate(() => {
-              const productElements = Array.from(
-                document.querySelectorAll('section.card div > article.prd'),
-              );
-              return productElements
-                .map((article) => {
-                  const anchor = article.querySelector('a.core');
-                  if (!anchor) return null;
-
-                  const discount = anchor
-                    .querySelector('div.s-prc-w div.bdg._dsct._sm')
-                    ?.textContent.trim();
-                  if (!discount) return null;
-
-                  const link =
-                    'https://www.jumia.com.ng/' +
-                    (anchor.getAttribute('href') || '');
-                  const image =
-                    anchor
-                      .querySelector('div.img-c img')
-                      ?.getAttribute('data-src') || 'No image';
-                  const name =
-                    anchor
-                      .querySelector('div.info h3.name')
-                      ?.textContent.trim() || 'No name';
-                  const discountPrice =
-                    anchor
-                      .querySelector('div.info div.prc')
-                      ?.textContent.trim() || 'No price';
-                  const price =
-                    anchor
-                      .querySelector('div.s-prc-w div.old')
-                      ?.textContent.trim() || 'No old price';
-                  const reviewText =
-                    anchor
-                      .querySelector('div.info div.rev')
-                      ?.textContent.trim() || 'No rating';
-
-                  let rating = 'No rating';
-                  let numberOfRatings = 'No rating';
-
-                  if (reviewText !== 'No rating') {
-                    const match = reviewText.match(/^(.*)\s\((\d+)\)$/);
-                    if (match) {
-                      rating = match[1]; // Extracts "3 out of 5"
-                      numberOfRatings = match[2]; // Extracts "2343"
-                    }
-                  }
-
-                  return {
-                    link,
-                    images: [image], // Initialize images as an array with the first image
-                    name,
-                    discountPrice,
-                    price,
-                    discount,
-                    rating,
-                    numberOfRatings,
-                    // store: 'jumia',
-                    description: '', // Initialize description (will be populated later)
-                    keyFeatures: '', // Initialize key features (will be populated later)
-                    specifications: '', // Initialize specifications (will be populated later)
-                    // categories: this.categories, // Use categories from the database or default
-                    categories: [''], // Use categories from the database or default
-                    brand: '', // Initialize brand (will be populated by AI service)
-                  };
-                })
-                .filter((product) => product !== null);
-            });
-
-            // Fetch additional images, description, key features, and specifications from the product link
-            for (const product of products) {
-              try {
-                const productPage = await browser.newPage();
-                await productPage.goto(product.link, {
-                  waitUntil: 'domcontentloaded',
-                  timeout: 30000,
-                });
-
-                // Fetch additional product images
-                const additionalImages = await productPage.evaluate(() => {
-                  const imageUrls = [];
-                  const imgElements =
-                    document.querySelectorAll('label.itm-sel._on'); // Target images with class '-fw _ni'
-                  imgElements.forEach((img) => {
-                    const element = img.querySelector('img.-fw._ni');
-                    const src = element.getAttribute('data-src');
-                    if (src) imageUrls.push(src);
-                  });
-                  return imageUrls;
-                });
-
-                // Scraping product description
-                const description = await productPage.evaluate(() => {
-                  const descriptionElement = document.querySelector(
-                    'div.markup.-mhm.-pvl.-oxa.-sc',
+              await page
+                .waitForSelector('section.card.-fh', { timeout: 10000 })
+                .catch(() => {
+                  this.logger.error(
+                    `Selector 'section.card.-fh' not found at URL ${currentPageUrl}. Skipping to next link.`,
                   );
-                  return descriptionElement
-                    ? descriptionElement.textContent.trim()
-                    : 'No description available';
+                  currentPageUrl = null;
+                  return;
                 });
 
-                // Scraping key features
-                const keyFeatures = await productPage.evaluate(() => {
-                  const keyFeaturesElement =
-                    document.querySelector('div.markup.-pam');
-                  return keyFeaturesElement
-                    ? keyFeaturesElement.textContent.trim()
-                    : 'No key features available';
-                });
-
-                // Scraping specifications
-                const specifications = await productPage.evaluate(() => {
-                  const specificationsElement = document.querySelector(
-                    'div.-pvs.-mvxs.-phm.-lsn',
-                  );
-                  return specificationsElement
-                    ? specificationsElement.textContent.trim()
-                    : 'No specifications available';
-                });
-
-                // Merge additional images with the primary image
-                product.images.push(...additionalImages); // Append additional images to the existing array
-                product.description = description; // Set the product description
-                product.keyFeatures = keyFeatures; // Set the key features
-                product.specifications = specifications; // Set the specifications
-
-                await productPage.close(); // Close the new page
-
-                // AI Categorization (categories and brand)
-                try {
-                  const category = await this.aiService.categorizeProducts({
-                    categories: this.categories,
-                    product: product.name,
-                  });
-
-                  const aiBrandName = category.brand; // Brand name from AI service
-
-                  // Create or find the categories in the database
-                  const categoryIds = await this.getCreateCategory(
-                    category.categories,
-                  );
-
-                  // Save the brand to the database
-                  const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
-
-                  // Set the category and brand from AI response
-                  product.categories = categoryIds; // Set the category from AI response
-                  product.brand = brandId; // Set the brand from AI response
-                } catch (aiError) {
-                  this.logger.error('Error categorizing product:', aiError);
-                }
-              } catch (error) {
-                this.logger.error(
-                  `Error fetching additional details for product: ${product.name}`,
-                  error,
+              const categoryHeading = await page.evaluate(() => {
+                const header = document.querySelector(
+                  'section.card.-fh header',
                 );
+                const heading = header
+                  ?.querySelector('div h1')
+                  ?.textContent.trim();
+                return heading || 'Unknown Category';
+              });
+
+              const products = await page.evaluate(() => {
+                const productElements = Array.from(
+                  document.querySelectorAll('section.card div > article.prd'),
+                );
+                return productElements
+                  .map((article) => {
+                    const anchor = article.querySelector('a.core');
+                    if (!anchor) return null;
+
+                    const discount = anchor
+                      .querySelector('div.s-prc-w div.bdg._dsct._sm')
+                      ?.textContent.trim();
+                    if (!discount) return null;
+
+                    const link =
+                      'https://www.jumia.com.ng/' +
+                      (anchor.getAttribute('href') || '');
+                    const image =
+                      anchor
+                        .querySelector('div.img-c img')
+                        ?.getAttribute('data-src') || 'No image';
+                    const name =
+                      anchor
+                        .querySelector('div.info h3.name')
+                        ?.textContent.trim() || 'No name';
+                    const discountPrice =
+                      anchor
+                        .querySelector('div.info div.prc')
+                        ?.textContent.trim() || 'No price';
+                    const price =
+                      anchor
+                        .querySelector('div.s-prc-w div.old')
+                        ?.textContent.trim() || 'No old price';
+                    const reviewText =
+                      anchor
+                        .querySelector('div.info div.rev')
+                        ?.textContent.trim() || 'No rating';
+
+                    let rating = 'No rating';
+                    let numberOfRatings = 'No rating';
+
+                    if (reviewText !== 'No rating') {
+                      const match = reviewText.match(/^(.*)\s\((\d+)\)$/);
+                      if (match) {
+                        rating = match[1]; // Extracts "3 out of 5"
+                        numberOfRatings = match[2]; // Extracts "2343"
+                      }
+                    }
+
+                    return {
+                      link,
+                      images: [image], // Initialize images as an array with the first image
+                      name,
+                      discountPrice,
+                      price,
+                      discount,
+                      rating,
+                      numberOfRatings,
+                      // tag: categoryHeading,
+                      tag: '',
+                      // store: 'jumia',
+                      description: '', // Initialize description (will be populated later)
+                      keyFeatures: '', // Initialize key features (will be populated later)
+                      specifications: '', // Initialize specifications (will be populated later)
+                      // categories: this.categories, // Use categories from the database or default
+                      categories: [''], // Use categories from the database or default
+                      brand: '', // Initialize brand (will be populated by AI service)
+                    };
+                  })
+                  .filter((product) => product !== null);
+              });
+
+              // Fetch additional images, description, key features, and specifications from the product link
+              for (const product of products) {
+                try {
+                  const productPage = await browser.newPage();
+                  await productPage.goto(product.link, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 30000,
+                  });
+
+                  // Fetch additional product images
+                  const additionalImages = await productPage.evaluate(() => {
+                    const imageUrls = [];
+                    const imgElements =
+                      document.querySelectorAll('label.itm-sel._on'); // Target images with class '-fw _ni'
+                    imgElements.forEach((img) => {
+                      const element = img.querySelector('img.-fw._ni');
+                      const src = element.getAttribute('data-src');
+                      if (src) imageUrls.push(src);
+                    });
+                    return imageUrls;
+                  });
+
+                  // Scraping product description
+                  const description = await productPage.evaluate(() => {
+                    const descriptionElement = document.querySelector(
+                      'div.markup.-mhm.-pvl.-oxa.-sc',
+                    );
+                    return descriptionElement
+                      ? descriptionElement.textContent.trim()
+                      : 'No description available';
+                  });
+
+                  // Scraping key features
+                  const keyFeatures = await productPage.evaluate(() => {
+                    const keyFeaturesElement =
+                      document.querySelector('div.markup.-pam');
+                    return keyFeaturesElement
+                      ? keyFeaturesElement.textContent.trim()
+                      : 'No key features available';
+                  });
+
+                  // Scraping specifications
+                  const specifications = await productPage.evaluate(() => {
+                    const specificationsElement = document.querySelector(
+                      'div.-pvs.-mvxs.-phm.-lsn',
+                    );
+                    return specificationsElement
+                      ? specificationsElement.textContent.trim()
+                      : 'No specifications available';
+                  });
+
+                  // Merge additional images with the primary image
+                  product.images.push(...additionalImages); // Append additional images to the existing array
+                  product.description = description; // Set the product description
+                  product.keyFeatures = keyFeatures; // Set the key features
+                  product.specifications = specifications; // Set the specifications
+
+                  await productPage.close(); // Close the new page
+
+                  // AI Categorization (categories and brand)
+                  try {
+                    const category = await this.aiService.categorizeProducts({
+                      categories: this.categories,
+                      product: product.name,
+                    });
+
+                    const aiBrandName = category.brand; // Brand name from AI service
+
+                    // Create or find the categories in the database
+                    const categoryIds = await this.getCreateCategory(
+                      category.categories,
+                    );
+
+                    // Save the brand to the database
+                    const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
+
+                    // Set the category and brand from AI response
+                    product.categories = categoryIds; // Set the category from AI response
+                    product.brand = brandId; // Set the brand from AI response
+                  } catch (aiError) {
+                    this.logger.error('Error categorizing product:', aiError);
+                  }
+                } catch (error) {
+                  this.logger.error(
+                    `Error fetching additional details for product: ${product.name}`,
+                    error,
+                  );
+                }
+              }
+
+              // Add products to the results
+              if (!results[categoryHeading]) {
+                results[categoryHeading] = [];
+              }
+              results[categoryHeading].push(...products);
+
+              const nextPageRelativeUrl = await page.evaluate(() => {
+                const nextPageAnchor = document.querySelector(
+                  'section.card.-fh div.pg-w.-ptm.-pbxl a[aria-label="Next Page"]',
+                );
+                return nextPageAnchor
+                  ? nextPageAnchor.getAttribute('href')
+                  : null;
+              });
+
+              currentPageUrl = nextPageRelativeUrl
+                ? new URL(nextPageRelativeUrl, 'https://www.jumia.com.ng').href
+                : null;
+            } catch (scrapeError) {
+              this.logger.error(
+                `Error scraping URL ${currentPageUrl}:`,
+                scrapeError,
+              );
+              currentPageUrl = null;
+            }
+          }
+        }
+      }
+
+      if (payload.special_links) {
+        for (const specialLink of payload.special_links) {
+          for (const url of specialLink.urls) {
+            let currentPageUrl = url;
+
+            while (currentPageUrl) {
+              this.logger.log(`Scraping URL: ${currentPageUrl}`);
+
+              try {
+                await page.goto(currentPageUrl, {
+                  waitUntil: 'domcontentloaded',
+                  timeout: 60000,
+                });
+
+                await page
+                  .waitForSelector('section.card.-fh', { timeout: 20000 })
+                  .catch(() => {
+                    this.logger.error(
+                      `Selector 'section.card.-fh' not found at URL ${currentPageUrl}. Skipping to next link.`,
+                    );
+                    currentPageUrl = null;
+                    return;
+                  });
+
+                const categoryHeading = await page.evaluate(() => {
+                  const header = document.querySelector(
+                    'section.card.-fh header',
+                  );
+                  const heading = header
+                    ?.querySelector('div h1')
+                    ?.textContent.trim();
+                  return heading || 'Unknown Category';
+                });
+
+                const products = await page.evaluate(() => {
+                  const productElements = Array.from(
+                    document.querySelectorAll('section.card div > article.prd'),
+                  );
+                  return productElements
+                    .map((article) => {
+                      const anchor = article.querySelector('a.core');
+                      if (!anchor) return null;
+
+                      const discount = anchor
+                        .querySelector('div.s-prc-w div.bdg._dsct._sm')
+                        ?.textContent.trim();
+                      if (!discount) return null;
+
+                      const link =
+                        'https://www.jumia.com.ng/' +
+                        (anchor.getAttribute('href') || '');
+                      const image =
+                        anchor
+                          .querySelector('div.img-c img')
+                          ?.getAttribute('data-src') || 'No image';
+                      const name =
+                        anchor
+                          .querySelector('div.info h3.name')
+                          ?.textContent.trim() || 'No name';
+                      const discountPrice =
+                        anchor
+                          .querySelector('div.info div.prc')
+                          ?.textContent.trim() || 'No price';
+                      const price =
+                        anchor
+                          .querySelector('div.s-prc-w div.old')
+                          ?.textContent.trim() || 'No old price';
+                      const reviewText =
+                        anchor
+                          .querySelector('div.info div.rev')
+                          ?.textContent.trim() || 'No rating';
+
+                      let rating = 'No rating';
+                      let numberOfRatings = 'No rating';
+
+                      if (reviewText !== 'No rating') {
+                        const match = reviewText.match(/^(.*)\s\((\d+)\)$/);
+                        if (match) {
+                          rating = match[1]; // Extracts "3 out of 5"
+                          numberOfRatings = match[2]; // Extracts "2343"
+                        }
+                      }
+
+                      return {
+                        link,
+                        images: [image], // Initialize images as an array with the first image
+                        name,
+                        discountPrice,
+                        price,
+                        discount,
+                        rating,
+                        numberOfRatings,
+                        // tag: specialLink.name,
+                        tag: '',
+                        description: '', // Initialize description (will be populated later)
+                        keyFeatures: '', // Initialize key features (will be populated later)
+                        specifications: '', // Initialize specifications (will be populated later)
+                        categories: [''], // Use categories from the database or default
+                        brand: '', // Initialize brand (will be populated by AI service)
+                      };
+                    })
+                    .filter((product) => product !== null);
+                });
+
+                // Fetch additional images, description, key features, and specifications from the product link
+                for (const product of products) {
+                  try {
+                    const productPage = await browser.newPage();
+                    await productPage.goto(product.link, {
+                      waitUntil: 'domcontentloaded',
+                      timeout: 30000,
+                    });
+
+                    // Fetch additional product images
+                    const additionalImages = await productPage.evaluate(() => {
+                      const imageUrls = [];
+                      const imgElements =
+                        document.querySelectorAll('label.itm-sel._on'); // Target images with class '-fw _ni'
+                      imgElements.forEach((img) => {
+                        const element = img.querySelector('img.-fw._ni');
+                        const src = element.getAttribute('data-src');
+                        if (src) imageUrls.push(src);
+                      });
+                      return imageUrls;
+                    });
+
+                    // Scraping product description
+                    const description = await productPage.evaluate(() => {
+                      const descriptionElement = document.querySelector(
+                        'div.markup.-mhm.-pvl.-oxa.-sc',
+                      );
+                      return descriptionElement
+                        ? descriptionElement.textContent.trim()
+                        : 'No description available';
+                    });
+
+                    // Scraping key features
+                    const keyFeatures = await productPage.evaluate(() => {
+                      const keyFeaturesElement =
+                        document.querySelector('div.markup.-pam');
+                      return keyFeaturesElement
+                        ? keyFeaturesElement.textContent.trim()
+                        : 'No key features available';
+                    });
+
+                    // Scraping specifications
+                    const specifications = await productPage.evaluate(() => {
+                      const specificationsElement = document.querySelector(
+                        'div.-pvs.-mvxs.-phm.-lsn',
+                      );
+                      return specificationsElement
+                        ? specificationsElement.textContent.trim()
+                        : 'No specifications available';
+                    });
+
+                    // Merge additional images with the primary image
+                    product.images.push(...additionalImages); // Append additional images to the existing array
+                    product.description = description; // Set the product description
+                    product.keyFeatures = keyFeatures; // Set the key features
+                    product.specifications = specifications; // Set the specifications
+                    // product.tag = specialLink.name;
+
+                    await productPage.close(); // Close the new page
+
+                    // AI Categorization (categories and brand)
+                    try {
+                      const category = await this.aiService.categorizeProducts({
+                        categories: this.categories,
+                        product: product.name,
+                      });
+
+                      const aiBrandName = category.brand; // Brand name from AI service
+
+                      // Create or find the categories in the database
+                      const categoryIds = await this.getCreateCategory(
+                        category.categories,
+                      );
+
+                      // Save the brand to the database
+                      const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
+
+                      const tagId = await this.getCreateTag(specialLink.name); // Find or create tag
+
+                      // Set the category and brand from AI response
+                      product.categories = categoryIds; // Set the category from AI response
+                      product.brand = brandId; // Set the brand from AI response
+                      product.tag = tagId; // Set the tag from AI response
+                    } catch (aiError) {
+                      this.logger.error('Error categorizing product:', aiError);
+                    }
+                  } catch (error) {
+                    this.logger.error(
+                      `Error fetching additional details for product: ${product.name}`,
+                      error,
+                    );
+                  }
+                }
+
+                // Add products to the results
+                if (!results[categoryHeading]) {
+                  results[categoryHeading] = [];
+                }
+                results[categoryHeading].push(...products);
+
+                const nextPageRelativeUrl = await page.evaluate(() => {
+                  const nextPageAnchor = document.querySelector(
+                    'section.card.-fh div.pg-w.-ptm.-pbxl a[aria-label="Next Page"]',
+                  );
+                  return nextPageAnchor
+                    ? nextPageAnchor.getAttribute('href')
+                    : null;
+                });
+
+                currentPageUrl = nextPageRelativeUrl
+                  ? new URL(nextPageRelativeUrl, 'https://www.jumia.com.ng')
+                      .href
+                  : null;
+              } catch (scrapeError) {
+                this.logger.error(
+                  `Error scraping URL ${currentPageUrl}:`,
+                  scrapeError,
+                );
+                currentPageUrl = null;
               }
             }
-
-            // Add products to the results
-            if (!results[categoryHeading]) {
-              results[categoryHeading] = [];
-            }
-            results[categoryHeading].push(...products);
-
-            const nextPageRelativeUrl = await page.evaluate(() => {
-              const nextPageAnchor = document.querySelector(
-                'section.card.-fh div.pg-w.-ptm.-pbxl a[aria-label="Next Page"]',
-              );
-              return nextPageAnchor
-                ? nextPageAnchor.getAttribute('href')
-                : null;
-            });
-
-            currentPageUrl = nextPageRelativeUrl
-              ? new URL(nextPageRelativeUrl, 'https://www.jumia.com.ng').href
-              : null;
-          } catch (scrapeError) {
-            this.logger.error(
-              `Error scraping URL ${currentPageUrl}:`,
-              scrapeError,
-            );
-            currentPageUrl = null;
           }
         }
       }
@@ -370,6 +608,7 @@ export class JumiaScraperService extends WorkerHost {
           storeName: company.name,
           storeLogo: company.logo,
           keyFeatures: product.keyFeatures,
+          tag: product.tag,
         };
 
         try {
@@ -433,5 +672,26 @@ export class JumiaScraperService extends WorkerHost {
     brandId = brand._id.toString();
 
     return brandId;
+  }
+
+  // Method to find or create tag by name
+  private async getCreateTag(tagName: string): Promise<string> {
+    let tagId: string = '';
+
+    const lowercaseTag = tagName.toLowerCase();
+    let tag = await this.productService.findTagByName(lowercaseTag);
+
+    if (!tag) {
+      tag = await this.productService.createTag({
+        name: lowercaseTag,
+      });
+      this.logger.log(`Created new tag: ${lowercaseTag}`);
+    } else {
+      this.logger.log(`Tag already exists: ${lowercaseTag}`);
+    }
+
+    tagId = tag._id.toString();
+
+    return tagId;
   }
 }

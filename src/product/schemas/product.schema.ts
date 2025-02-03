@@ -63,11 +63,17 @@ export class Product {
   @Prop()
   description: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })
-  tags: TagDocument[];
+  @Prop({ type: Types.ObjectId, ref: 'Tag' })
+  tag: TagDocument;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'TagAttributes' }] })
-  tagAtrributes: TagDocument[];
+  // @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })
+  // tags: TagDocument[];
+
+  // @Prop({ type: [{ type: Types.ObjectId, ref: 'TagAttributes' }] })
+  // tagAtrributes: TagDocument[];
+
+  // @Prop()
+  // tag: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Brand' })
   brand: BrandDocument;

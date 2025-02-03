@@ -66,17 +66,22 @@ export class CreateProductDto {
   @IsOptional()
   link?: string;
 
-  @ApiProperty({ type: [String], required: false })
-  @IsArray()
-  @IsMongoId({ each: true })
+  @ApiProperty({ required: false })
+  @IsString()
   @IsOptional()
-  tags?: string[];
+  tag?: string;
 
-  @ApiProperty({ type: [String], required: false })
-  @IsArray()
-  @IsMongoId({ each: true })
-  @IsOptional()
-  tagAttributes?: string[];
+  // @ApiProperty({ type: [String], required: false })
+  // @IsArray()
+  // @IsMongoId({ each: true })
+  // @IsOptional()
+  // tags?: string[];
+
+  // @ApiProperty({ type: [String], required: false })
+  // @IsArray()
+  // @IsMongoId({ each: true })
+  // @IsOptional()
+  // tagAttributes?: string[];
 
   @ApiProperty({ required: false })
   @IsMongoId()

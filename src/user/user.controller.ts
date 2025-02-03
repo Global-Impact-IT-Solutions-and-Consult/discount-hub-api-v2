@@ -6,18 +6,18 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
+  // UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+// import { AuthGuard } from '@nestjs/passport';
+// import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-@UseGuards(AuthGuard('jwt'))
-@ApiTags('User')
 @Controller('user')
-@ApiBearerAuth()
+// @UseGuards(AuthGuard('jwt'))
+// @ApiTags('User')
+// @ApiBearerAuth()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -67,6 +67,48 @@ export class UserController {
     return {
       success: true,
       message: 'User deleted successfully',
+    };
+  }
+
+  // ************* //
+  // Newsletter stuff
+  // ************* //
+  @Post('newsletter')
+  async createNewsletter(@Body() newsletterData: { email: string }) {
+    const data = await this.userService.createNewsletter(newsletterData);
+    return {
+      success: true,
+      message: 'Newsletter created successfully',
+      data,
+    };
+  }
+
+  @Get('newsletter/all')
+  async getAllNewsletters() {
+    const data = await this.userService.getAllNewsletters();
+    return {
+      success: true,
+      message: 'Newsletters fetched successfully',
+      data,
+    };
+  }
+
+  @Delete('newsletter/one/:id')
+  async deleteNewsletter(@Param('id') id: string) {
+    const data = await this.userService.deleteNewsletter(id);
+    return {
+      success: true,
+      message: 'Newsletter deleted successfully',
+      data,
+    };
+  }
+
+  @Delete('newsletter/all')
+  async deleteAllNewsletters() {
+    await this.userService.deleteAllNewsletters();
+    return {
+      success: true,
+      message: 'All newsletters deleted successfully',
     };
   }
 }

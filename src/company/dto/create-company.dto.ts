@@ -28,6 +28,21 @@ export class CreateCompanyDto implements Partial<Company> {
   // @IsString()
   // apiKey: string;
 
+  // @IsOptional()
+  // urls?: {
+  //   links?: string[];
+  //   special_links?: {
+  //     name: string;
+  //     urls: string[];
+  //   }[];
+  // };
+
+  @IsOptional({ each: true })
+  special_links?: Array<{
+    name: string;
+    urls: string[];
+  }>;
+
   @IsString({ each: true })
   @IsOptional()
   urls?: string[];
