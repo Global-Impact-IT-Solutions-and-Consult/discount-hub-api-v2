@@ -22,8 +22,26 @@ export class Company {
   @Prop({ required: true })
   badgeColor: string;
 
+  // @Prop({ type: Object, required: false })
+  // urls?: {
+  //   links?: string[];
+  //   special_links?: Array<{
+  //     name: string;
+  //     urls: string[];
+  //   }>;
+  // };
+
   @Prop({ type: [String], required: true })
   urls: string[];
+
+  @Prop({ type: [{ name: String, urls: [String] }], required: false })
+  special_links?: Array<{
+    name: string;
+    urls: string[];
+  }>;
+
+  // @Prop({ type: [String], required: true })
+  // urls: string[];
 }
 
 export type CompanyDocument = Company & Document;

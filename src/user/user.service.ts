@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Inject,
   Injectable,
   NotFoundException,
@@ -15,12 +16,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
+import { Newsletter, NewsletterDocument } from './schemas/newsletter.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel('Newsletter')
+    private readonly newsletterModel: Model<Newsletter>,
     private notificationService: NotificationService,
   ) {}
 
@@ -135,5 +139,49 @@ export class UserService {
     user.changePasswordTokenTTL = null;
     await user.save();
     return user;
+  }
+
+  // ************* //
+  // Newsletter functions
+  // ************* //
+  async createNewsletter(NewsletterData: {
+    email: string;
+  }): Promise<NewsletterDocument> {
+    const existingNewsletter = await this.newsletterModel
+      .findOne({ email: NewsletterData.email })
+      .exec();
+    if (existingNewsletter) {
+      throw new ConflictException('Email already subscribed to the newsletter');
+    }
+    const newNewsletter = new this.newsletterModel(NewsletterData);
+    return await newNewsletter.save();
+  }
+
+  async getAllNewsletters(): Promise<NewsletterDocument[]> {
+    const cacheKey = 'all_newsletters';
+    const cachedNewsletters =
+      await this.cacheManager.get<NewsletterDocument[]>(cacheKey);
+    if (cachedNewsletters) {
+      console.log(`Fetching all newsletters from cache`);
+      return cachedNewsletters;
+    }
+
+    console.log(`Fetching all newsletters from database`);
+    const newsletters = await this.newsletterModel.find().exec();
+
+    if (newsletters) {
+      await this.cacheManager.set(cacheKey, newsletters, 3600); // Cache for 1 hour
+    }
+
+    return newsletters;
+  }
+
+  async deleteNewsletter(id: string): Promise<NewsletterDocument | null> {
+    return await this.newsletterModel.findByIdAndDelete(id).exec();
+  }
+
+  async deleteAllNewsletters(): Promise<void> {
+    await this.newsletterModel.deleteMany().exec();
+    await this.cacheManager.del('all_newsletters'); // Invalidate cache
   }
 }
