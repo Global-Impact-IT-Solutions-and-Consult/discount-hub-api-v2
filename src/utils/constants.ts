@@ -35,17 +35,17 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     ],
     special_links: [
       {
-        name: 'Flash Sales',
+        name: 'Jumia Flash Sales',
         urls: ['https://www.jumia.com.ng/flash-sales'],
       },
       // {
       //   name: 'Global New Arrival',
       //   urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
       // },
-      {
-        name: 'Clearance Sale',
-        urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
-      },
+      // {
+      //   name: 'Jumia Clearance Sale',
+      //   urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
+      // },
       // {
       //   name: 'Global Best Deals',
       //   urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
@@ -59,17 +59,58 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Konga',
     slug: 'konga',
     badgeColor: 'emerald',
-    // urls: ['https://www.konga.com/deals/daily'],
     urls: ['https://www.konga.com'],
     special_links: [
       {
-        name: 'Daily Deals',
+        name: 'Konga Daily Deals',
         urls: ['https://www.konga.com/deals/daily'],
       },
     ],
     website: 'https://www.konga.com/',
     logoUrl:
       'https://www.konga.com/_next/static/images/62f8a0d88e07573b4d46735aa24f3f04.png',
+  },
+  // {
+  //   name: 'Temu',
+  //   slug: 'temu',
+  //   badgeColor: 'orange',
+  //   urls: ['https://www.temu.com/ng'],
+  //   special_links: [
+  //     {
+  //       name: 'Temu Best Sellers',
+  //       urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
+  //     },
+  //     // {
+  //     //   name: 'Temu New Arrivals',
+  //     //   urls: ['https://www.temu.com/ng/channel/new-in.html'],
+  //     // },
+  //   ],
+  //   website: 'https://www.temu.com/ng',
+  //   logoUrl:
+  //     'https://seeklogo.com/images/T/temu-logo-B5FE5A9A56-seeklogo.com.png',
+  // },
+  {
+    name: 'Aliexpress',
+    slug: 'aliexpress',
+    badgeColor: 'red',
+    urls: ['https://www.aliexpress.com/'],
+    special_links: [
+      {
+        name: 'Aliexpress Best Sellers',
+        urls: ['https://www.aliexpress.com/ssr/300000444/GSDWp3p6aC'],
+      },
+      {
+        name: 'AliExpress Bundle Deals',
+        urls: ['https://www.aliexpress.com/ssr/300000512/BundleDeals2'],
+      },
+      {
+        name: 'AliExpress Choices',
+        urls: ['https://www.aliexpress.com/ssr/300000556/zQFHEaEPNJ'],
+      },
+    ],
+    website: 'https://www.aliexpress.com/',
+    logoUrl:
+      'https://w7.pngwing.com/pngs/453/223/png-transparent-aliexpress-hd-logo-thumbnail.png',
   },
 ];
 
