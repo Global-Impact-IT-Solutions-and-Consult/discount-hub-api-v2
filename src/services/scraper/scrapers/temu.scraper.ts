@@ -131,10 +131,10 @@ export class TemuScraperService extends WorkerHost {
               });
 
               await page
-                .waitForSelector('div.t33rbhT3', { timeout: 10000 })
+                .waitForSelector('div._6q6qVUF5_1UrrHYym', { timeout: 10000 })
                 .catch(() => {
                   this.logger.error(
-                    `Selector 'div.t33rbhT3' not found at URL ${currentPageUrl}. Skipping to next link.`,
+                    `Selector 'div._6q6qVUF5._1UrrHYym' not found at URL ${currentPageUrl}. Skipping to next link.`,
                   );
                   currentPageUrl = null;
                   return;
@@ -363,24 +363,35 @@ export class TemuScraperService extends WorkerHost {
 
               try {
                 await page.goto(currentPageUrl, {
-                  waitUntil: 'networkidle2', // Wait for network to be idle
+                  // waitUntil: 'networkidle2', // Wait for network to be idle
+                  waitUntil: 'domcontentloaded',
                   timeout: 60000,
                 });
 
                 // Wait for the js-goods-list to be fully loaded
-                await page.waitForSelector(
-                  'div.t33rbhT3[role="region"], div.t33rbhT3.autoFitList[role="region"]',
-                  {
-                    timeout: 20000,
-                  },
-                );
+                // await page.waitForSelector(
+                //   'div.t33rbhT3[role="region"], div.t33rbhT3.autoFitList[role="region"]',
+                //   {
+                //     timeout: 20000,
+                //   },
+                // );
+
+                await page
+                  .waitForSelector('div.EKDT7a3v', {
+                    timeout: 10000,
+                  })
+                  .catch(() => {
+                    this.logger.error(
+                      `Selector 'div.EKDT7a3v' not found at URL ${currentPageUrl}. Skipping to next link.`,
+                    );
+                    currentPageUrl = null;
+                    return;
+                  });
 
                 // Fetch all products with class .EKDT7a3v using page.evaluate
                 const allProducts = await page.evaluate(() => {
                   return Array.from(
-                    document.querySelectorAll(
-                      'div.t33rbhT3.autoFitList[role="region"] div.EKDT7a3v',
-                    ),
+                    document.querySelectorAll('div._6q6qVUF5_1UrrHYym'),
                   ).map((product) => product.outerHTML);
                 });
 
@@ -388,7 +399,7 @@ export class TemuScraperService extends WorkerHost {
 
                 const categoryHeading = await page.evaluate(() => {
                   const header = document.querySelector(
-                    'div.t33rbhT3.autoFitList header',
+                    'div._6q6qVUF5_1UrrHYym header',
                   );
                   const heading = header
                     ?.querySelector('div h1')
@@ -398,9 +409,7 @@ export class TemuScraperService extends WorkerHost {
 
                 const products = await page.evaluate(() => {
                   const productElements = Array.from(
-                    document.querySelectorAll(
-                      'div.t33rbhT3.autoFitList > div.EKDT7a3v',
-                    ),
+                    document.querySelectorAll('div._6q6qVUF5_1UrrHYym'),
                   );
                   return productElements
                     .map((productHolder) => {

@@ -13,7 +13,7 @@ export class AppService implements OnApplicationBootstrap {
   ) {}
 
   onApplicationBootstrap() {
-    // this.scraperService.startAllCompanyScrapers(); // disabled on dev
+    this.scraperService.startAllCompanyScrapers(); // disabled on dev
     // this.productService.getRandomFeaturedItemsByTag(); // disabled on dev
     // this.productService.getRandomFeaturedCategory(); // disabled on dev
   }
