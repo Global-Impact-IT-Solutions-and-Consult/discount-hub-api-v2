@@ -17,39 +17,39 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     slug: 'jumia',
     badgeColor: 'blue',
     urls: [
-      // 'https://www.jumia.com.ng',
-      // 'https://www.jumia.com.ng/mlp-appliances',
-      // 'https://www.jumia.com.ng/health-beauty',
-      // 'https://www.jumia.com.ng/electronics',
-      // 'https://www.jumia.com.ng/mlp-beauty-essentials',
-      // 'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
-      // 'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
-      // 'https://www.jumia.com.ng/category-fashion-by-jumia',
-      // 'https://www.jumia.com.ng/mlp-beverages-drinks',
-      // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
-      // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
-      // 'https://www.jumia.com.ng/flash-sales',
-      // 'https://www.jumia.com.ng/mlp-clearance-sale',
-      // 'https://www.jumia.com.ng/mlp-global-best-deal',
-      // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
+      'https://www.jumia.com.ng',
+      'https://www.jumia.com.ng/mlp-appliances',
+      'https://www.jumia.com.ng/health-beauty',
+      'https://www.jumia.com.ng/electronics',
+      'https://www.jumia.com.ng/mlp-beauty-essentials',
+      'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
+      'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
+      'https://www.jumia.com.ng/category-fashion-by-jumia',
+      'https://www.jumia.com.ng/mlp-beverages-drinks',
+      'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
+      'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
+      'https://www.jumia.com.ng/flash-sales',
+      'https://www.jumia.com.ng/mlp-clearance-sale',
+      'https://www.jumia.com.ng/mlp-global-best-deal',
+      'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
     ],
     special_links: [
-      // {
-      //   name: 'Jumia Flash Sales',
-      //   urls: ['https://www.jumia.com.ng/flash-sales'],
-      // },
-      // {
-      //   name: 'Global New Arrival',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
-      // },
-      // {
-      //   name: 'Jumia Clearance Sale',
-      //   urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
-      // },
-      // {
-      //   name: 'Global Best Deals',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
-      // },
+      {
+        name: 'Jumia Flash Sales',
+        urls: ['https://www.jumia.com.ng/flash-sales'],
+      },
+      {
+        name: 'Global New Arrival',
+        urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
+      },
+      {
+        name: 'Jumia Clearance Sale',
+        urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
+      },
+      {
+        name: 'Global Best Deals',
+        urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
+      },
     ],
     website: 'https://www.jumia.com.ng/',
     logoUrl:
@@ -59,14 +59,12 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Konga',
     slug: 'konga',
     badgeColor: 'emerald',
-    urls: [
-      // 'https://www.konga.com'
-    ],
+    urls: ['https://www.konga.com'],
     special_links: [
-      // {
-      //   name: 'Konga Daily Deals',
-      //   urls: ['https://www.konga.com/deals/daily'],
-      // },
+      {
+        name: 'Konga Daily Deals',
+        urls: ['https://www.konga.com/deals/daily'],
+      },
     ],
     website: 'https://www.konga.com/',
     logoUrl:
@@ -80,14 +78,14 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
       // 'https://www.temu.com/ng'
     ],
     special_links: [
-      {
-        name: 'Temu Best Sellers',
-        urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
-      },
-      {
-        name: 'Temu New Arrivals',
-        urls: ['https://www.temu.com/ng/channel/new-in.html'],
-      },
+      // {
+      //   name: 'Temu Best Sellers',
+      //   urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
+      // },
+      // {
+      //   name: 'Temu New Arrivals',
+      //   urls: ['https://www.temu.com/ng/channel/new-in.html'],
+      // },
     ],
     website: 'https://www.temu.com/ng',
     logoUrl:
@@ -97,22 +95,20 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Aliexpress',
     slug: 'aliexpress',
     badgeColor: 'red',
-    urls: [
-      // 'https://www.aliexpress.com/'
-    ],
+    urls: ['https://www.aliexpress.com/'],
     special_links: [
-      // {
-      //   name: 'Aliexpress Best Sellers',
-      //   urls: ['https://www.aliexpress.com/ssr/300000444/GSDWp3p6aC'],
-      // },
-      // {
-      //   name: 'AliExpress Bundle Deals',
-      //   urls: ['https://www.aliexpress.com/ssr/300000512/BundleDeals2'],
-      // },
-      // {
-      //   name: 'AliExpress Choices',
-      //   urls: ['https://www.aliexpress.com/ssr/300000556/zQFHEaEPNJ'],
-      // },
+      {
+        name: 'Aliexpress Best Sellers',
+        urls: ['https://www.aliexpress.com/ssr/300000444/GSDWp3p6aC'],
+      },
+      {
+        name: 'AliExpress Bundle Deals',
+        urls: ['https://www.aliexpress.com/ssr/300000512/BundleDeals2'],
+      },
+      {
+        name: 'AliExpress Choices',
+        urls: ['https://www.aliexpress.com/ssr/300000556/zQFHEaEPNJ'],
+      },
     ],
     website: 'https://www.aliexpress.com/',
     logoUrl:
