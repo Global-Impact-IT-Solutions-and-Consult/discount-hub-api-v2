@@ -18,38 +18,38 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     badgeColor: 'blue',
     urls: [
       'https://www.jumia.com.ng',
-      // 'https://www.jumia.com.ng/mlp-appliances',
-      // 'https://www.jumia.com.ng/health-beauty',
-      // 'https://www.jumia.com.ng/electronics',
-      // 'https://www.jumia.com.ng/mlp-beauty-essentials',
-      // 'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
-      // 'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
-      // 'https://www.jumia.com.ng/category-fashion-by-jumia',
-      // 'https://www.jumia.com.ng/mlp-beverages-drinks',
-      // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
-      // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
-      // 'https://www.jumia.com.ng/flash-sales',
-      // 'https://www.jumia.com.ng/mlp-clearance-sale',
-      // 'https://www.jumia.com.ng/mlp-global-best-deal',
-      // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
+      'https://www.jumia.com.ng/mlp-appliances',
+      'https://www.jumia.com.ng/health-beauty',
+      'https://www.jumia.com.ng/electronics',
+      'https://www.jumia.com.ng/mlp-beauty-essentials',
+      'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
+      'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
+      'https://www.jumia.com.ng/category-fashion-by-jumia',
+      'https://www.jumia.com.ng/mlp-beverages-drinks',
+      'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
+      'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
+      'https://www.jumia.com.ng/flash-sales',
+      'https://www.jumia.com.ng/mlp-clearance-sale',
+      'https://www.jumia.com.ng/mlp-global-best-deal',
+      'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
     ],
     special_links: [
       {
         name: 'Jumia Flash Sales',
         urls: ['https://www.jumia.com.ng/flash-sales'],
       },
-      // {
-      //   name: 'Global New Arrival',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
-      // },
-      // {
-      //   name: 'Jumia Clearance Sale',
-      //   urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
-      // },
-      // {
-      //   name: 'Global Best Deals',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
-      // },
+      {
+        name: 'Global New Arrival',
+        urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
+      },
+      {
+        name: 'Jumia Clearance Sale',
+        urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
+      },
+      {
+        name: 'Global Best Deals',
+        urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
+      },
     ],
     website: 'https://www.jumia.com.ng/',
     logoUrl:
@@ -70,25 +70,27 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     logoUrl:
       'https://www.konga.com/_next/static/images/62f8a0d88e07573b4d46735aa24f3f04.png',
   },
-  // {
-  //   name: 'Temu',
-  //   slug: 'temu',
-  //   badgeColor: 'orange',
-  //   urls: ['https://www.temu.com/ng'],
-  //   special_links: [
-  //     {
-  //       name: 'Temu Best Sellers',
-  //       urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
-  //     },
-  //     // {
-  //     //   name: 'Temu New Arrivals',
-  //     //   urls: ['https://www.temu.com/ng/channel/new-in.html'],
-  //     // },
-  //   ],
-  //   website: 'https://www.temu.com/ng',
-  //   logoUrl:
-  //     'https://seeklogo.com/images/T/temu-logo-B5FE5A9A56-seeklogo.com.png',
-  // },
+  {
+    name: 'Temu',
+    slug: 'temu',
+    badgeColor: 'orange',
+    urls: [
+      // 'https://www.temu.com/ng'
+    ],
+    special_links: [
+      // {
+      //   name: 'Temu Best Sellers',
+      //   urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
+      // },
+      // {
+      //   name: 'Temu New Arrivals',
+      //   urls: ['https://www.temu.com/ng/channel/new-in.html'],
+      // },
+    ],
+    website: 'https://www.temu.com/ng',
+    logoUrl:
+      'https://seeklogo.com/images/T/temu-logo-B5FE5A9A56-seeklogo.com.png',
+  },
   {
     name: 'Aliexpress',
     slug: 'aliexpress',
