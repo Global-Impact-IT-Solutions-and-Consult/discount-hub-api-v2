@@ -22,7 +22,7 @@ export class AppService implements OnApplicationBootstrap {
     name: 'scraperJob', // Give the job a name so it can be managed programmatically
   })
   async handleCron() {
-    this.logger.debug('Called once to add scrape job to queue..');
+    this.logger.debug('Called once to add scrape job to queue...');
     await this.scraperService.startAllCompanyScrapers();
     await this.productService.getRandomFeaturedItemsByTag();
     await this.productService.getRandomFeaturedCategory(); // disabled on dev
