@@ -15,8 +15,8 @@ export class AppService implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     // this.productService.removeAll(); // disabled on dev
     this.scraperService.startAllCompanyScrapers(); // disabled on dev
-    // this.productService.getRandomFeaturedItemsByTag(); // disabled on dev
-    // this.productService.getRandomFeaturedCategory(); // disabled on dev
+    this.productService.getRandomFeaturedItemsByTag(); // disabled on dev
+    this.productService.getRandomFeaturedCategory(); // disabled on dev
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
