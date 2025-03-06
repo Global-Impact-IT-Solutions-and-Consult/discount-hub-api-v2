@@ -74,9 +74,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Temu',
     slug: 'temu',
     badgeColor: 'orange',
-    urls: [
-      // 'https://www.temu.com/ng'
-    ],
+    urls: ['https://www.temu.com/ng'],
     special_links: [
       // {
       //   name: 'Temu Best Sellers',
