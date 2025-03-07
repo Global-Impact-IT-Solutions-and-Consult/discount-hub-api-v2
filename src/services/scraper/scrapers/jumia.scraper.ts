@@ -98,9 +98,10 @@ export class JumiaScraperService extends WorkerHost {
   private async scrapeCompany(payload: CompanyDocument): Promise<any> {
     this.logger.log(`Scraping data for company: ${payload.name}`);
     const browser = await puppeteer.launch({
-      executablePath: '/usr/bin/google-chrome', // Use system-installed Chrome
+      // executablePath: '/usr/bin/google-chrome', // Use system-installed Chrome
       headless: true,
       ignoreDefaultArgs: ['--disable-extensions'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     try {
