@@ -106,6 +106,7 @@ export class AliexpressScraperService extends WorkerHost {
     //   ignoreDefaultArgs: ['--disable-extensions'],
     // });
     const browser = await puppeteer.launch({
+      executablePath: '/usr/bin/google-chrome', // Use system-installed Chrome
       headless: true,
       args: [
         '--no-sandbox',
