@@ -85,13 +85,12 @@ export class TemuScraperService extends WorkerHost {
     this.logger.log(`Starting scrape for company: ${company.slug}`);
     try {
       // const scrapedData = await this.scrapeCompany(company);
-      const scrapedData = await this.crawlReactSPA(
-        'https://www.temu.com/ng/channel/best-sellers.html',
-      );
+      // const scrapedData = await this.crawlReactSPA(
+      //   'https://www.temu.com/ng/channel/best-sellers.html',
+      // );
       // this.logger.log(`Scraped data: ${JSON.stringify(scrapedData)}`);
-
       // Save the scraped data using the ProductService
-      await this.saveProducts(scrapedData, company);
+      // await this.saveProducts(scrapedData, company);
     } catch (error) {
       this.logger.error(`Error scraping company ${company.slug}:`, error);
     }
@@ -163,6 +162,7 @@ export class TemuScraperService extends WorkerHost {
     //   ignoreDefaultArgs: ['--disable-extensions'],
     // });
     const browser = await puppeteer.launch({
+      executablePath: '/usr/bin/google-chrome', // Use system-installed Chrome
       headless: true,
       args: [
         '--no-sandbox',
