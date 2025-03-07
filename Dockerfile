@@ -71,7 +71,8 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache python3 make g++ cmake git
 
 # Copy package.json and package-lock.json before installing dependencies
-COPY package.json package-lock.json ./
+# COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # Install dependencies first to leverage Docker cache
 RUN npm install --legacy-peer-deps
