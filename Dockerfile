@@ -1,11 +1,11 @@
 # Build stage
-# FROM node:latest AS build
-FROM node:18-alpine AS builder
+FROM node:latest AS build
 
 # Set working directory
 WORKDIR /usr/src/app
 
 # Install build dependencies
+# RUN npm install -g @swc/core @nestjs/cli
 RUN npm install -g @swc/core  @nestjs/cli
 
 # Copy package files
@@ -22,8 +22,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-# FROM node:latest AS production
-FROM node:18-alpine AS runner
+FROM node:latest AS production
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -60,7 +59,6 @@ USER pptruser
 
 # Run your app
 CMD ["npm", "run", "start:prod"]
-
 
 
 # # Build stage
