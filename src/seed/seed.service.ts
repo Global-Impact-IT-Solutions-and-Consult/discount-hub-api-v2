@@ -21,6 +21,7 @@ export class SeedService implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
+    await this.companyService.removeAll(); // disabled on dev
     await this.seedRoles();
     await this.seedSuperAdmin();
     await this.seedCompanies();

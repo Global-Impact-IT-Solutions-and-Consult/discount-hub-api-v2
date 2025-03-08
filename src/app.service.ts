@@ -2,6 +2,7 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ScraperService } from './services/scraper/scraper.service';
 import { ProductService } from './product/product.service';
+// import { CompanyService } from './company/company.service';
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {
@@ -10,10 +11,11 @@ export class AppService implements OnApplicationBootstrap {
   constructor(
     private readonly scraperService: ScraperService,
     private readonly productService: ProductService,
+    // private readonly companyService: CompanyService,
   ) {}
 
   onApplicationBootstrap() {
-    // this.productService.removeAll(); // disabled on dev
+    this.productService.removeAll(); // disabled on dev
     this.scraperService.startAllCompanyScrapers(); // disabled on dev
     this.productService.getRandomFeaturedItemsByTag(); // disabled on dev
     this.productService.getRandomFeaturedCategory(); // disabled on dev

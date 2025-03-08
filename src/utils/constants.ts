@@ -70,25 +70,25 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     logoUrl:
       'https://www.konga.com/_next/static/images/62f8a0d88e07573b4d46735aa24f3f04.png',
   },
-  {
-    name: 'Temu',
-    slug: 'temu',
-    badgeColor: 'orange',
-    urls: ['https://www.temu.com/ng'],
-    special_links: [
-      // {
-      //   name: 'Temu Best Sellers',
-      //   urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
-      // },
-      // {
-      //   name: 'Temu New Arrivals',
-      //   urls: ['https://www.temu.com/ng/channel/new-in.html'],
-      // },
-    ],
-    website: 'https://www.temu.com/ng',
-    logoUrl:
-      'https://seeklogo.com/images/T/temu-logo-B5FE5A9A56-seeklogo.com.png',
-  },
+  // {
+  //   name: 'Temu',
+  //   slug: 'temu',
+  //   badgeColor: 'orange',
+  //   urls: ['https://www.temu.com/ng'],
+  //   special_links: [
+  //     // {
+  //     //   name: 'Temu Best Sellers',
+  //     //   urls: ['https://www.temu.com/ng/channel/best-sellers.html'],
+  //     // },
+  //     // {
+  //     //   name: 'Temu New Arrivals',
+  //     //   urls: ['https://www.temu.com/ng/channel/new-in.html'],
+  //     // },
+  //   ],
+  //   website: 'https://www.temu.com/ng',
+  //   logoUrl:
+  //     'https://seeklogo.com/images/T/temu-logo-B5FE5A9A56-seeklogo.com.png',
+  // },
   {
     name: 'Aliexpress',
     slug: 'aliexpress',
