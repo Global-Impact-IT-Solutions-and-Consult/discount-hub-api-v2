@@ -213,4 +213,14 @@ export class CompanyService {
     }
     return true;
   }
+
+  // Delete all the products
+  async removeAll(): Promise<{ message: string }> {
+    console.log('Deleting all companies.');
+    await this.companyModel.deleteMany({}).exec();
+
+    return {
+      message: 'All company categories have been deleted',
+    };
+  }
 }
