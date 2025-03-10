@@ -36,24 +36,6 @@ import { ChatModule } from './chat/chat.module';
       }),
       inject: [ConfigService],
     }),
-    // BullModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: async (
-    //     configService: ConfigService<EnvironmentVariables>,
-    //   ) => ({
-    //     connection: {
-    //       host: configService.get('REDIS_HOST'),
-    //       port: configService.get('REDIS_PORT'),
-    //       password: configService.get('REDIS_PASSWORD') ?? undefined,
-    //       username: configService.get('REDIS_USERNAME') ?? undefined,
-    //       // Add retry strategy and error handling
-    //       retryStrategy: (times) => {
-    //         return Math.min(times * 50, 2000); // Adjust retry strategy as needed
-    //       },
-    //     },
-    //   }),
-    //   inject: [ConfigService],
-    // }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (
@@ -64,17 +46,60 @@ import { ChatModule } from './chat/chat.module';
           port: configService.get('REDIS_PORT'),
           password: configService.get('REDIS_PASSWORD') ?? undefined,
           username: configService.get('REDIS_USERNAME') ?? undefined,
-          // 👇 Add connection pool settings
-          maxRetriesPerRequest: null, // Important for BullMQ
-          enableOfflineQueue: false, // Disable queuing when Redis is down
+          // Add retry strategy and error handling
+          retryStrategy: (times) => {
+            return Math.min(times * 50, 2000); // Adjust retry strategy as needed
+          },
         },
-        // 👇 Shared Redis connection for all queues
-        sharedConnection: true,
       }),
       inject: [ConfigService],
     }),
+    // BullModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (
+    //     configService: ConfigService<EnvironmentVariables>,
+    //   ) => ({
+    //     connection: {
+    //       host: configService.get('REDIS_HOST'),
+    //       port: configService.get('REDIS_PORT'),
+    //       password: configService.get('REDIS_PASSWORD') ?? undefined,
+    //       username: configService.get('REDIS_USERNAME') ?? undefined,
+    //       // 👇 Add connection pool settings
+    //       maxRetriesPerRequest: null, // Important for BullMQ
+    //       enableOfflineQueue: false, // Disable queuing when Redis is down
+    //     },
+    //     // 👇 Shared Redis connection for all queues
+    //     sharedConnection: true,
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     BullModule.registerQueue({
       name: 'scraper',
+    }),
+    CacheModule.registerAsync<RedisClientOptions>({
+      isGlobal: true,
+      imports: [ConfigModule],
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => {
+        const store = await redisStore({
+          url: configService.get('REDIS_USERNAME')
+            ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
+            : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
+          ttl: configService.get<number>('CACHE_TTL'),
+        });
+
+        return {
+          store: () => store,
+          // Add error handling here
+          onClientReady: (client) => {
+            client.on('error', (err) =>
+              console.error('Redis Client Error', err),
+            );
+          },
+        };
+      },
+      inject: [ConfigService],
     }),
     // CacheModule.registerAsync<RedisClientOptions>({
     //   isGlobal: true,
@@ -82,46 +107,21 @@ import { ChatModule } from './chat/chat.module';
     //   useFactory: async (
     //     configService: ConfigService<EnvironmentVariables>,
     //   ) => {
-    //     const store = await redisStore({
+    //     return {
+    //       store: redisStore,
     //       url: configService.get('REDIS_USERNAME')
     //         ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
     //         : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
     //       ttl: configService.get<number>('CACHE_TTL'),
-    //     });
-
-    //     return {
-    //       store: () => store,
-    //       // Add error handling here
-    //       onClientReady: (client) => {
-    //         client.on('error', (err) =>
-    //           console.error('Redis Client Error', err),
-    //         );
+    //       // 👇 Add connection settings
+    //       socket: {
+    //         reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
     //       },
+    //       pingInterval: 10000, // Keep connection alive
     //     };
     //   },
     //   inject: [ConfigService],
     // }),
-    CacheModule.registerAsync<RedisClientOptions>({
-      isGlobal: true,
-      imports: [ConfigModule],
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables>,
-      ) => {
-        return {
-          store: redisStore,
-          url: configService.get('REDIS_USERNAME')
-            ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
-            : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
-          ttl: configService.get<number>('CACHE_TTL'),
-          // 👇 Add connection settings
-          socket: {
-            reconnectStrategy: (retries) => Math.min(retries * 100, 3000),
-          },
-          pingInterval: 10000, // Keep connection alive
-        };
-      },
-      inject: [ConfigService],
-    }),
     UserModule,
     ServicesModule,
     CompanyModule,
