@@ -59,7 +59,10 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Konga',
     slug: 'konga',
     badgeColor: 'emerald',
-    urls: ['https://www.konga.com'],
+    urls: [
+      'https://www.konga.com',
+      // 'https://www.konga.com'
+    ],
     special_links: [
       {
         name: 'Konga Daily Deals',
@@ -93,7 +96,10 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Aliexpress',
     slug: 'aliexpress',
     badgeColor: 'red',
-    urls: ['https://www.aliexpress.com/'],
+    urls: [
+      'https://www.aliexpress.com/',
+      // 'https://www.aliexpress.com/'
+    ],
     special_links: [
       {
         name: 'Aliexpress Best Sellers',

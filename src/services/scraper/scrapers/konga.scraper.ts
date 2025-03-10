@@ -358,32 +358,40 @@ export class KongaScraperService extends WorkerHost {
                 });
 
                 await page.waitForSelector(
-                  'div.e5d9e_mwBLu section._588b5_3MtNs ul.b49ee_2pjyI._3b9ce_2Ge9A',
+                  // 'div.e5d9e_mwBLu section._588b5_3MtNs ul.b49ee_2pjyI._3b9ce_2Ge9A',
+                  'div.e5d9e_mwBLu section ul.b49ee_2pjyI',
                   { timeout: 20000 },
                 );
 
-                // const categoryHeading = await page.evaluate(() => {
-                //   const header = document.querySelector(
-                //     'div.a146d_2EPwb ul._1fce2_1jxDY._923ee_2j7PF li.breadcrumbItem a',
-                //   );
-                //   return header?.textContent.trim() || 'Unknown Category';
-                //   // const heading = header
-                //   //   ?.querySelector('div h1')
-                //   //   ?.textContent.trim();
-                //   // return heading || 'Unknown Category';
-                // });
+                // <div class="e5d9e_mwBLu">
+                //   <section class>
+                //     <ul class="b49ee_2pjyI">
+                //       <li class="bbe45_3oExY">
+                //         <a class="a2cf5_2S5q5 _2b5c5_1Qou0"></a>
+                //       </li>
+                //       <li class="bbe45_3oExY">
+                //         <a class="a2cf5_2S5q5 _2b5c5_1Qou0"></a>
+                //       </li>
+                //       <li class="bbe45_3oExY">
+                //         <a class="a2cf5_2S5q5 _2b5c5_1Qou0"></a>
+                //       </li>
+                //     </ul>
+                //   </section>
+                // </div>
 
                 const products = await page.evaluate(() => {
                   const productElements = Array.from(
                     document.querySelectorAll(
-                      'div.e5d9e_mwBLu section._588b5_3MtNs section ul.b49ee_2pjyI._3b9ce_2Ge9A > li',
+                      // 'div.e5d9e_mwBLu section._588b5_3MtNs section ul.b49ee_2pjyI._3b9ce_2Ge9A > li',
+                      'div.e5d9e_mwBLu section ul.b49ee_2pjyI > li',
                     ),
                   );
 
                   return productElements
                     .map((li) => {
                       const anchor = li.querySelector(
-                        'li.bbe45_3oExY._3b9ce_2Ge9A a',
+                        // 'li.bbe45_3oExY._3b9ce_2Ge9A a',
+                        'li.bbe45_3oExY a',
                       );
                       if (!anchor) return null;
 
