@@ -34,10 +34,10 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
       // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
     ],
     special_links: [
-      // {
-      //   name: 'Jumia Flash Sales',
-      //   urls: ['https://www.jumia.com.ng/flash-sales'],
-      // },
+      {
+        name: 'Jumia Flash Sales',
+        urls: ['https://www.jumia.com.ng/flash-sales'],
+      },
       // {
       //   name: 'Global New Arrival',
       //   urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
