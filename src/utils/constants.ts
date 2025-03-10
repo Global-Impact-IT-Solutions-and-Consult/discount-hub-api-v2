@@ -17,7 +17,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     slug: 'jumia',
     badgeColor: 'blue',
     urls: [
-      // 'https://www.jumia.com.ng',
+      'https://www.jumia.com.ng',
       // 'https://www.jumia.com.ng/mlp-appliances',
       // 'https://www.jumia.com.ng/health-beauty',
       // 'https://www.jumia.com.ng/electronics',
@@ -38,18 +38,18 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
         name: 'Jumia Flash Sales',
         urls: ['https://www.jumia.com.ng/flash-sales'],
       },
-      // {
-      //   name: 'Global New Arrival',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
-      // },
-      // {
-      //   name: 'Jumia Clearance Sale',
-      //   urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
-      // },
-      // {
-      //   name: 'Global Best Deals',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
-      // },
+      {
+        name: 'Global New Arrival',
+        urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
+      },
+      {
+        name: 'Jumia Clearance Sale',
+        urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
+      },
+      {
+        name: 'Global Best Deals',
+        urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
+      },
     ],
     website: 'https://www.jumia.com.ng/',
     logoUrl:
@@ -59,14 +59,12 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     name: 'Konga',
     slug: 'konga',
     badgeColor: 'emerald',
-    urls: [
-      // 'https://www.konga.com'
-    ],
+    urls: ['https://www.konga.com'],
     special_links: [
-      // {
-      //   name: 'Konga Daily Deals',
-      //   urls: ['https://www.konga.com/deals/daily'],
-      // },
+      {
+        name: 'Konga Daily Deals',
+        urls: ['https://www.konga.com/deals/daily'],
+      },
     ],
     website: 'https://www.konga.com/',
     logoUrl:
