@@ -36,17 +36,36 @@ import { ChatModule } from './chat/chat.module';
       }),
       inject: [ConfigService],
     }),
+    // BullModule.forRootAsync({
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => ({
+    //     connection: {
+    //       host: configService.get('REDIS_HOST'),
+    //       port: configService.get('REDIS_PORT'),
+    //       password: configService.get('REDIS_PASSWORD') ?? undefined,
+    //       username: configService.get('REDIS_USERNAME') ?? undefined,
+    //       maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
+    //       enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
+    //       retryStrategy: (times) => Math.min(times * 50, 2000),
+    //     },
+    //     sharedConnection: true, // ✅ Use a single Redis connection for all queues
+    //   }),
+    //   inject: [ConfigService],
+    // }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
+      useFactory: async (
+        configService: ConfigService<EnvironmentVariables>,
+      ) => ({
         connection: {
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
           password: configService.get('REDIS_PASSWORD') ?? undefined,
           username: configService.get('REDIS_USERNAME') ?? undefined,
-          maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
-          enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
-          retryStrategy: (times) => Math.min(times * 50, 2000),
+          // Add retry strategy and error handling
+          retryStrategy: (times) => {
+            return Math.min(times * 50, 2000); // Adjust retry strategy as needed
+          },
         },
         sharedConnection: true, // ✅ Use a single Redis connection for all queues
       }),
