@@ -36,39 +36,17 @@ import { ChatModule } from './chat/chat.module';
       }),
       inject: [ConfigService],
     }),
-    // BullModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: async (configService: ConfigService) => ({
-    //     connection: {
-    //       host: configService.get('REDIS_HOST'),
-    //       port: configService.get('REDIS_PORT'),
-    //       password: configService.get('REDIS_PASSWORD') ?? undefined,
-    //       username: configService.get('REDIS_USERNAME') ?? undefined,
-    //       maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
-    //       enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
-    //       retryStrategy: (times) => Math.min(times * 50, 2000),
-    //     },
-    //     sharedConnection: true, // ✅ Use a single Redis connection for all queues
-    //   }),
-    //   inject: [ConfigService],
-    // }),
     BullModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (
-        configService: ConfigService<EnvironmentVariables>,
-      ) => ({
+      useFactory: async (configService: ConfigService) => ({
         connection: {
           host: configService.get('REDIS_HOST'),
           port: configService.get('REDIS_PORT'),
           password: configService.get('REDIS_PASSWORD') ?? undefined,
           username: configService.get('REDIS_USERNAME') ?? undefined,
           maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
-          // enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
+          enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
           retryStrategy: (times) => Math.min(times * 50, 2000),
-          // Add retry strategy and error handling
-          // retryStrategy: (times) => {
-          //   return Math.min(times * 50, 2000); // Adjust retry strategy as needed
-          // },
         },
         sharedConnection: true, // ✅ Use a single Redis connection for all queues
       }),
@@ -77,41 +55,6 @@ import { ChatModule } from './chat/chat.module';
     BullModule.registerQueue({
       name: 'scraper',
     }),
-    // CacheModule.registerAsync<RedisClientOptions>({
-    //   isGlobal: true,
-    //   imports: [ConfigModule],
-    //   useFactory: async (configService: ConfigService) => {
-    //     const redisUrl = configService.get('REDIS_USERNAME')
-    //       ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
-    //       : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`;
-
-    //     // ✅ Store a single Redis connection
-    //     const store = await redisStore({
-    //       url: redisUrl,
-    //       ttl: configService.get<number>('CACHE_TTL'),
-    //       socket: {
-    //         reconnectStrategy: (retries) => Math.min(retries * 50, 2000), // Retry logic
-    //       },
-    //     });
-
-    //     return {
-    //       store: () => store,
-    //       isGlobal: true,
-    //       onClientReady: (client) => {
-    //         console.log('✅ Redis Client Connected');
-
-    //         client.on('error', (err) => {
-    //           console.error('❌ Redis Client Error:', err);
-    //         });
-
-    //         client.on('reconnecting', () => {
-    //           console.warn('🔄 Redis Client Reconnecting...');
-    //         });
-    //       },
-    //     };
-    //   },
-    //   inject: [ConfigService],
-    // }),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
