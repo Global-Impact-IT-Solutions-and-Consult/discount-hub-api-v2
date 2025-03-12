@@ -55,13 +55,61 @@ import { ChatModule } from './chat/chat.module';
     BullModule.registerQueue({
       name: 'scraper',
     }),
+    // CacheModule.registerAsync<RedisClientOptions>({
+    //   isGlobal: true,
+    //   imports: [ConfigModule],
+    //   useFactory: async (configService: ConfigService) => {
+    //     const redisUrl = configService.get('REDIS_USERNAME')
+    //       ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
+    //       : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`;
+
+    //     // ✅ Store a single Redis connection
+    //     const store = await redisStore({
+    //       url: redisUrl,
+    //       ttl: configService.get<number>('CACHE_TTL'),
+    //       socket: {
+    //         reconnectStrategy: (retries) => Math.min(retries * 50, 2000), // Retry logic
+    //       },
+    //     });
+
+    //     return {
+    //       store: () => store,
+    //       isGlobal: true,
+    //       onClientReady: (client) => {
+    //         console.log('✅ Redis Client Connected');
+
+    //         client.on('error', (err) => {
+    //           console.error('❌ Redis Client Error:', err);
+    //         });
+
+    //         client.on('reconnecting', () => {
+    //           console.warn('🔄 Redis Client Reconnecting...');
+    //         });
+    //       },
+    //     };
+    //   },
+    //   inject: [ConfigService],
+    // }),
     CacheModule.registerAsync<RedisClientOptions>({
       isGlobal: true,
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const redisUrl = configService.get('REDIS_USERNAME')
-          ? `redis://${configService.get('REDIS_USERNAME')}:${configService.get('REDIS_PASSWORD')}@${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`
-          : `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`;
+        const redisHost = configService.get('REDIS_HOST');
+        const redisPort = configService.get('REDIS_PORT');
+        const redisUsername = configService.get('REDIS_USERNAME');
+        const redisPassword = configService.get('REDIS_PASSWORD');
+
+        // Construct the Redis URL
+        let redisUrl: string;
+        if (redisUsername && redisPassword) {
+          redisUrl = `redis://${redisUsername}:${redisPassword}@${redisHost}:${redisPort}`;
+        } else if (redisPassword) {
+          redisUrl = `redis://:${redisPassword}@${redisHost}:${redisPort}`;
+        } else {
+          redisUrl = `redis://${redisHost}:${redisPort}`;
+        }
+
+        // console.log('Redis URL:', redisUrl); // Debugging
 
         // ✅ Store a single Redis connection
         const store = await redisStore({

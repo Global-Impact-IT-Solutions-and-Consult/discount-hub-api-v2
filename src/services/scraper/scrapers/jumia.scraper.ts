@@ -584,6 +584,7 @@ export class JumiaScraperService extends WorkerHost {
   private async saveProducts(scrapedData: any, company: CompanyDocument) {
     // this.logger.log('Saving products:', scrapedData.products);
     this.logger.log('Company: ', company);
+    this.logger.log('Company Special Link: ', company.special_links);
 
     for (const category of scrapedData) {
       for (const product of category.products) {
