@@ -6,7 +6,7 @@ import { ProductModule } from 'src/product/product.module';
 import { AiModule } from 'src/services/ai/ai.module';
 import { BullModule } from '@nestjs/bullmq';
 import { KongaScraperService } from './scrapers/konga.scraper';
-import { TemuScraperService } from './scrapers/temu.scraper';
+// import { TemuScraperService } from './scrapers/temu.scraper';
 import { AliexpressScraperService } from './scrapers/aliexpress.scraper';
 
 @Module({
@@ -22,7 +22,7 @@ import { AliexpressScraperService } from './scrapers/aliexpress.scraper';
     ScraperService,
     JumiaScraperService,
     KongaScraperService,
-    TemuScraperService,
+    // TemuScraperService,
     AliexpressScraperService,
   ],
   exports: [ScraperService],
