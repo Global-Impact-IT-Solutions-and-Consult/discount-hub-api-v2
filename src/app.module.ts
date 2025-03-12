@@ -62,10 +62,13 @@ import { ChatModule } from './chat/chat.module';
           port: configService.get('REDIS_PORT'),
           password: configService.get('REDIS_PASSWORD') ?? undefined,
           username: configService.get('REDIS_USERNAME') ?? undefined,
+          maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
+          // enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
+          retryStrategy: (times) => Math.min(times * 50, 2000),
           // Add retry strategy and error handling
-          retryStrategy: (times) => {
-            return Math.min(times * 50, 2000); // Adjust retry strategy as needed
-          },
+          // retryStrategy: (times) => {
+          //   return Math.min(times * 50, 2000); // Adjust retry strategy as needed
+          // },
         },
         sharedConnection: true, // ✅ Use a single Redis connection for all queues
       }),
