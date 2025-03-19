@@ -1,6 +1,3 @@
-
-
-
 # # Build stage
 # FROM node:latest AS build
 
@@ -8,16 +5,15 @@
 # WORKDIR /usr/src/app
 
 # # Install build dependencies
-# RUN npm install -g @swc/core @nestjs/cli
+# # RUN npm install -g @swc/core @nestjs/cli
+# RUN npm install -g @swc/core  @nestjs/cli
 
 # # Copy package files
 # COPY package*.json ./
 
-# # Set Puppeteer cache directory within the app
-# ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
-
-# # Install project dependencies and Puppeteer
-# RUN npm install && npm install puppeteer
+# # Install project dependencies
+# RUN npm install
+# RUN npm install puppeteer
 
 # # Copy the rest of your application's source code
 # COPY . .
@@ -32,12 +28,12 @@
 # ENV NODE_ENV=production
 # ENV PORT=5000
 # ENV MONGODB_URI=mongodb://mongo:27017/discount-hub
-# ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
+# ENV PUPPETEER_CACHE_DIR=/root/.cache/puppeteer
 
 # # Set working directory
 # WORKDIR /usr/src/app
 
-# # Install required dependencies for Puppeteer/Chrome
+# # Install required dependencies for Puppeteer
 # RUN apt-get update \
 #     && apt-get install -y wget gnupg \
 #     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -47,16 +43,15 @@
 #       --no-install-recommends \
 #     && rm -rf /var/lib/apt/lists/*
 
-# # Copy built assets and Puppeteer cache from the 'build' stage
+# # Copy built assets from the 'build' stage
 # COPY --from=build /usr/src/app /usr/src/app
 
-# # Create user and set permissions for app and cache directories
+# # Set permissions (optional)
 # RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
 #     && mkdir -p /home/pptruser/Downloads \
-#     && chown -R pptruser:pptruser /usr/src/app \
-#     && chown -R pptruser:pptruser /home/pptruser
+#     && chown -R pptruser:pptruser /usr/src/app
 
-# # Expose port
+# # Expose port (same as in ENV)
 # EXPOSE ${PORT}
 
 # # Run as non-root user
@@ -65,6 +60,7 @@
 # # Run your app
 # CMD ["npm", "run", "start:prod"]
 
+
 # Build stage
 FROM node:latest AS build
 
@@ -72,15 +68,16 @@ FROM node:latest AS build
 WORKDIR /usr/src/app
 
 # Install build dependencies
-# RUN npm install -g @swc/core @nestjs/cli
-RUN npm install -g @swc/core  @nestjs/cli
+RUN npm install -g @swc/core @nestjs/cli
 
 # Copy package files
 COPY package*.json ./
 
-# Install project dependencies
-RUN npm install
-RUN npm install puppeteer
+# Set Puppeteer cache directory within the app
+ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
+
+# Install project dependencies and Puppeteer
+RUN npm install && npm install puppeteer
 
 # Copy the rest of your application's source code
 COPY . .
@@ -95,12 +92,12 @@ FROM node:latest AS production
 ENV NODE_ENV=production
 ENV PORT=5000
 ENV MONGODB_URI=mongodb://mongo:27017/discount-hub
-ENV PUPPETEER_CACHE_DIR=/root/.cache/puppeteer
+ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
 
 # Set working directory
 WORKDIR /usr/src/app
 
-# Install required dependencies for Puppeteer
+# Install required dependencies for Puppeteer/Chrome
 RUN apt-get update \
     && apt-get install -y wget gnupg \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
@@ -110,15 +107,16 @@ RUN apt-get update \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy built assets from the 'build' stage
+# Copy built assets and Puppeteer cache from the 'build' stage
 COPY --from=build /usr/src/app /usr/src/app
 
-# Set permissions (optional)
+# Create user and set permissions for app and cache directories
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /usr/src/app
+    && chown -R pptruser:pptruser /usr/src/app \
+    && chown -R pptruser:pptruser /home/pptruser
 
-# Expose port (same as in ENV)
+# Expose port
 EXPOSE ${PORT}
 
 # Run as non-root user
