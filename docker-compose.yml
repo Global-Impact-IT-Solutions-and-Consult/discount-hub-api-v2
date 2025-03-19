@@ -1,54 +1,3 @@
-version: '3.8'
-
-services:
-  mongo:
-    image: mongo
-    container_name: mongo
-    ports:
-      - '27017:27017'
-    volumes:
-      - db:/data/db # specify the absolute path inside the container
-    networks:
-      - discount-hub-network
-
-  redis:
-    image: redis
-    container_name: redis
-    ports:
-      - '6379:6379'
-    networks:
-      - discount-hub-network
-
-  app:
-    image: discount-hub-image
-    container_name: app
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '3030:3030'
-    depends_on:
-      - mongo
-      - redis
-    cap_add:
-      - SYS_ADMIN # Add required privilege for Puppeteer
-    tmpfs:
-      - /tmp # Improve shared memory for Puppeteer
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/discount-hub
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PORT=3030
-    networks:
-      - discount-hub-network
-    command: ['npm', 'run', 'start:prod'] # Or provide a Puppeteer-specific command here
-
-networks:
-  discount-hub-network:
-    driver: bridge
-
-volumes:
-  db:
 # version: '3.8'
 
 # services:
@@ -81,14 +30,18 @@ volumes:
 #     depends_on:
 #       - mongo
 #       - redis
+#     cap_add:
+#       - SYS_ADMIN # Add required privilege for Puppeteer
+#     tmpfs:
+#       - /tmp # Improve shared memory for Puppeteer
 #     environment:
-#       # - MONGO_URI=mongodb://mongo:27017/nest
 #       - MONGO_URI=mongodb://mongo:27017/discount-hub
 #       - REDIS_HOST=redis
 #       - REDIS_PORT=6379
 #       - PORT=3030
 #     networks:
 #       - discount-hub-network
+#     command: ['npm', 'run', 'start:prod'] # Or provide a Puppeteer-specific command here
 
 # networks:
 #   discount-hub-network:
@@ -96,3 +49,51 @@ volumes:
 
 # volumes:
 #   db:
+
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - '27017:27017'
+    volumes:
+      - db:/data/db # specify the absolute path inside the container
+    networks:
+      - discount-hub-network
+
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - '6379:6379'
+    networks:
+      - discount-hub-network
+
+  app:
+    image: discount-hub-image
+    container_name: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3030:3030'
+    depends_on:
+      - mongo
+      - redis
+    environment:
+      # - MONGO_URI=mongodb://mongo:27017/nest
+      - MONGO_URI=mongodb://mongo:27017/discount-hub
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=3030
+    networks:
+      - discount-hub-network
+
+networks:
+  discount-hub-network:
+    driver: bridge
+
+volumes:
+  db:
