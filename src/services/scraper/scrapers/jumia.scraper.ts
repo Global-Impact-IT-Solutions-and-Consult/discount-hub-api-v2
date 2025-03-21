@@ -65,7 +65,7 @@ export class JumiaScraperService extends WorkerHost {
     return Promise.resolve();
   }
 
-  @OnEvent('scrape.company.jumia_') // Listening for the specific company's event
+  @OnEvent('scrape.company.jumia') // Listening for the specific company's event
   async handleJumiaScrape(company: CompanyDocument): Promise<void> {
     this.logger.log(`Starting scrape for company: ${company.slug}`);
     try {
