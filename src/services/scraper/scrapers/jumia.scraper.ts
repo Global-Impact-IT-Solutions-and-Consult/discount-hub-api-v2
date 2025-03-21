@@ -347,7 +347,7 @@ export class JumiaScraperService extends WorkerHost {
           rating: product.rating,
           numberOfRatings: product.numberOfRatings,
           store: company.name,
-          badgeColor: company.badgeColor || 'defaultColor', // Ensure badgeColor is saved
+          // badgeColor: company.badgeColor || 'defaultColor', // Ensure badgeColor is saved
           keyFeatures: product.keyFeatures,
         };
 
