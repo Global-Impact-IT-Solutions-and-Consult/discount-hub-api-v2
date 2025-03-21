@@ -58,7 +58,7 @@ export class JumiaScraperService extends WorkerHost {
   async process(job: Job<any, any, string>): Promise<any> {
     this.logger.log(`Processing job: ${job.id}`);
 
-    if (job.data && job.data.company && job.data.company.slug === 'jumia_') {
+    if (job.data && job.data.company && job.data.company.slug === 'jumia') {
       await this.handleJumiaScrape(job.data.company);
     }
 
