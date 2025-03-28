@@ -4,11 +4,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ProductService } from 'src/product/product.service';
 import { AiService } from 'src/services/ai/ai.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import puppeteer from 'puppeteer';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
+// import puppeteer from 'puppeteer';
+// import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium';
+import puppeteer from 'puppeteer-core';
 
 @Injectable()
 @Processor('scraper') // BullMQ processor for 'scraper' jobs
@@ -97,9 +100,29 @@ export class JumiaScraperService extends WorkerHost {
 
   private async scrapeCompany(payload: CompanyDocument): Promise<any> {
     this.logger.log(`Scraping data for company: ${payload.name}`);
+    // const browser = await puppeteer.launch({
+    //   headless: true,
+    //   ignoreDefaultArgs: ['--disable-extensions'],
+    // });
+
+    // const browser = await puppeteer.launch({
+    //   args: chromium.args,
+    //   defaultViewport: chromium.defaultViewport,
+    //   executablePath: await chromium.executablePath(),
+    //   headless: chromium.headless,
+    // });
+
+    const isServerless =
+      process.env.NODE_ENV === 'production' || process.env.AWS_EXECUTION_ENV;
+
     const browser = await puppeteer.launch({
-      headless: true,
-      ignoreDefaultArgs: ['--disable-extensions'],
+      args: isServerless ? chromium.args : ['--disable-gpu', '--no-sandbox'],
+      executablePath: isServerless
+        ? await chromium.executablePath()
+        : process.env.PUPPETEER_EXECUTABLE_PATH ||
+          'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+      headless: isServerless ? chromium.headless : false, // Changed 'new' to false
+      defaultViewport: chromium.defaultViewport,
     });
 
     try {
