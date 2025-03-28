@@ -8,6 +8,7 @@ import puppeteer from 'puppeteer';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
+import chromium from '@sparticuz/chromium';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 
 @Injectable()
@@ -103,6 +104,14 @@ export class KongaScraperService extends WorkerHost {
       ignoreDefaultArgs: ['--disable-extensions'],
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
+
+    // const browser = await puppeteer.launch({
+    //   args: chromium.args,
+    //   defaultViewport: chromium.defaultViewport,
+    //   executablePath: await chromium.executablePath(),
+    //   headless: chromium.headless,
+    // });
+
     const results: any[] = [];
 
     try {
