@@ -9,7 +9,7 @@ import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 import puppeteer from 'puppeteer';
-// import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium';
 // import chromium from '@sparticuz/chromium';
 // import puppeteer from 'puppeteer-core';
 
@@ -100,17 +100,17 @@ export class JumiaScraperService extends WorkerHost {
 
   private async scrapeCompany(payload: CompanyDocument): Promise<any> {
     this.logger.log(`Scraping data for company: ${payload.name}`);
-    const browser = await puppeteer.launch({
-      headless: true,
-      ignoreDefaultArgs: ['--disable-extensions'],
-    });
-
     // const browser = await puppeteer.launch({
-    //   args: chromium.args,
-    //   defaultViewport: chromium.defaultViewport,
-    //   executablePath: await chromium.executablePath(),
-    //   headless: chromium.headless,
+    //   headless: true,
+    //   ignoreDefaultArgs: ['--disable-extensions'],
     // });
+
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
 
     // const isServerless =
     //   process.env.NODE_ENV === 'production' || process.env.AWS_EXECUTION_ENV;

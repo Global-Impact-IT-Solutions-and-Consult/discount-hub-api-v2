@@ -106,26 +106,26 @@ export class AliexpressScraperService extends WorkerHost {
     //   headless: true,
     //   ignoreDefaultArgs: ['--disable-extensions'],
     // });
-    const browser = await puppeteer.launch({
-      // executablePath: '/usr/bin/google-chrome', // Use system-installed Chrome
-      headless: true,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu',
-      ],
-    });
-
     // const browser = await puppeteer.launch({
-    //   args: chromium.args,
-    //   defaultViewport: chromium.defaultViewport,
-    //   executablePath: await chromium.executablePath(),
-    //   headless: chromium.headless,
+    //   // executablePath: '/usr/bin/google-chrome', // Use system-installed Chrome
+    //   headless: true,
+    //   args: [
+    //     '--no-sandbox',
+    //     '--disable-setuid-sandbox',
+    //     '--disable-dev-shm-usage',
+    //     '--disable-accelerated-2d-canvas',
+    //     '--no-first-run',
+    //     '--no-zygote',
+    //     '--disable-gpu',
+    //   ],
     // });
+
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
 
     try {
       const page = await browser.newPage();
