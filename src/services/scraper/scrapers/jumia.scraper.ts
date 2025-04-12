@@ -105,11 +105,23 @@ export class JumiaScraperService extends WorkerHost {
     //   ignoreDefaultArgs: ['--disable-extensions'],
     // });
 
+    // const browser = await puppeteer.launch({
+    //   args: chromium.args,
+    //   defaultViewport: chromium.defaultViewport,
+    //   executablePath: await chromium.executablePath(),
+    //   headless: chromium.headless,
+    // });
+
     const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+      ],
+      executablePath:
+        process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
+      headless: true, // Explicitly set to true for production
+      // ignoreHTTPSErrors: true,
     });
 
     // const isServerless =
