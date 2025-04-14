@@ -1,32 +1,38 @@
-# Build stage remains the same
+# Build stage
 FROM node:latest AS build
 
 WORKDIR /usr/src/app
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN npm install -g @swc/core @nestjs/cli
 COPY package*.json ./
-ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
-RUN npm install && npm install puppeteer
+RUN npm install
 COPY . .
 RUN npm run build
 
-# Production stage with Chromium
+# Production stage
 FROM node:latest AS production
 
 ENV NODE_ENV=production
 ENV PORT=5000
 ENV MONGODB_URI=mongodb://mongo:27017/discount-hub
-ENV PUPPETEER_CACHE_DIR=/usr/src/app/.cache/puppeteer
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 WORKDIR /usr/src/app
 
-# Install Chromium and dependencies
+# Install Chromium with proper dependencies
 RUN apt-get update \
-    && apt-get install -y chromium fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    && apt-get install -y chromium \
+    fonts-freefont-ttf \
+    fonts-indic \
+    fonts-noto-color-emoji \
+    fonts-noto-cjk \
+    fonts-ipafont-gothic \
+    fonts-wqy-zenhei \
+    fonts-thai-tlwg \
+    fonts-kacst \
+    libxss1 \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
-
-# Set Chromium as the Puppeteer browser
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 COPY --from=build /usr/src/app /usr/src/app
 

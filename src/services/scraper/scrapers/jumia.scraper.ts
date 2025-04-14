@@ -117,10 +117,11 @@ export class JumiaScraperService extends WorkerHost {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
+        '--single-process',
       ],
-      executablePath:
-        process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
-      headless: true, // Explicitly set to true for production
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+      // headless: 'new', // Use new Headless mode
+      headless: true, // Use new Headless mode
       // ignoreHTTPSErrors: true,
     });
 
