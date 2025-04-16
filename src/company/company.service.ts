@@ -209,7 +209,7 @@ export class CompanyService {
   async deleteById(id: string) {
     const company = await this.companyModel.findByIdAndDelete(id);
     if (!company) {
-      throw new NotFoundException(`No Company found for this id: ${id}`);
+      throw new NotFoundException(`No Company found for this id: ${id}.`);
     }
     return true;
   }
