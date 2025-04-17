@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EmailService } from './email/email.service';
 import { format } from 'date-fns';
-import * as uniqid from 'uniqid';
+import { v4 as uuidv4 } from 'uuid';
 import { UserDocument } from 'src/user/schemas/user.schema';
 
 @Injectable()
@@ -10,10 +10,7 @@ export class NotificationService {
 
   private generateNotificationReference(id: string) {
     const presentDate = format(new Date(), 'yyMMdd');
-    const notificationReference = uniqid(
-      `CG_${id}-`,
-      `-${presentDate}`,
-    ) as string;
+    const notificationReference = `CG_${id}-${uuidv4()}-${presentDate}`;
     return notificationReference.toUpperCase();
   }
 
