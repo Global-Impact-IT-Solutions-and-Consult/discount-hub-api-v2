@@ -11,13 +11,13 @@ services:
     networks:
       - discount-hub-network
 
-  redis:
-    image: redis
-    container_name: redis
-    ports:
-      - '6379:6379'
-    networks:
-      - discount-hub-network
+  # redis:
+  #   image: redis
+  #   container_name: redis
+  #   ports:
+  #     - '6379:6379'
+  #   networks:
+  #     - discount-hub-network
 
   app:
     image: discount-hub-image
