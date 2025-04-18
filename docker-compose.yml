@@ -29,16 +29,20 @@ services:
       - '3030:3030'
     depends_on:
       - mongo
-      - redis
+      # - redis
     cap_add:
       - SYS_ADMIN # Add required privilege for Puppeteer
     tmpfs:
       - /tmp # Improve shared memory for Puppeteer
     environment:
-      - MONGO_URI=mongodb://mongo:27017/discount-hub
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - PORT=3030
+      # - MONGO_URI=mongodb://mongo:27017/discount-hub
+      # - REDIS_HOST=redis
+      # - REDIS_PORT=6379
+      # - PORT=3030
+      - MONGO_URI=${MONGO_URI}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - PORT=${PORT}
     networks:
       - discount-hub-network
     command: ['npm', 'run', 'start:prod'] # Or provide a Puppeteer-specific command here
