@@ -39,7 +39,7 @@ services:
       # - REDIS_HOST=redis
       # - REDIS_PORT=6379
       # - PORT=3030
-      - MONGO_URI=${MONGO_URI}
+      - MONGO_URI=${MONGODB_URI}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - PORT=${PORT}
