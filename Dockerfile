@@ -12,11 +12,11 @@ RUN npm run build
 # Production stage
 FROM node:latest AS production
 
-ENV NODE_ENV=production
-ENV PORT=5000
+ENV NODE_ENV=${NODE_ENV}
+ENV PORT=${PORT}
 # ENV MONGODB_URI=mongodb://mongo:27017/discount-hub
-ENV MONGODB_URI=mongodb+srv://kastroud:ISxI2ulidLIQx9qc@cluster0.mohssa2.mongodb.net/discount-hub?retryWrites=true&w=majority&appName=Cluster0
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV MONGODB_URI=${MONGODB_URI}
+ENV PUPPETEER_EXECUTABLE_PATH=${PUPPETEER_EXECUTABLE_PATH}
 
 WORKDIR /usr/src/app
 
