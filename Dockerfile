@@ -14,7 +14,8 @@ FROM node:latest AS production
 
 ENV NODE_ENV=production
 ENV PORT=5000
-ENV MONGODB_URI=mongodb://mongo:27017/discount-hub
+# ENV MONGODB_URI=mongodb://mongo:27017/discount-hub
+ENV MONGODB_URI=mongodb+srv://kastroud:ISxI2ulidLIQx9qc@cluster0.mohssa2.mongodb.net/discount-hub?retryWrites=true&w=majority&appName=Cluster0
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 WORKDIR /usr/src/app

@@ -10,7 +10,7 @@ async function bootstrap() {
     origin: true,
   });
   configureSwagger(app, 'documentation');
-  await app.listen(app.get(ConfigService).get('PORT'), () =>
+  await app.listen(app.get(ConfigService).get('PORT'), '0.0.0.0', () =>
     Logger.log(`
     ************************************************
     Welcome to Discount Hub. Server listening on port: ${app.get(ConfigService).get('PORT')}   
