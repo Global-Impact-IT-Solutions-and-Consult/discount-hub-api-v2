@@ -11,10 +11,19 @@ import { EnvironmentVariables } from 'src/common/config/env.config';
       useFactory: async (
         configService: ConfigService<EnvironmentVariables>,
       ) => ({
+        // transport: {
+        //   service: 'gmail',
+        //   // host: configService.get('EMAIL_HOST'),
+        //   // secure: false,
+        //   auth: {
+        //     user: configService.get('EMAIL_USER'),
+        //     pass: configService.get('EMAIL_PASSWORD'),
+        //   },
+        // },
         transport: {
-          service: 'gmail',
-          // host: configService.get('EMAIL_HOST'),
-          // secure: false,
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false, // true for 465, false for 587
           auth: {
             user: configService.get('EMAIL_USER'),
             pass: configService.get('EMAIL_PASSWORD'),
