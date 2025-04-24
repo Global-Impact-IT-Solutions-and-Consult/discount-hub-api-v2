@@ -84,7 +84,7 @@ export class UserService {
     const expire = add(new Date(), { minutes: 15 });
     user.confirmEmailToken = verificationToken;
     user.confirmEmailTTL = expire;
-    this.notificationService.sendConfirmEmailNotification(user);
+    // this.notificationService.sendConfirmEmailNotification(user);
     await user.save();
     return user;
   }
@@ -102,7 +102,7 @@ export class UserService {
     user.isEmailVerified = true;
     user.confirmEmailTTL = null;
     user.confirmEmailToken = null;
-    await this.notificationService.sendConfirmEmailNotification(user);
+    // await this.notificationService.sendConfirmEmailNotification(user);
     await user.save();
     return user;
   }
