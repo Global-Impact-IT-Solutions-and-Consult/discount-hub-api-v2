@@ -17,7 +17,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     slug: 'jumia',
     badgeColor: 'blue',
     urls: [
-      'https://www.jumia.com.ng',
+      // 'https://www.jumia.com.ng',
       // 'https://www.jumia.com.ng/mlp-appliances',
       // 'https://www.jumia.com.ng/health-beauty',
       // 'https://www.jumia.com.ng/electronics',
@@ -28,7 +28,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
       // 'https://www.jumia.com.ng/mlp-beverages-drinks',
       // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
       // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
-      'https://www.jumia.com.ng/flash-sales',
+      // 'https://www.jumia.com.ng/flash-sales',
       // 'https://www.jumia.com.ng/mlp-clearance-sale',
       // 'https://www.jumia.com.ng/mlp-global-best-deal',
       // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
@@ -60,7 +60,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     slug: 'konga',
     badgeColor: 'emerald',
     urls: [
-      'https://www.konga.com',
+      // 'https://www.konga.com',
       // 'https://www.konga.com'
     ],
     special_links: [
@@ -97,7 +97,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     slug: 'aliexpress',
     badgeColor: 'red',
     urls: [
-      'https://www.aliexpress.com/',
+      // 'https://www.aliexpress.com/',
       // 'https://www.aliexpress.com/'
     ],
     special_links: [
