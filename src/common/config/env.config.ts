@@ -4,13 +4,12 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumber,
-  // IsNumber,
   IsOptional,
   IsString,
   validateSync,
 } from 'class-validator';
 
-enum Environment {
+export enum Environment {
   Development = 'development',
   Production = 'production',
   Test = 'test',
@@ -18,7 +17,10 @@ enum Environment {
 }
 
 export class EnvironmentVariables {
-  @IsEnum(Environment)
+  @IsEnum(Environment, {
+    message:
+      'NODE_ENV must be one of: development, production, test, provision',
+  })
   NODE_ENV: Environment;
 
   @IsNumber()
@@ -98,7 +100,13 @@ export function validateEnv(config: Record<string, unknown>) {
   });
 
   if (errors.length > 0) {
-    throw new Error(errors.toString());
+    const errorMessages = errors.map((error) => {
+      const constraints = Object.values(error.constraints || {});
+      return `${error.property}: ${constraints.join(', ')}`;
+    });
+    throw new Error(
+      `Environment validation failed:\n${errorMessages.join('\n')}`,
+    );
   }
   return validatedConfig;
 }
