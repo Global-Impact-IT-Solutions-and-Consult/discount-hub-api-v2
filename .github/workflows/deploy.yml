@@ -20,7 +20,7 @@ jobs:
             cd giitsc/discount-hub-api-v2
             git checkout dev
             git pull
-            echo "${{ vars.ENVIROMENT_VARIABLES }}" > .env
+            echo "${{ vars.PRODUCTION_VARIABLES }}" > .env
             docker compose down
             docker compose up --build -d
             exit
