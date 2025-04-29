@@ -20,8 +20,6 @@ services:
   #     - discount-hub-network
 
   app:
-    image: discount-hub-image
-    container_name: app
     build:
       context: .
       dockerfile: Dockerfile
@@ -34,15 +32,8 @@ services:
       - SYS_ADMIN # Add required privilege for Puppeteer
     tmpfs:
       - /tmp # Improve shared memory for Puppeteer
-    environment:
-      # - MONGO_URI=mongodb://mongo:27017/discount-hub
-      # - REDIS_HOST=redis
-      # - REDIS_PORT=6379
-      # - PORT=3030
-      - MONGO_URI=${MONGODB_URI}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - PORT=${PORT}
+    env_file:
+      - .env
     networks:
       - discount-hub-network
     command: ['npm', 'run', 'start:prod'] # Or provide a Puppeteer-specific command here
