@@ -11,15 +11,21 @@ export class Category {
   })
   name: string;
 
+  @Prop()
+  description?: string;
+
+  @Prop()
+  image: string;
+
+  @Prop({
+    default: false,
+  })
+  isFeatured: boolean;
+
   @Prop({
     type: { type: Types.ObjectId, ref: 'Category', default: null },
   })
   parentCategory: CategoryDocument;
-
-  @Prop({
-    type: [{ type: Types.ObjectId, ref: 'Category' }],
-  })
-  subCategories: CategoryDocument[];
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

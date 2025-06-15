@@ -3,14 +3,6 @@ import { ProductService } from './product.service';
 import { ProductController } from './product.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Product, ProductSchema } from './schemas/product.schema';
-import { Brand, BrandSchema } from './schemas/brand.schema';
-import { Category, CategorySchema } from './schemas/category.schema';
-import { Tag, TagSchema } from './schemas/tag.schema';
-import {
-  TagAttribute,
-  TagAttributeSchema,
-} from './schemas/tagAttribute.schema';
-import { AiModule } from 'src/services/ai/ai.module';
 import {
   FeaturedItem,
   FeaturedItemSchema,
@@ -19,19 +11,20 @@ import {
   FeaturedCategory,
   FeaturedCategorySchema,
 } from './schemas/featuredCategory.schema';
+import { CategoryModule } from './category/category.module';
+import { BrandModule } from './brand/brand.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: Product.name, schema: ProductSchema },
-      { name: Brand.name, schema: BrandSchema },
-      { name: Category.name, schema: CategorySchema },
-      { name: Tag.name, schema: TagSchema },
-      { name: TagAttribute.name, schema: TagAttributeSchema },
       { name: FeaturedItem.name, schema: FeaturedItemSchema },
       { name: FeaturedCategory.name, schema: FeaturedCategorySchema },
     ]),
-    AiModule,
+    CategoryModule,
+    BrandModule,
+    TagModule,
   ],
   controllers: [ProductController],
   providers: [ProductService],
