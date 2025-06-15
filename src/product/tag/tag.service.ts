@@ -2,13 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Tag } from './schema/tag.schema';
 import { Model } from 'mongoose';
+import { CreateTagDto } from './dto/create-tag.dto';
+import { UpdateCategoryDto } from '../category/dto/update-category.dto';
 
 @Injectable()
 export class TagService {
   constructor(@InjectModel(Tag.name) private tagModel: Model<Tag>) {}
 
-  async create(name: string) {
-    return this.tagModel.create({ name });
+  async create(createTagDto: CreateTagDto) {
+    return this.tagModel.create(createTagDto);
   }
 
   async findAll() {
@@ -19,19 +21,23 @@ export class TagService {
     return this.tagModel.findById(id).exec();
   }
 
-  async update(id: string, name: string) {
-    return this.tagModel.findByIdAndUpdate(id, { name }, { new: true }).exec();
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    return this.tagModel
+      .findByIdAndUpdate(id, { ...updateCategoryDto }, { new: true })
+      .exec();
   }
 
   async remove(id: string) {
     return this.tagModel.findByIdAndDelete(id).exec();
   }
 
-  async findOrCreate(name: string) {
-    let tag = await this.tagModel.findOne({ name }).exec();
-    if (!tag) {
-      tag = await this.create(name);
-    }
-    return tag;
+  async findOrCreate(createTagDto: CreateTagDto) {
+    return this.tagModel
+      .findOneAndUpdate(
+        { name: createTagDto.name },
+        { $set: { ...createTagDto } },
+        { upsert: true, returnDocument: 'after' },
+      )
+      .exec();
   }
 }

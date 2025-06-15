@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateTagDto } from './dto/create-tag.dto';
+import { UpdateCategoryDto } from '../category/dto/update-category.dto';
 
 @ApiTags('Product|Tag')
 @Controller('product/tag')
@@ -16,8 +18,8 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Post()
-  async create(@Body() tagData: { name: string }) {
-    const data = await this.tagService.create(tagData.name);
+  async create(@Body() createTagDto: CreateTagDto) {
+    const data = await this.tagService.create(createTagDto);
     return {
       success: true,
       message: 'Tag created successfully',
@@ -46,8 +48,11 @@ export class TagController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() tagData: { name: string }) {
-    const data = await this.tagService.update(id, tagData.name);
+  async update(
+    @Param('id') id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    const data = await this.tagService.update(id, updateCategoryDto);
     return {
       success: true,
       message: 'Tag updated successfully',
