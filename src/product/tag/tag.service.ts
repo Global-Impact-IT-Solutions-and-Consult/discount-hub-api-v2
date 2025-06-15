@@ -21,6 +21,10 @@ export class TagService {
     return this.tagModel.findById(id).exec();
   }
 
+  async findOneByName(name: string) {
+    return this.tagModel.findOne({ name }).exec();
+  }
+
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {
     return this.tagModel
       .findByIdAndUpdate(id, { ...updateCategoryDto }, { new: true })

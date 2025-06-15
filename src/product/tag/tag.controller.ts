@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { ApiTags } from '@nestjs/swagger';
@@ -33,6 +34,16 @@ export class TagController {
     return {
       success: true,
       message: 'Tags fetched successfully',
+      data,
+    };
+  }
+
+  @Get('name')
+  async findOneByName(@Query('name') name: string) {
+    const data = await this.tagService.findOneByName(name);
+    return {
+      success: true,
+      message: 'Tag fetched successfully',
       data,
     };
   }
