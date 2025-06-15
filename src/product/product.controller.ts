@@ -12,8 +12,10 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { AiService } from 'src/services/ai/ai.service';
+import { ApiTags } from '@nestjs/swagger';
 // import { AiCategorizeDto } from './dto/ai-categorize.dto';
 
+@ApiTags('Product')
 @Controller('product')
 export class ProductController {
   constructor(

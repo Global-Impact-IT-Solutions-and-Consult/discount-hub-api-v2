@@ -8,6 +8,7 @@ export class Category {
   @Prop({
     required: true,
     unique: true,
+    index: true,
   })
   name: string;
 
@@ -25,7 +26,7 @@ export class Category {
   @Prop({
     type: { type: Types.ObjectId, ref: 'Category', default: null },
   })
-  parentCategory: CategoryDocument;
+  parentCategory?: CategoryDocument;
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);

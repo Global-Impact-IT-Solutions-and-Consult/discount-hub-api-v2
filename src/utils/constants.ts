@@ -154,3 +154,8 @@ export enum MessageTypeEnum {
   AI = 'AI',
   USER = 'USER',
 }
+
+export enum QueryOrderEnum {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
