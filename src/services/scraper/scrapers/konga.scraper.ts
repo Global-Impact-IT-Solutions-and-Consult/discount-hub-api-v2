@@ -8,7 +8,6 @@ import puppeteer from 'puppeteer';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
-import chromium from '@sparticuz/chromium';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 
 @Injectable()
@@ -23,52 +22,6 @@ export class KongaScraperService extends WorkerHost {
     private readonly eventEmitter: EventEmitter2,
   ) {
     super();
-  }
-
-  async onModuleInit() {
-    // Fetch all categories from the database on initialization
-    const categoriesFromDb = await this.productService.findAllCategories();
-    this.categories = categoriesFromDb.map((category) => category.name); // Extracting category names
-
-    if (this.categories.length === 0) {
-      this.categories = [
-        'electronics',
-        'kitchenware',
-        'home appliances',
-        'personal care',
-        'furniture',
-        'accessories',
-        'health and beauty',
-        'fashion',
-        'groceries',
-        'jewelry',
-        'home and office',
-        'books',
-        'toys',
-        'sports and outdoors',
-        'gaming',
-        'appliances',
-        'fitness and wellness',
-        'beverages',
-        'phones and tablets',
-        'industrial and tools',
-        'beauty and cosmetics',
-        'audio and headphones',
-        'solar products',
-        'footwear',
-        'clothing',
-        'travel and luggage',
-        'automotive',
-        'pet supplies',
-        'office supplies',
-        'gardening',
-        'home decor',
-        'health devices',
-        'art and crafts',
-        'musical instruments',
-        'smart home',
-      ];
-    }
   }
 
   // Implement the process method from WorkerHost
@@ -307,25 +260,6 @@ export class KongaScraperService extends WorkerHost {
                   // ];
 
                   try {
-                    const category = await this.aiService.categorizeProducts({
-                      categories: this.categories,
-                      product: product.name,
-                    });
-
-                    // Use AI categorization for categories and brand
-                    const aiBrandName = category.brand; // Brand name from AI service
-
-                    // Create or find the categories in the database
-                    const categoryIds = await this.getCreateCategory(
-                      category.categories,
-                    );
-
-                    // Save the brand to the database
-                    const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
-
-                    // Set the category and brand from AI response
-                    product.categories = categoryIds; // Set the category from AI response
-                    product.brand = brandId; // Set the brand from AI response
                   } catch (aiError) {
                     this.logger.error('Error categorizing product:', aiError);
                   }
@@ -552,28 +486,6 @@ export class KongaScraperService extends WorkerHost {
                     // ];
 
                     try {
-                      const category = await this.aiService.categorizeProducts({
-                        categories: this.categories,
-                        product: product.name,
-                      });
-
-                      // Use AI categorization for categories and brand
-                      const aiBrandName = category.brand; // Brand name from AI service
-
-                      // Create or find the categories in the database
-                      const categoryIds = await this.getCreateCategory(
-                        category.categories,
-                      );
-
-                      // Save the brand to the database
-                      const brandId = await this.getCreateBrand(aiBrandName); // Find or create brand
-
-                      const tagId = await this.getCreateTag(specialLink.name); // Find or create tag
-
-                      // Set the category and brand from AI response
-                      product.categories = categoryIds; // Set the category from AI response
-                      product.brand = brandId; // Set the brand from AI response
-                      product.tag = tagId; // Set the tag from AI response
                     } catch (aiError) {
                       this.logger.error('Error categorizing product:', aiError);
                     }
@@ -658,68 +570,5 @@ export class KongaScraperService extends WorkerHost {
 
   private parsePrice(price: string): number {
     return parseFloat(price.replace(/[^\d.-]/g, ''));
-  }
-
-  private async getCreateCategory(categoryNames: string[]): Promise<string[]> {
-    const categoryIds: string[] = [];
-
-    for (const categoryName of categoryNames) {
-      const lowercaseCategory = categoryName.toLowerCase();
-      let category =
-        await this.productService.findCategoryByName(lowercaseCategory);
-
-      if (!category) {
-        category = await this.productService.createCategory({
-          name: lowercaseCategory,
-        });
-        this.logger.log(`Created new category: ${lowercaseCategory}`);
-      } else {
-        this.logger.log(`Category already exists: ${lowercaseCategory}`);
-      }
-
-      categoryIds.push(category._id.toString());
-    }
-
-    return categoryIds;
-  }
-
-  private async getCreateBrand(brandName: string): Promise<string> {
-    const lowercaseBrand = brandName.toLowerCase();
-    let brand = await this.productService.findBrandByName(lowercaseBrand);
-
-    if (!brand) {
-      brand = await this.productService.createBrand({
-        name: lowercaseBrand,
-      });
-      this.logger.log(`Created new brand: ${lowercaseBrand}`);
-    } else {
-      this.logger.log(`Brand already exists: ${lowercaseBrand}`);
-    }
-
-    return brand._id.toString(); // Return the brand ID
-  }
-
-  // Method to find or create tag by name
-  private async getCreateTag(tagName: string): Promise<string> {
-    // let tagId: string = '';
-
-    const lowercaseTag = tagName.toLowerCase();
-    let tag = await this.productService.findTagByName(lowercaseTag);
-
-    if (!tag) {
-      tag = await this.productService.createTag({
-        name: lowercaseTag,
-      });
-      this.logger.log(`Created new tag: ${lowercaseTag}`);
-    } else {
-      this.logger.log(`Tag already exists: ${lowercaseTag}`);
-    }
-
-    // tagId = tag._id.toString();
-
-    // return tagId;
-    this.logger.log(`Returning tag: ${tag._id.toString()}`);
-
-    return tag._id.toString();
   }
 }

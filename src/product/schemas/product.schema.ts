@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { TagDocument } from './tag.schema';
-import { BrandDocument } from './brand.schema';
-import { CategoryDocument } from './category.schema';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
+import { CategoryDocument } from '../category/schemas/category.schema';
+import { BrandDocument } from '../brand/schemas/brand.schema';
+import { TagDocument } from '../tag/schema/tag.schema';
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -45,35 +45,14 @@ export class Product {
   @Prop()
   link: string;
 
-  // @Prop()
-  // store: string;
-
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
   store: CompanyDocument[];
 
   @Prop()
-  storeName?: string;
-
-  @Prop()
-  storeLogo?: string;
-
-  @Prop()
-  storeBadgeColor?: string;
-
-  @Prop()
   description: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'Tag' })
-  tag: TagDocument;
-
-  // @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })
-  // tags: TagDocument[];
-
-  // @Prop({ type: [{ type: Types.ObjectId, ref: 'TagAttributes' }] })
-  // tagAtrributes: TagDocument[];
-
-  // @Prop()
-  // tag: string;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Tag' }] })
+  tags: TagDocument[];
 
   @Prop({ type: Types.ObjectId, ref: 'Brand' })
   brand: BrandDocument;

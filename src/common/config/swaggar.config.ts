@@ -8,5 +8,6 @@ export const configureSwagger = (app: INestApplication, path: string) => {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
+  document.tags = document.tags?.sort((a, b) => a.name.localeCompare(b.name));
   SwaggerModule.setup(path, app, document);
 };

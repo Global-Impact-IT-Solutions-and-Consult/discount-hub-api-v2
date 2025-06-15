@@ -12,7 +12,7 @@ import { BrandService } from './brand.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
 
-@ApiTags('Product|Brand')
+@ApiTags('Product | Brand')
 @Controller('product/brand')
 export class BrandController {
   constructor(private readonly brandService: BrandService) {}

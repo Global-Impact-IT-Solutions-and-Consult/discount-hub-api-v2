@@ -30,3 +30,14 @@ export class Category {
 }
 
 export const CategorySchema = SchemaFactory.createForClass(Category);
+
+CategorySchema.virtual('productCount', {
+  ref: 'Product',
+  localField: '_id',
+  foreignField: 'categories',
+  count: true,
+});
+
+// Include virtuals in JSON output
+CategorySchema.set('toJSON', { virtuals: true });
+CategorySchema.set('toObject', { virtuals: true });

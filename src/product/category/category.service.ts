@@ -28,17 +28,21 @@ export class CategoryService {
   }
 
   async findAll() {
-    const categories = await this.categoryModel.find();
+    const categories = await this.categoryModel.find().populate('productCount');
     return categories;
   }
 
   async findOneById(id: string) {
-    const category = await this.categoryModel.findById(id);
+    const category = await this.categoryModel
+      .findById(id)
+      .populate('productCount');
     return category;
   }
 
   async findOneByName(name: string) {
-    const category = await this.categoryModel.findOne({ name });
+    const category = await this.categoryModel
+      .findOne({ name })
+      .populate('productCount');
     return category;
   }
 
