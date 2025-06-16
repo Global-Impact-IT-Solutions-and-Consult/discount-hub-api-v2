@@ -1,6 +1,7 @@
 import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CreateRoleDto } from 'src/user/role/dto/create-role.dto';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export const POSTGRES_ERROR_CODES = {
   unique_violation: 23505,
@@ -158,4 +159,22 @@ export enum MessageTypeEnum {
 export enum QueryOrderEnum {
   ASC = 'ASC',
   DESC = 'DESC',
+}
+
+export class BaseQueryDto {
+  @IsNumber()
+  @IsOptional()
+  limit?: number;
+
+  @IsNumber()
+  @IsOptional()
+  page?: number;
+
+  @IsString()
+  @IsOptional()
+  sortBy: string;
+
+  @IsEnum(QueryOrderEnum)
+  @IsOptional()
+  order: QueryOrderEnum;
 }
