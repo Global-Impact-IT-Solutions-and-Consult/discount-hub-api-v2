@@ -33,7 +33,6 @@ import { ChatModule } from './chat/chat.module';
         configService: ConfigService<EnvironmentVariables>,
       ) => ({
         uri: configService.get<string>('MONGODB_URI'),
-        // uri: `mongodb://mongodb:27017/discount-hub`,
       }),
       inject: [ConfigService],
     }),

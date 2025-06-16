@@ -2,9 +2,11 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CompanyService } from 'src/company/company.service';
 import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
+import { CategoryService } from 'src/product/category/category.service';
 import { RoleService } from 'src/user/role/role.service';
 import { UserService } from 'src/user/user.service';
 import {
+  categoryDTOs,
   defaultCompanies,
   defaultRoles,
   defaultSuperAdmin,
@@ -18,6 +20,7 @@ export class SeedService implements OnApplicationBootstrap {
     private roleService: RoleService,
     private companyService: CompanyService,
     private userService: UserService,
+    private categoryService: CategoryService,
   ) {}
 
   async onApplicationBootstrap() {
@@ -25,6 +28,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedRoles();
     await this.seedSuperAdmin();
     await this.seedCompanies();
+    await this.seedCategories();
   }
 
   async seedRoles() {
@@ -85,21 +89,10 @@ export class SeedService implements OnApplicationBootstrap {
     }
   }
 
-  // async seedCompanies() {
-  //   for (const company of defaultCompanies) {
-  //     let foundCompany: CompanyDocument = null;
-  //     try {
-  //       foundCompany = await this.companyService.findOneBySlug(company.slug);
-  //       if (
-  //         JSON.stringify(foundCompany.urls) !== JSON.stringify(company.urls)
-  //       ) {
-  //         foundCompany.urls = company.urls;
-  //         await foundCompany.save();
-  //         this.logger.log(`Company : ${company.name} updated`);
-  //       }
-  //     } catch (error) {
-  //       this.logger.error(`Error seeding company: ${company.name}`, error);
-  //     }
-  //   }
-  // }
+  async seedCategories() {
+    for (const categoryDto of categoryDTOs) {
+      await this.categoryService.findOneOrCreate(categoryDto);
+    }
+    this.logger.log(`Categories Seeded`);
+  }
 }

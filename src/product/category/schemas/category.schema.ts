@@ -24,7 +24,13 @@ export class Category {
   isFeatured: boolean;
 
   @Prop({
-    type: { type: Types.ObjectId, ref: 'Category', default: null },
+    default: false,
+  })
+  isSeeded: boolean;
+
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Category',
   })
   parentCategory?: CategoryDocument;
 }

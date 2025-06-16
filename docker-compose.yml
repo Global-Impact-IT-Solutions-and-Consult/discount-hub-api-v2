@@ -17,16 +17,6 @@ services:
     networks:
       - discount-hub-network
 
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '6001:6001'
-    depends_on:
-    - mongo
-    - redis
-
 networks:
   discount-hub-network:
     driver: bridge

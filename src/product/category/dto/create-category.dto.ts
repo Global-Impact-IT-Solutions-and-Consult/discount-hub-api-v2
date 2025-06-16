@@ -23,6 +23,10 @@ export class CreateCategoryDTO {
   @IsOptional()
   isFeatured?: boolean;
 
+  @IsBoolean()
+  @IsOptional()
+  isSeeded: boolean;
+
   @IsMongoId()
   @IsOptional()
   parentCategoryId?: string;

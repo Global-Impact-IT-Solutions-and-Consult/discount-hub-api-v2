@@ -16,6 +16,6 @@ import { TagModule } from './tag/tag.module';
   ],
   controllers: [ProductController],
   providers: [ProductService],
-  exports: [ProductService],
+  exports: [ProductService, CategoryModule, BrandModule, TagModule],
 })
 export class ProductModule {}

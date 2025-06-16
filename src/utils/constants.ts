@@ -2,6 +2,7 @@ import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CreateRoleDto } from 'src/user/role/dto/create-role.dto';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { CreateCategoryDTO } from 'src/product/category/dto/create-category.dto';
 
 export const POSTGRES_ERROR_CODES = {
   unique_violation: 23505,
@@ -178,3 +179,41 @@ export class BaseQueryDto {
   @IsOptional()
   order: QueryOrderEnum;
 }
+
+export const categoryDTOs: CreateCategoryDTO[] = [
+  { name: 'electronics', isSeeded: true },
+  { name: 'kitchenware', isSeeded: true },
+  { name: 'home appliances', isSeeded: true },
+  { name: 'personal care', isSeeded: true },
+  { name: 'furniture', isSeeded: true },
+  { name: 'accessories', isSeeded: true },
+  { name: 'health and beauty', isSeeded: true },
+  { name: 'fashion', isSeeded: true },
+  { name: 'groceries', isSeeded: true },
+  { name: 'jewelry', isSeeded: true },
+  { name: 'home and office', isSeeded: true },
+  { name: 'books', isSeeded: true },
+  { name: 'toys', isSeeded: true },
+  { name: 'sports and outdoors', isSeeded: true },
+  { name: 'gaming', isSeeded: true },
+  { name: 'appliances', isSeeded: true },
+  { name: 'fitness and wellness', isSeeded: true },
+  { name: 'beverages', isSeeded: true },
+  { name: 'phones and tablets', isSeeded: true },
+  { name: 'industrial and tools', isSeeded: true },
+  { name: 'beauty and cosmetics', isSeeded: true },
+  { name: 'audio and headphones', isSeeded: true },
+  { name: 'solar products', isSeeded: true },
+  { name: 'footwear', isSeeded: true },
+  { name: 'clothing', isSeeded: true },
+  { name: 'travel and luggage', isSeeded: true },
+  { name: 'automotive', isSeeded: true },
+  { name: 'pet supplies', isSeeded: true },
+  { name: 'office supplies', isSeeded: true },
+  { name: 'gardening', isSeeded: true },
+  { name: 'home decor', isSeeded: true },
+  { name: 'health devices', isSeeded: true },
+  { name: 'art and crafts', isSeeded: true },
+  { name: 'musical instruments', isSeeded: true },
+  { name: 'smart home', isSeeded: true },
+];

@@ -48,8 +48,8 @@ export class CategoryService {
 
   async findOneOrCreate(createCategoryDTO: CreateCategoryDTO) {
     const category = await this.categoryModel
-      .findByIdAndUpdate(
-        { name: createCategoryDTO },
+      .findOneAndUpdate(
+        { name: createCategoryDTO.name },
         {
           $set: {
             ...createCategoryDTO,
