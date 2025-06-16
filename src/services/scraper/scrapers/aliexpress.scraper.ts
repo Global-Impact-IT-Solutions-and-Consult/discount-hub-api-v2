@@ -11,8 +11,8 @@ import { Job } from 'bullmq';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 
 @Processor('scraper') // BullMQ processor for 'scraper' jobs
-export class AliexpressScraperService extends WorkerHost {
-  private readonly logger = new Logger(AliexpressScraperService.name);
+export class AliExpressScraperService extends WorkerHost {
+  private readonly logger = new Logger(AliExpressScraperService.name);
 
   constructor(
     private readonly productService: ProductService,

@@ -12,7 +12,6 @@ import puppeteer from 'puppeteer';
 // import chromium from '@sparticuz/chromium';
 // import puppeteer from 'puppeteer-core';
 
-@Injectable()
 @Processor('scraper') // BullMQ processor for 'scraper' jobs
 export class JumiaScraperService extends WorkerHost {
   private readonly logger = new Logger(JumiaScraperService.name);

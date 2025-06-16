@@ -23,6 +23,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@bull-board/api": "^6.10.1",
+    "@bull-board/express": "^6.10.1",
+    "@bull-board/nestjs": "^6.10.1",
     "@langchain/community": "^0.3.16",
     "@langchain/core": "^0.3.19",
     "@langchain/groq": "^0.1.2",

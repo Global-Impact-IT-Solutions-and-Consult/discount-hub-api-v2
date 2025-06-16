@@ -6,6 +6,10 @@ import { Product, ProductSchema } from './schemas/product.schema';
 import { CategoryModule } from './category/category.module';
 import { BrandModule } from './brand/brand.module';
 import { TagModule } from './tag/tag.module';
+import { JOB_NAMES } from 'src/utils/constants';
+import { BullModule } from '@nestjs/bullmq';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 
 @Module({
   imports: [
@@ -13,6 +17,17 @@ import { TagModule } from './tag/tag.module';
     CategoryModule,
     BrandModule,
     TagModule,
+    ...Object.values(JOB_NAMES.product).map((name) =>
+      BullModule.registerQueue({
+        name,
+      }),
+    ),
+    ...Object.values(JOB_NAMES.product).map((name) =>
+      BullBoardModule.forFeature({
+        name,
+        adapter: BullMQAdapter, //or use BullAdapter if you're using bull instead of bullMQ
+      }),
+    ),
   ],
   controllers: [ProductController],
   providers: [ProductService],

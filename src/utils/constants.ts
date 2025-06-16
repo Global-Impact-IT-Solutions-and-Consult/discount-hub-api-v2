@@ -217,3 +217,15 @@ export const categoryDTOs: CreateCategoryDTO[] = [
   { name: 'musical instruments', isSeeded: true },
   { name: 'smart home', isSeeded: true },
 ];
+
+export const JOB_NAMES = {
+  product: {
+    PRODUCT_SAVE_PRODUCT: 'PRODUCT_SAVE_PRODUCT',
+  },
+  scraper: {
+    SCRAPE_JUMIA: 'SCRAPE_JUMIA',
+    SCRAPE_ALIEXPRESS: 'SCRAPE_ALIEXPRESS',
+    SCRAPE_KONGA: 'SCRAPE_KONGA',
+    SCRAPE_TEMU: 'SCRAPE_TEMU',
+  },
+};
