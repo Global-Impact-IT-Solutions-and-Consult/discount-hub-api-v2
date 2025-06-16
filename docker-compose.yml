@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   mongo:
-    image: mongo
-    container_name: mongo
+    image: mongo:latest
     ports:
       - '27017:27017'
     volumes:
@@ -12,8 +11,7 @@ services:
       - discount-hub-network
 
   redis:
-    image: redis
-    container_name: redis
+    image: redis:latest
     ports:
       - '6379:6379'
     networks:
