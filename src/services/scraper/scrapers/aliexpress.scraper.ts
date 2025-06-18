@@ -760,6 +760,7 @@ export class AliExpressScraperService extends WorkerHost {
         const createProductDto: CreateProductDto = {
           name: product.name,
           price: this.parsePrice(product.price),
+          image: '',
           discountPrice: this.parsePrice(product.discountPrice),
           images: product.images,
           specifications: product.specifications,
@@ -771,12 +772,12 @@ export class AliExpressScraperService extends WorkerHost {
           rating: product.rating,
           numberOfRatings: product.numberOfRatings,
           // store: company.name,
-          storeBadgeColor: company.badgeColor || 'red', // Use badgeColor from company
-          store: company.id,
-          storeName: company.name,
-          storeLogo: company.logo,
+          // storeBadgeColor: company.badgeColor || 'red', // Use badgeColor from company
+          // store: company.id,
+          // storeName: company.name,
+          // storeLogo: company.logo,
           keyFeatures: product.keyFeatures,
-          tag: product.tag,
+          // tag: product.tag,
         };
 
         try {

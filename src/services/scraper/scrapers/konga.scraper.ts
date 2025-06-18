@@ -540,6 +540,7 @@ export class KongaScraperService extends WorkerHost {
     for (const product of scrapedData) {
       const createProductDto: CreateProductDto = {
         name: product.name,
+        image: '',
         price: this.parsePrice(product.price),
         discountPrice: this.parsePrice(product.discountPrice),
         images: product.images,
@@ -552,12 +553,12 @@ export class KongaScraperService extends WorkerHost {
         rating: product.rating,
         numberOfRatings: product.numberOfRatings,
         // store: company.name,
-        storeBadgeColor: company.badgeColor || 'red', // Use badgeColor from company
-        store: company.id,
-        storeName: company.name,
-        storeLogo: company.logo,
-        keyFeatures: product.keyFeatures,
-        tag: product.tag,
+        // storeBadgeColor: company.badgeColor || 'red', // Use badgeColor from company
+        // store: company.id,
+        // storeName: company.name,
+        // storeLogo: company.logo,
+        // keyFeatures: product.keyFeatures,
+        // tag: product.tag,
       };
       try {
         await this.productService.create(createProductDto);

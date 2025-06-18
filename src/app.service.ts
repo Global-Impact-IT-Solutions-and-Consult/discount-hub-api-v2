@@ -2,6 +2,8 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ScraperService } from './services/scraper/scraper.service';
 import { ProductService } from './product/product.service';
+import { CompanyService } from './company/company.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 // import { CompanyService } from './company/company.service';
 
 @Injectable()
@@ -11,10 +13,12 @@ export class AppService implements OnApplicationBootstrap {
   constructor(
     private readonly scraperService: ScraperService,
     private readonly productService: ProductService,
-    // private readonly companyService: CompanyService,
+    private readonly companyService: CompanyService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   onApplicationBootstrap() {
+    this.scrapeProducts();
     // // this.productService.removeAll(); // disabled on dev
     // this.scraperService.startAllCompanyScrapers(); // disabled on dev
     // this.productService.getRandomFeaturedItemsByTag(); // disabled on dev
@@ -29,5 +33,12 @@ export class AppService implements OnApplicationBootstrap {
     // await this.scraperService.startAllCompanyScrapers();
     // await this.productService.getRandomFeaturedItemsByTag();
     // await this.productService.getRandomFeaturedCategory(); // disabled on dev
+  }
+
+  async scrapeProducts() {
+    const companies = await this.companyService.findAll();
+    for (const company of companies) {
+      this.eventEmitter.emit(`scrape.${company.slug}`, {});
+    }
   }
 }

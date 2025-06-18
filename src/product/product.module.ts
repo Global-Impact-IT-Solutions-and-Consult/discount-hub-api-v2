@@ -10,6 +10,7 @@ import { JOB_NAMES } from 'src/utils/constants';
 import { BullModule } from '@nestjs/bullmq';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { SaveProductConsumer } from './save-product.consumer';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
     ),
   ],
   controllers: [ProductController],
-  providers: [ProductService],
+  providers: [ProductService, SaveProductConsumer],
   exports: [ProductService, CategoryModule, BrandModule, TagModule],
 })
 export class ProductModule {}

@@ -25,7 +25,7 @@ export class CreateCategoryDTO {
 
   @IsBoolean()
   @IsOptional()
-  isSeeded: boolean;
+  isSeeded?: boolean;
 
   @IsMongoId()
   @IsOptional()

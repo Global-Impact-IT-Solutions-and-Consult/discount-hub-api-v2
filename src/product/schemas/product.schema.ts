@@ -26,6 +26,11 @@ export class Product {
 
   @Prop({
     required: true,
+  })
+  image: string;
+
+  @Prop({
+    required: true,
     type: [{ type: String }],
   })
   images: string[];
@@ -45,8 +50,8 @@ export class Product {
   @Prop()
   link: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'Company' }] })
-  store: CompanyDocument[];
+  @Prop({ type: Types.ObjectId, ref: 'Company' })
+  store: CompanyDocument;
 
   @Prop()
   description: string;

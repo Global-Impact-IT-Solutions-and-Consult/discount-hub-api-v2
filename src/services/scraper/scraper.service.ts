@@ -4,12 +4,14 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { JOB_NAMES } from 'src/utils/constants';
+import { CompanyService } from 'src/company/company.service';
 
 @Injectable()
 export class ScraperService {
   private readonly logger = new Logger(ScraperService.name);
 
   constructor(
+    private companyService: CompanyService,
     @InjectQueue(JOB_NAMES.scraper.SCRAPE_JUMIA)
     private jumiaScraper: Queue,
   ) {}
@@ -61,6 +63,21 @@ export class ScraperService {
 
   @OnEvent('scrape.jumia')
   async handleScrapeJumia(payload: any) {
-    await this.jumiaScraper.add('scrape-jumia', {});
+    console.log('running');
+    const company = await this.companyService.findOneBySlug('jumia');
+    company.urls?.map(async (url) => {
+      await this.jumiaScraper.add(url, {
+        link: url,
+        storeId: company._id,
+      });
+    });
+    company.special_links?.map(async (url) => {
+      for (const link of url.urls) {
+        await this.jumiaScraper.add(link, {
+          link,
+          storeId: company._id,
+        });
+      }
+    });
   }
 }

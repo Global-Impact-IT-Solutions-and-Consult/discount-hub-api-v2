@@ -7,13 +7,18 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './schemas/product.schema';
 import { Model, Types } from 'mongoose';
 import { QueryProductDto } from './dto/query-product.dto';
-import { QueryOrderEnum } from 'src/utils/constants';
+import { JOB_NAMES, QueryOrderEnum } from 'src/utils/constants';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+import { SaveProductConsumerDto } from './save-product.consumer';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectQueue(JOB_NAMES.product.PRODUCT_SAVE_PRODUCT)
+    private saveProductQueue: Queue,
   ) {}
 
   async create(createProduct: CreateProductDto) {
@@ -291,5 +296,9 @@ export class ProductService {
         pages: Math.ceil(total / limit),
       },
     };
+  }
+
+  async saveProductJob(data: SaveProductConsumerDto) {
+    this.saveProductQueue.add(data.createProductDto.name, data);
   }
 }
