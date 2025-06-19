@@ -5,6 +5,7 @@ import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { JOB_NAMES } from 'src/utils/constants';
 import { CompanyService } from 'src/company/company.service';
+import { CompanyDocument } from 'src/company/schemas/company.schema';
 
 @Injectable()
 export class ScraperService {
@@ -14,6 +15,8 @@ export class ScraperService {
     private companyService: CompanyService,
     @InjectQueue(JOB_NAMES.scraper.SCRAPE_JUMIA)
     private jumiaScraper: Queue,
+    @InjectQueue(JOB_NAMES.scraper.SCRAPE_KONGA)
+    private kongaScraper: Queue,
   ) {}
 
   // async startAllCompanyScrapers() {
@@ -62,20 +65,36 @@ export class ScraperService {
   // }
 
   @OnEvent('scrape.jumia')
-  async handleScrapeJumia(payload: any) {
-    console.log('running');
-    const company = await this.companyService.findOneBySlug('jumia');
-    company.urls?.map(async (url) => {
+  async handleScrapeJumia(payload: { company: CompanyDocument }) {
+    payload.company.urls?.map(async (url) => {
       await this.jumiaScraper.add(url, {
         link: url,
-        storeId: company._id,
+        storeId: payload.company._id,
       });
     });
-    company.special_links?.map(async (url) => {
+    payload.company.special_links?.map(async (url) => {
       for (const link of url.urls) {
         await this.jumiaScraper.add(link, {
           link,
-          storeId: company._id,
+          storeId: payload.company._id,
+        });
+      }
+    });
+  }
+
+  @OnEvent('scrape.konga')
+  async handleScrapeKonga(payload: { company: CompanyDocument }) {
+    payload.company.urls?.map(async (url) => {
+      await this.kongaScraper.add(url, {
+        link: url,
+        storeId: payload.company._id,
+      });
+    });
+    payload.company.special_links?.map(async (url) => {
+      for (const link of url.urls) {
+        await this.kongaScraper.add(link, {
+          link,
+          storeId: payload.company._id,
         });
       }
     });

@@ -2,6 +2,7 @@ import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 // import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
 import puppeteer from 'puppeteer';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { SaveProductConsumerDto } from 'src/product/save-product.consumer';
 import { parsePrice } from 'src/utils/misc';

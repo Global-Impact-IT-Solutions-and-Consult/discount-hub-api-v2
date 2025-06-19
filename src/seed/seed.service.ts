@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CompanyService } from 'src/company/company.service';
 import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
@@ -21,6 +22,7 @@ export class SeedService implements OnApplicationBootstrap {
     private companyService: CompanyService,
     private userService: UserService,
     private categoryService: CategoryService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async onApplicationBootstrap() {
@@ -29,6 +31,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedSuperAdmin();
     await this.seedCompanies();
     await this.seedCategories();
+    await this.scrapeProducts();
   }
 
   async seedRoles() {
@@ -94,5 +97,12 @@ export class SeedService implements OnApplicationBootstrap {
       await this.categoryService.findOneOrCreate(categoryDto);
     }
     this.logger.log(`Categories Seeded`);
+  }
+
+  async scrapeProducts() {
+    const companies = await this.companyService.findAll();
+    for (const company of companies) {
+      this.eventEmitter.emit(`scrape.${company.slug}`, {});
+    }
   }
 }
