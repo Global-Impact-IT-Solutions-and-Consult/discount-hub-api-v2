@@ -124,4 +124,8 @@ export class CategoryService {
   async delete(id: string) {
     return await this.categoryModel.findByIdAndDelete(id);
   }
+
+  async clearCategories() {
+    return await this.categoryModel.deleteMany({ isSeeded: false });
+  }
 }

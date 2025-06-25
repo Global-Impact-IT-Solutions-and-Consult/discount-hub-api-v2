@@ -1,6 +1,4 @@
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Injectable, Inject } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -16,7 +14,6 @@ import { SaveProductConsumerDto } from './save-product.consumer';
 export class ProductService {
   constructor(
     @InjectModel('Product') private readonly productModel: Model<Product>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectQueue(JOB_NAMES.product.PRODUCT_SAVE_PRODUCT)
     private saveProductQueue: Queue,
   ) {}
@@ -300,5 +297,9 @@ export class ProductService {
 
   async saveProductJob(data: SaveProductConsumerDto) {
     this.saveProductQueue.add(data.createProductDto.name, data);
+  }
+
+  async clearProducts() {
+    await this.productModel.deleteMany({});
   }
 }

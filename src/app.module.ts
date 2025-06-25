@@ -105,6 +105,11 @@ import { ExpressAdapter } from '@bull-board/express';
       },
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
+    EventEmitterModule.forRoot({
+      wildcard: true,
+      delimiter: '.',
+    }),
     UserModule,
     ServicesModule,
     CompanyModule,
@@ -112,11 +117,6 @@ import { ExpressAdapter } from '@bull-board/express';
     AuthModule,
     SeedModule,
     NotificationModule,
-    ScheduleModule.forRoot(),
-    EventEmitterModule.forRoot({
-      wildcard: true,
-      delimiter: '.',
-    }),
     AiModule,
     ChatModule,
     // EmailModule,

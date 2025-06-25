@@ -44,4 +44,8 @@ export class BrandService {
       )
       .exec();
   }
+
+  async clearBrands() {
+    return await this.brandModel.deleteMany({ isSeeded: false }).exec();
+  }
 }

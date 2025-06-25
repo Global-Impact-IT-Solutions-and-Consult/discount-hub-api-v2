@@ -6,6 +6,7 @@ import { CompanyDocument } from 'src/company/schemas/company.schema';
 import { CategoryService } from 'src/product/category/category.service';
 import { RoleService } from 'src/user/role/role.service';
 import { UserService } from 'src/user/user.service';
+import { EventEmitterReadinessWatcher } from '@nestjs/event-emitter';
 import {
   categoryDTOs,
   defaultCompanies,
@@ -16,6 +17,8 @@ import {
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SeedService.name);
+  private eventEmitterReadinessWatcher: EventEmitterReadinessWatcher =
+    new EventEmitterReadinessWatcher();
 
   constructor(
     private roleService: RoleService,
@@ -100,9 +103,25 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   async scrapeProducts() {
-    const companies = await this.companyService.findAll();
-    for (const company of companies) {
-      this.eventEmitter.emit(`scrape.${company.slug}`, {});
+    try {
+      const companies = await this.companyService.findAll();
+      this.logger.log(`Starting scraping for ${companies.length} companies`);
+
+      for (const company of companies) {
+        const eventName = `scrape.${company.slug}`;
+        const listenersCount = this.eventEmitter.listenerCount(eventName);
+
+        if (listenersCount === 0) {
+          this.logger.warn(`No listeners found for event: ${eventName}`);
+          continue;
+        }
+
+        this.logger.log(`Emitting scrape event for company: ${company.name}`);
+        this.eventEmitter.emit(eventName, { company });
+      }
+    } catch (error) {
+      this.logger.error('Error during product scraping:', error);
+      throw error;
     }
   }
 }

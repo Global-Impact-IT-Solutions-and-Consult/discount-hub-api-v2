@@ -13,6 +13,9 @@ export class Brand {
 
   @Prop()
   logo: string;
+
+  @Prop({ default: false })
+  isSeeded: boolean;
 }
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);

@@ -13,6 +13,9 @@ export class Tag {
 
   @Prop()
   description?: string;
+
+  @Prop({ default: false })
+  isSeeded: boolean;
 }
 
 export const TagSchema = SchemaFactory.createForClass(Tag);

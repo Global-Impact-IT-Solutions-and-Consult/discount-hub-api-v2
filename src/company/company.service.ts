@@ -137,6 +137,7 @@ export class CompanyService {
       slug: createCompanyDto.slug,
       urls: createCompanyDto.urls,
       website: createCompanyDto.website,
+      special_links: createCompanyDto.special_links,
       apiKey: apiKey,
       badgeColor: colors[randColor],
     });

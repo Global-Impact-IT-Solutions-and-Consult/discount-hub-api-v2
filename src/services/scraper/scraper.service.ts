@@ -66,6 +66,7 @@ export class ScraperService {
 
   @OnEvent('scrape.jumia')
   async handleScrapeJumia(payload: { company: CompanyDocument }) {
+    console.log('Handling scrape.jumia event', payload);
     payload.company.urls?.map(async (url) => {
       await this.jumiaScraper.add(url, {
         link: url,

@@ -44,4 +44,8 @@ export class TagService {
       )
       .exec();
   }
+
+  async clearTags() {
+    return await this.tagModel.deleteMany({ isSeeded: false }).exec();
+  }
 }
