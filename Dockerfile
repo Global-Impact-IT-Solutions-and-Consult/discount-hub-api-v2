@@ -5,9 +5,9 @@ WORKDIR /usr/src/app
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN npm install -g @swc/core @nestjs/cli
 COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+RUN yarn install
+COPY . . 
+RUN yarn build
 
 # Production stage
 FROM node:latest AS production
