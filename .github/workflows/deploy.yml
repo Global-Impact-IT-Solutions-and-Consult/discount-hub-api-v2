@@ -39,7 +39,7 @@ jobs:
             git checkout main
             git pull
             echo "${{ vars.PRODUCTION_VARIABLES }}" > .env
-            npm install --production
+            npm install
             npm run build
             pm2 start ecosystem.config.js --env production
             exit

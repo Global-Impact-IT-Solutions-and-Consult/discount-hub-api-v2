@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'nestjs-app',
+      name: 'discount-hub-api', // Name of your application
       script: 'dist/main.js', // Path to your compiled NestJS main file
       instances: 'max', // Use all available CPU cores
       exec_mode: 'cluster',
