@@ -28,8 +28,8 @@ export class JumiaScraperService extends WorkerHost {
           '--disable-setuid-sandbox',
           '--disable-dev-shm-usage',
         ],
-        // executablePath:
-        //   process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
+        executablePath:
+          process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
         headless: true, // Explicitly set to true for production
         // ignoreHTTPSErrors: true,
       });
@@ -42,7 +42,6 @@ export class JumiaScraperService extends WorkerHost {
             timeout: 30000,
           });
           console.log(currentPageUrl);
-
           await page
             .waitForSelector('section.card.-fh', { timeout: 10000 })
             .catch(() => {

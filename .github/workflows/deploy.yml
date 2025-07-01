@@ -16,11 +16,28 @@ jobs:
           username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
           key: ${{ secrets.DIGITAL_OCEAN_SSH_KEY }}
           script: |
-            docker system prune --force
+            echo "Deploying to Digital Ocean..."
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            sudo npm install -g pm2 @swc/core @nestjs/cli
+
+            apt-get update \
+            && apt-get install -y chromium \
+            fonts-freefont-ttf \
+            fonts-indic \
+            fonts-noto-color-emoji \
+            fonts-noto-cjk \
+            fonts-ipafont-gothic \
+            fonts-wqy-zenhei \
+            fonts-thai-tlwg \
+            fonts-kacst \
+            libxss1 \
+            --no-install-recommends \
+            && rm -rf /var/lib/apt/lists/*
+
             cd giitsc/discount-hub-api-v2
             git checkout main
             git pull
             echo "${{ vars.PRODUCTION_VARIABLES }}" > .env
-            docker compose -f docker-compose.prod.yml down
-            docker compose -f docker-compose.prod.yml up --build -d
+            pm2 start ecosystem.config.js --env production
             exit
