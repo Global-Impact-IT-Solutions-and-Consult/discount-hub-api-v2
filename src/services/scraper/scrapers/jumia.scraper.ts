@@ -23,15 +23,7 @@ export class JumiaScraperService extends WorkerHost {
     let currentPageUrl = job.data.link;
     try {
       const browser = await puppeteer.launch({
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-        ],
-        executablePath:
-          process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
-        headless: true, // Explicitly set to true for production
-        // ignoreHTTPSErrors: true,
+        headless: true,
       });
       try {
         const page = await browser.newPage();
