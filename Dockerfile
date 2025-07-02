@@ -24,6 +24,8 @@ RUN apt-get update \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+COPY --from=build /usr/src/app /usr/src/app
+
 RUN npm init -y &&  \
     npm i puppeteer \
     # Add user so we don't need --no-sandbox.
@@ -35,7 +37,6 @@ RUN npm init -y &&  \
     && chown -R pptruser:pptruser /package.json \
     && chown -R pptruser:pptruser /package-lock.json
 
-COPY --from=build /usr/src/app /usr/src/app
 
 
 EXPOSE ${PORT}
