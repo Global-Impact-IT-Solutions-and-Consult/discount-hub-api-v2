@@ -46,12 +46,6 @@ export class JumiaScraperService extends WorkerHost {
             waitUntil: 'networkidle2',
             timeout: 30000,
           });
-          // Create a sanitized filename from the URL
-          const filename = `jumia-${currentPageUrl.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
-          // Get the HTML content
-          const html = await page.content();
-          // Write to file using Node's fs
-          await fs.promises.writeFile(filename, html);
           console.log(currentPageUrl);
           await page
             .waitForSelector('section.card.-fh', { timeout: 10000 })
