@@ -43,7 +43,7 @@ export class JumiaScraperService extends WorkerHost {
         const fetchedProducts = [];
         while (currentPageUrl) {
           await page.goto(currentPageUrl, {
-            waitUntil: 'networkidle2',
+            waitUntil: 'domcontentloaded',
             timeout: 30000,
           });
           console.log(currentPageUrl);
