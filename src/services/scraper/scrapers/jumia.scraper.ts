@@ -111,8 +111,8 @@ export class JumiaScraperService extends WorkerHost {
               const productPage = await browser.newPage();
               try {
                 await productPage.goto(productDetail.link, {
-                  waitUntil: 'domcontentloaded',
-                  timeout: 200000,
+                  waitUntil: 'networkidle2',
+                  timeout: 0,
                 });
                 const extraDetails = await productPage.evaluate(() => {
                   //images
