@@ -1,13 +1,15 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 // import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { SaveProductConsumerDto } from 'src/product/save-product.consumer';
 import { parsePrice } from 'src/utils/misc';
 import { ProductService } from 'src/product/product.service';
 import { JOB_NAMES } from 'src/utils/constants';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import fs from 'fs';
 // import chromium from '@sparticuz/chromium';
 
 @Processor(JOB_NAMES.scraper.SCRAPE_JUMIA) // BullMQ processor for 'scraper' jobs
@@ -22,6 +24,7 @@ export class JumiaScraperService extends WorkerHost {
   ): Promise<any> {
     let currentPageUrl = job.data.link;
     try {
+      puppeteer.use(StealthPlugin());
       const browser = await puppeteer.launch({
         headless: true,
         args: [
@@ -40,9 +43,15 @@ export class JumiaScraperService extends WorkerHost {
         const fetchedProducts = [];
         while (currentPageUrl) {
           await page.goto(currentPageUrl, {
-            waitUntil: 'domcontentloaded',
+            waitUntil: 'networkidle2',
             timeout: 30000,
           });
+          // Create a sanitized filename from the URL
+          const filename = `jumia-${currentPageUrl.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
+          // Get the HTML content
+          const html = await page.content();
+          // Write to file using Node's fs
+          await fs.promises.writeFile(filename, html);
           console.log(currentPageUrl);
           await page
             .waitForSelector('section.card.-fh', { timeout: 10000 })
