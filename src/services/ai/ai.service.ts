@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 // import { OpenAI } from 'openai';
 import { Groq } from 'groq-sdk';
 import { ChatGroq } from '@langchain/groq';
-import { OllamaEmbeddings } from '@langchain/ollama';
+import { ChatOllama, OllamaEmbeddings } from '@langchain/ollama';
 import { ProductDocument } from 'src/product/schemas/product.schema';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { FaissStore } from '@langchain/community/vectorstores/faiss';
@@ -48,7 +48,11 @@ export class AiService {
     product: string;
   }): Promise<any> {
     try {
-      const groq = new Groq({ apiKey: this.configService.get('AI_API_KEY') });
+      const llm = new ChatOllama({
+        baseUrl: this.configService.get('AI_URL'), // Default Ollama URL
+        temperature: 0.7,
+        model: this.configService.get('AI_MODEL') || 'llama3.2',
+      });
 
       const { categories, product } = input;
 
@@ -70,28 +74,17 @@ export class AiService {
         Do not provide any additional explanations or outputs beyond the specified format.
       `;
 
-      const model = this.configService.get('AI_MODEL') || 'llama3-8b-8192';
-      const maxTokens = prompt.length > 1000 ? 1024 : 512;
+      const messages = [
+        new SystemMessage(
+          'You are an AI trained to categorize products into a list of given categories and assign a brand from the product name. Always prioritize existing categories unless there is absolutely no match. Return only a JSON response.',
+        ),
+        new HumanMessage(prompt),
+      ];
 
-      const chatCompletion = await groq.chat.completions.create({
-        model,
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are an AI trained to categorize products into a list of given categories and assign a brand from the product name. Always prioritize existing categories unless there is absolutely no match. Return only a JSON response.',
-          },
-          { role: 'user', content: prompt },
-        ],
-        temperature: 0.6,
-        max_tokens: maxTokens,
-      });
-
-      const aiResponse = chatCompletion.choices[0].message.content.trim();
-      console.log('🚀 ~ AI Response:', aiResponse);
+      const response = await llm.invoke(messages);
 
       const formattedResponse = JSON.parse(
-        aiResponse.replace(/(\r\n|\n|\r)/gm, ''),
+        response.content.toString().replace(/(\r\n|\n|\r)/gm, ''),
       );
 
       // Validate AI response
@@ -100,6 +93,10 @@ export class AiService {
         !Array.isArray(formattedResponse.categories) ||
         !formattedResponse.brand
       ) {
+        console.error(
+          'Invalid AI response format:',
+          response.content.toString(),
+        );
         throw new Error('AI response is missing required fields');
       }
 
