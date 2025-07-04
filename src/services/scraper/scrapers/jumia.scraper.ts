@@ -44,7 +44,7 @@ export class JumiaScraperService extends WorkerHost {
         while (currentPageUrl) {
           await page.goto(currentPageUrl, {
             waitUntil: 'domcontentloaded',
-            timeout: 200000,
+            timeout: 30000, // 30 seconds
           });
           console.log(currentPageUrl);
           await page
@@ -112,7 +112,7 @@ export class JumiaScraperService extends WorkerHost {
               try {
                 await productPage.goto(productDetail.link, {
                   waitUntil: 'domcontentloaded',
-                  // timeout: 200000,
+                  timeout: 30000, // 30 seconds
                 });
                 const extraDetails = await productPage.evaluate(() => {
                   //images
