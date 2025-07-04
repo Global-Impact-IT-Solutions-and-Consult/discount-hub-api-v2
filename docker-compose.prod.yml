@@ -1,14 +1,19 @@
 version: '3.8'
 
 services:
-  app:
-    restart: always
-    build:
-      context: .
-      dockerfile: Dockerfile
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
     ports:
-      - '6001:6001'
-    env_file:
-      - .env
+      - "11434:11434"
     volumes:
-     - .:/usr/src/app
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]  # remove this line if you don't have GPU
+
+volumes:
+  ollama_data:

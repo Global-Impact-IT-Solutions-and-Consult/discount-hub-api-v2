@@ -39,6 +39,12 @@ jobs:
             git checkout main
             git pull
             echo "${{ vars.PRODUCTION_VARIABLES }}" > .env
+
+
+            docker compose -f docker-compose.prod.yml down
+            docker compose -f docker-compose.prod.yml up -d --build
+            docker exec ollama ollama pull llama3.2
+
             npm install
             npx puppeteer browsers install chrome
             npm run build
