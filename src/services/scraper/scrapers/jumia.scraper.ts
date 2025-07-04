@@ -26,30 +26,26 @@ export class JumiaScraperService extends WorkerHost {
     try {
       puppeteer.use(StealthPlugin());
       const browser = await puppeteer.launch({
-        // args: [
-        //   '--no-sandbox',
-        //   '--disable-setuid-sandbox',
-        //   '--disable-dev-shm-usage',
-        // ],
-        // executablePath:
-        //   process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium',
-        headless: true, // Explicitly set to true for production
-        // ignoreHTTPSErrors: true,
+        headless: true,
+        args: [
+          '--no-sandbox',
+          // '--disable-setuid-sandbox',
+          // '--disable-dev-shm-usage',
+          // '--disable-accelerated-2d-canvas',
+          // '--no-first-run',
+          // '--no-zygote',
+          // '--single-process',
+          // '--disable-gpu',
+        ],
       });
       try {
         const page = await browser.newPage();
         const fetchedProducts = [];
         while (currentPageUrl) {
           await page.goto(currentPageUrl, {
-            waitUntil: 'networkidle2',
-            timeout: 30000,
+            waitUntil: 'domcontentloaded',
+            timeout: 30000, // 30 seconds
           });
-          // Create a sanitized filename from the URL
-          const filename = `jumia-${currentPageUrl.replace(/[^a-zA-Z0-9]/g, '_')}.html`;
-          // Get the HTML content
-          const html = await page.content();
-          // Write to file using Node's fs
-          await fs.promises.writeFile(filename, html);
           console.log(currentPageUrl);
           await page
             .waitForSelector('section.card.-fh', { timeout: 10000 })
@@ -116,7 +112,7 @@ export class JumiaScraperService extends WorkerHost {
               try {
                 await productPage.goto(productDetail.link, {
                   waitUntil: 'domcontentloaded',
-                  timeout: 200000,
+                  timeout: 30000, // 30 seconds
                 });
                 const extraDetails = await productPage.evaluate(() => {
                   //images

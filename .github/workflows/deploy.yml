@@ -22,7 +22,7 @@ jobs:
             sudo npm install -g pm2 @swc/core @nestjs/cli
 
             apt-get update \
-            && apt-get install -y chromium \
+            && apt-get install -y google-chrome-stable \
             fonts-freefont-ttf \
             fonts-indic \
             fonts-noto-color-emoji \
@@ -40,6 +40,7 @@ jobs:
             git pull
             echo "${{ vars.PRODUCTION_VARIABLES }}" > .env
             npm install
+            npx puppeteer browsers install chrome
             npm run build
             pm2 start ecosystem.config.js --env production
             exit
