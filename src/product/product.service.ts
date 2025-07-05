@@ -296,7 +296,9 @@ export class ProductService {
   }
 
   async saveProductJob(data: SaveProductConsumerDto) {
-    this.saveProductQueue.add(data.createProductDto.name, data);
+    this.saveProductQueue.add(data.createProductDto.name, data, {
+      jobId: data.createProductDto.name,
+    });
   }
 
   async clearProducts() {
