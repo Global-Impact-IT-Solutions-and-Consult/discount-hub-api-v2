@@ -44,14 +44,14 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
         name: 'Global New Arrival',
         urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
       },
-      {
-        name: 'Jumia Clearance Sale',
-        urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
-      },
-      {
-        name: 'Global Best Deals',
-        urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
-      },
+      // {
+      //   name: 'Jumia Clearance Sale',
+      //   urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
+      // },
+      // {
+      //   name: 'Global Best Deals',
+      //   urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
+      // },
     ],
     website: 'https://www.jumia.com.ng/',
     logoUrl:
