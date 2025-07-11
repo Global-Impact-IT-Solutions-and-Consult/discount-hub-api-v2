@@ -17,12 +17,12 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           script: |
             echo "Deploying to Digital Ocean..."
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-            sudo npm install -g pm2 @swc/core @nestjs/cli
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -S -E bash -
+            echo "${{ secrets.PASSWORD }}" | sudo -S  apt-get install -y nodejs
+            echo "${{ secrets.PASSWORD }}" | sudo -S  npm install -g pm2 @swc/core @nestjs/cli
 
-            apt-get update \
-            && apt-get install -y google-chrome-stable \
+             echo "${{ secrets.PASSWORD }}" | sudo -S  apt-get update \
+            && sudo apt-get install -y google-chrome-stable \
             fonts-freefont-ttf \
             fonts-indic \
             fonts-noto-color-emoji \

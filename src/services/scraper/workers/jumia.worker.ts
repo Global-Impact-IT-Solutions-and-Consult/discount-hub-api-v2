@@ -11,8 +11,8 @@ async function scrapePage(url) {
     puppeteer.use(StealthPlugin());
     const browser = await puppeteer.launch({
       headless: true,
-      executablePath:
-        '/Users/admin/.cache/puppeteer/chrome/mac_arm-135.0.7049.114/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing',
+      // executablePath:
+      //   '/Users/admin/.cache/puppeteer/chrome/mac_arm-135.0.7049.114/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing',
       args: [
         '--no-sandbox',
         // '--disable-setuid-sandbox',
