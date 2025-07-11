@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Deploy App
-        uses: appleboy/ssh-action@v0.1.10
+        uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.DIGITAL_OCEAN_HOST }}
-          username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
-          key: ${{ secrets.DIGITAL_OCEAN_SSH_KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
           script: |
             echo "Deploying to Digital Ocean..."
             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
