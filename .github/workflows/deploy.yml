@@ -16,24 +16,26 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            echo "Deploying to Digital Ocean..."
+            echo "Deploying to Server..."`
             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -S -E bash -
-            echo "${{ secrets.PASSWORD }}" | sudo -S  apt-get install -y nodejs
-            echo "${{ secrets.PASSWORD }}" | sudo -S  npm install -g pm2 @swc/core @nestjs/cli
+            echo "${{ secrets.PASSWORD }}" | sudo -S bash -c "curl -fsSL https://deb.nodesource.com/setup_18.x | bash -"
+            echo "${{ secrets.PASSWORD }}" | sudo -S apt-get install -y nodejs
+            echo "${{ secrets.PASSWORD }}" | sudo -S npm install -g pm2 @swc/core @nestjs/cli
 
-             echo "${{ secrets.PASSWORD }}" | sudo -S  apt-get update \
-            && sudo apt-get install -y google-chrome-stable \
-            fonts-freefont-ttf \
-            fonts-indic \
-            fonts-noto-color-emoji \
-            fonts-noto-cjk \
-            fonts-ipafont-gothic \
-            fonts-wqy-zenhei \
-            fonts-thai-tlwg \
-            fonts-kacst \
-            libxss1 \
-            --no-install-recommends \
-            && rm -rf /var/lib/apt/lists/*
+
+            echo "${{ secrets.PASSWORD }}" | sudo -S apt-get update
+            echo "${{ secrets.PASSWORD }}" | sudo -S apt-get install -y google-chrome-stable \
+              fonts-freefont-ttf \
+              fonts-indic \
+              fonts-noto-color-emoji \
+              fonts-noto-cjk \
+              fonts-ipafont-gothic \
+              fonts-wqy-zenhei \
+              fonts-thai-tlwg \
+              fonts-kacst \
+              libxss1 \
+              --no-install-recommends
+            echo "${{ secrets.PASSWORD }}" | sudo -S rm -rf /var/lib/apt/lists/*
 
             cd giitsc/discount-hub-api-v2
             git checkout main
@@ -41,9 +43,9 @@ jobs:
             echo "${{ vars.PRODUCTION_VARIABLES }}" > .env
 
 
-            docker compose -f docker-compose.prod.yml down
-            docker compose -f docker-compose.prod.yml up -d --build
-            docker exec ollama ollama pull llama3.2
+            echo "${{ secrets.PASSWORD }}" | sudo -S docker compose -f docker-compose.prod.yml down
+            echo "${{ secrets.PASSWORD }}" | sudo -S docker compose -f docker-compose.prod.yml up -d --build
+            echo "${{ secrets.PASSWORD }}" | sudo -S docker exec ollama ollama pull llama3.2
 
             npm install
             npx puppeteer browsers install chrome

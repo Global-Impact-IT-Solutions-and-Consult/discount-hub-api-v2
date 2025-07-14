@@ -1,6 +1,11 @@
 version: '3.8'
 
 services:
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
   ollama:
     image: ollama/ollama:latest
     container_name: ollama
@@ -9,11 +14,11 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - capabilities: [gpu]  # remove this line if you don't have GPU
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]  # remove this line if you don't have GPU
 
 volumes:
   ollama_data:
