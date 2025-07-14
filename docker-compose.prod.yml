@@ -14,11 +14,11 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]  # remove this line if you don't have GPU
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]  # remove this line if you don't have GPU
 
 volumes:
   ollama_data:
