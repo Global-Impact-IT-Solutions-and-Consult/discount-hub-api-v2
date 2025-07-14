@@ -16,7 +16,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            echo "Deploying to Server..."`
+            echo "Deploying to Server..."
             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -S -E bash -
             echo "${{ secrets.PASSWORD }}" | sudo -S bash -c "curl -fsSL https://deb.nodesource.com/setup_18.x | bash -"
             echo "${{ secrets.PASSWORD }}" | sudo -S apt-get install -y nodejs
