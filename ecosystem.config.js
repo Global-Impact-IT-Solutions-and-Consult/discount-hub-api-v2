@@ -3,7 +3,6 @@ module.exports = {
     {
       name: 'discount-hub-api', // Name of your application
       script: 'dist/main.js', // Path to your compiled NestJS main file
-      instances: '1', // Use all available CPU cores
       exec_mode: 'cluster',
       // Load environment variables from .env file
       env_file: '.env',
