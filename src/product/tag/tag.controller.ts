@@ -14,7 +14,7 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateCategoryDto } from '../category/dto/update-category.dto';
 
 @ApiTags('Product | Tag')
-@Controller('product/tag')
+@Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 

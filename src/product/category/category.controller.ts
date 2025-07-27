@@ -15,7 +15,7 @@ import { QueryCategoryDto } from './dto/query-categories.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Product | Category')
-@Controller('product/category')
+@Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
