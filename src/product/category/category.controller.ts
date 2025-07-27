@@ -51,7 +51,7 @@ export class CategoryController {
 
   @Get('featured')
   async getFeaturedCategories() {
-    const data = await this.categoryService.fetchFeaturedcategories();
+    const data = await this.categoryService.fetchFeaturedCategories();
     return {
       success: true,
       message: 'Featured categories fetched successfully',

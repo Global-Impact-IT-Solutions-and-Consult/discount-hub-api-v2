@@ -34,7 +34,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedSuperAdmin();
     await this.seedCompanies();
     await this.seedCategories();
-    await this.scrapeProducts();
+    // await this.scrapeProducts();
   }
 
   async seedRoles() {

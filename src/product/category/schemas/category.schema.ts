@@ -21,11 +21,6 @@ export class Category {
   @Prop({
     default: false,
   })
-  isFeatured: boolean;
-
-  @Prop({
-    default: false,
-  })
   isSeeded: boolean;
 
   @Prop({

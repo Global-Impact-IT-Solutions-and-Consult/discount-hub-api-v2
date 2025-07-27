@@ -117,8 +117,21 @@ export class CategoryService {
     };
   }
 
-  async fetchFeaturedcategories() {
-    const categories = await this.categoryModel.find({ isFeatured: true });
+  async fetchFeaturedCategories() {
+    const categories = await this.categoryModel.aggregate([
+      { $match: { isSeeded: true } },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: 'categories',
+          as: 'productCount',
+        },
+      },
+      { $addFields: { productCount: { $size: '$productCount' } } },
+      { $sort: { productCount: -1 } },
+      { $limit: 3 },
+    ]);
     return categories;
   }
   async delete(id: string) {

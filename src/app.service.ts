@@ -36,7 +36,7 @@ export class AppService {
   async scrapeProducts() {
     const companies = await this.companyService.findAll();
     for (const company of companies) {
-      this.eventEmitter.emit(`scrape.${company.slug}`, { company });
+      // this.eventEmitter.emit(`scrape.${company.slug}`, { company });
     }
   }
 }
