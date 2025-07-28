@@ -29,6 +29,7 @@ export class ProductService {
       .find()
       .populate('categories')
       .populate('brand')
+      .populate('store')
       .exec();
     return products;
   }
