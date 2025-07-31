@@ -125,12 +125,70 @@ export class CategoryService {
           from: 'products',
           localField: '_id',
           foreignField: 'categories',
-          as: 'productCount',
+          as: 'products',
         },
       },
-      { $addFields: { productCount: { $size: '$productCount' } } },
+      {
+        $addFields: {
+          productCount: { $size: '$products' },
+          products: { $slice: ['$products', 3] },
+        },
+      },
       { $sort: { productCount: -1 } },
       { $limit: 3 },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'products.store',
+          foreignField: '_id',
+          as: 'storeData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'brands',
+          localField: 'products.brand',
+          foreignField: '_id',
+          as: 'brandData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'products.categories',
+          foreignField: '_id',
+          as: 'categoryData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'tags',
+          localField: 'products.tags',
+          foreignField: '_id',
+          as: 'tagData',
+        },
+      },
+      {
+        $addFields: {
+          products: {
+            $map: {
+              input: '$products',
+              as: 'product',
+              in: {
+                $mergeObjects: [
+                  '$$product',
+                  {
+                    store: { $arrayElemAt: ['$storeData', 0] },
+                    brand: { $arrayElemAt: ['$brandData', 0] },
+                    categories: '$categoryData',
+                    tags: '$tagData',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
     ]);
     return categories;
   }
