@@ -1,19 +1,8 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  Sse,
-  MessageEvent,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete } from '@nestjs/common';
 import { ChatService } from './chat.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 import { AddMessageDto } from './dto/add-message.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { Observable } from 'rxjs';
 
 @ApiTags('Chat')
 @Controller('chat')
@@ -40,26 +29,19 @@ export class ChatController {
     return this.chatService.findByUser(userId);
   }
 
-  @Sse(':id/message')
+  @Post(':id/message')
   async streamMessage(
     @Param('id') chatId: string,
-    @Query() addMessageDto: AddMessageDto,
+    @Body() addMessageDto: AddMessageDto,
   ) {
-    const response$ = await this.chatService.addMessage(chatId, addMessageDto);
-    return new Observable<MessageEvent>((subscriber) => {
-      response$.subscribe({
-        next: (data) => {
-          subscriber.next({ data }); // Emit each chunk as an SSE event
-        },
-        error: (err) => {
-          console.error(err);
-          subscriber.error(err); // Notify the client of the error
-        },
-        complete: () => {
-          subscriber.complete(); // Signal the end of the stream
-        },
-      });
-    });
+    const response = await this.chatService.addMessage(chatId, addMessageDto);
+    return response;
+  }
+
+  @Post('chat/test')
+  async testChat(@Body() addMessageDto: AddMessageDto) {
+    const response = await this.chatService.testChat(addMessageDto);
+    return response;
   }
 
   @Delete(':id')

@@ -14,6 +14,7 @@ import { MessageTypeEnum } from 'src/utils/constants';
 import { QueryChatDto } from './dto/query-chat.dto';
 import { AddMessageDto } from './dto/add-message.dto';
 import { ChatMemory } from './schemas/memory.schema';
+import { add } from 'date-fns';
 
 @Injectable()
 export class ChatService {
@@ -62,28 +63,17 @@ export class ChatService {
 
   async addMessage(chatId: string, addMessageDto: AddMessageDto) {
     const chat = await this.chatModel.findById(chatId);
-
     const products = await this.productService.findAll();
-    // const response = await this.aiService.handleQuery(
-    //   userMessage.content,
-    //   chat.id,
-    //   memoryCollection,
-    //   products,
-    // );
-    // const AIMessage = await this.messageModel.create({
-    //   chat: chat._id,
-    //   content: response,
-    //   type: MessageTypeEnum.AI,
-    // });
-
-    // chat.messages.push(userMessage, AIMessage);
-    // await chat.save();
     return this.aiService.handleQuery(
       addMessageDto.content,
       chat.id,
       this.chatMemoryModel.collection,
       products,
     );
+  }
+
+  async testChat(addMessageDto: AddMessageDto) {
+    return await this.aiService.testChat({ chat: addMessageDto.content });
   }
 
   async remove(id: string) {

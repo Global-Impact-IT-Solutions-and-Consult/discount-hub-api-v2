@@ -231,12 +231,12 @@ export class AiService {
     collection: Collection,
     products: ProductDocument[],
   ) {
-    const memory = new MongoDBChatMessageHistory({
-      collection,
-      sessionId: chatId,
-    });
+    // const memory = new MongoDBChatMessageHistory({
+    //   collection,
+    //   sessionId: chatId,
+    // });
 
-    const subject = new Subject<string>();
+    // const subject = new Subject<string>();
 
     try {
       const llm = new ChatOllama({
@@ -255,6 +255,7 @@ export class AiService {
         chunkSize: 500,
         chunkOverlap: 50,
       });
+
       const product_chunks = await text_splitter.splitText(
         product_texts.join('\n'),
       );
@@ -326,14 +327,14 @@ export class AiService {
 
       // Example usage
 
-      for await (const s of await conversationalRagChain2.stream(
-        { input: query },
-        { configurable: { sessionId: chatId } },
-      )) {
-        console.log(s);
-        subject.next(s.answer);
-        console.log('----');
-      }
+      // for await (const s of await conversationalRagChain2.stream(
+      //   { input: query },
+      //   { configurable: { sessionId: chatId } },
+      // )) {
+      //   console.log(s);
+      //   subject.next(s.answer);
+      //   console.log('----');
+      // }
 
       // const messageHistory = conversationalRagChain2.getMessageHistory();
       // console.log(messageHistory);
@@ -345,12 +346,11 @@ export class AiService {
       //   }
       //   return sessionHistory;
       // }
-      subject.complete();
+      // subject.complete();
     } catch (error) {
-      console.log(error);
-      subject.error(error);
+      console.error('Error handling query:', error);
+      throw new Error('Failed to handle query');
     }
-    return subject.asObservable();
   }
 
   private convertToProductText = (product: ProductDocument) => {
@@ -372,4 +372,21 @@ export class AiService {
         Categories: ${product.categories.map((category, index) => `${index}-${category.name}`)}
         `;
   };
+
+  async testChat({ chat }: { chat: string }) {
+    const llm = new ChatOllama({
+      baseUrl: this.configService.get('AI_URL'), // Default Ollama URL
+      temperature: 0.7,
+      model: this.configService.get('AI_MODEL') || 'llama3.2',
+    });
+
+    const embeddings = new OllamaEmbeddings({ model: 'nomic-embed-text' });
+
+    const vectorStore = new FaissStore(embeddings, {});
+
+    const splitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 1000,
+      chunkOverlap: 200,
+    });
+  }
 }
