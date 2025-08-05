@@ -138,14 +138,6 @@ export class CategoryService {
       { $limit: 3 },
       {
         $lookup: {
-          from: 'companies',
-          localField: 'products.store',
-          foreignField: '_id',
-          as: 'storeData',
-        },
-      },
-      {
-        $lookup: {
           from: 'brands',
           localField: 'products.brand',
           foreignField: '_id',
@@ -158,6 +150,14 @@ export class CategoryService {
           localField: 'products.categories',
           foreignField: '_id',
           as: 'categoryData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'products.store',
+          foreignField: '_id',
+          as: 'companyData',
         },
       },
       {
@@ -178,7 +178,7 @@ export class CategoryService {
                 $mergeObjects: [
                   '$$product',
                   {
-                    store: { $arrayElemAt: ['$storeData', 0] },
+                    store: { $arrayElemAt: ['$companyData', 0] },
                     brand: { $arrayElemAt: ['$brandData', 0] },
                     categories: '$categoryData',
                     tags: '$tagData',

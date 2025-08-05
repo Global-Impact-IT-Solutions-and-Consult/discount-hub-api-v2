@@ -19,6 +19,9 @@ export class Category {
   @Prop()
   image: string;
 
+  @Prop()
+  backgroundImage?: string;
+
   @Prop({
     default: false,
   })
