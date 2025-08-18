@@ -181,7 +181,7 @@ export class BaseQueryDto {
 }
 
 export const categoryDTOs: CreateCategoryDTO[] = [
-  { name: 'electronics', isSeeded: true },
+  { name: 'electronics', isSeeded: true, image: 'electronics.png' },
   { name: 'kitchenware', isSeeded: true },
   { name: 'home appliances', isSeeded: true },
   { name: 'personal care', isSeeded: true },

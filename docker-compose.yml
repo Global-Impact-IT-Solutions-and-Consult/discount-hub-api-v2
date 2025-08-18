@@ -17,9 +17,19 @@ services:
     networks:
       - discount-hub-network
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - '11434:11434'
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
 networks:
   discount-hub-network:
     driver: bridge
 
 volumes:
-  db:
+  ollama_data:
+  # db:

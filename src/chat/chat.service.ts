@@ -64,6 +64,7 @@ export class ChatService {
   async addMessage(chatId: string, addMessageDto: AddMessageDto) {
     const chat = await this.chatModel.findById(chatId);
     const products = await this.productService.findAll();
+    console.log({ chatId, addMessageDto, chat, products });
     return this.aiService.handleQuery(
       addMessageDto.content,
       chat.id,
