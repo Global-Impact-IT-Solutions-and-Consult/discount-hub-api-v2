@@ -32,6 +32,8 @@ import { createReactAgent } from '@langchain/langgraph/prebuilt';
 import { EmbeddingsInterface } from '@langchain/core/embeddings';
 import { RunnableWithMessageHistory } from '@langchain/core/runnables';
 import { Subject } from 'rxjs';
+import { MessageDocument } from 'src/chat/schemas/chat-message.schema';
+import { MessageTypeEnum } from 'src/utils/constants';
 
 @Injectable()
 export class AiService {
@@ -225,19 +227,139 @@ export class AiService {
     // }
   }
 
+  // async handleQuery(
+  //   query: string,
+  //   chatId: string,
+  //   collection: Collection,
+  //   products: ProductDocument[],
+  // ) {
+  //   // const memory = new MongoDBChatMessageHistory({
+  //   //   collection,
+  //   //   sessionId: chatId,
+  //   // });
+
+  //   // const subject = new Subject<string>();
+
+  //   try {
+  //     const llm = new ChatOllama({
+  //       baseUrl: this.configService.get('AI_URL'), // Default Ollama URL
+  //       temperature: 0.7,
+  //       model: this.configService.get('AI_MODEL') || 'llama3.2',
+  //     });
+
+  //     const product_texts: string[] = [];
+
+  //     products.map((product) =>
+  //       product_texts.push(this.convertToProductText(product)),
+  //     );
+
+  //     const text_splitter = new RecursiveCharacterTextSplitter({
+  //       chunkSize: 500,
+  //       chunkOverlap: 50,
+  //     });
+
+  //     const product_chunks = await text_splitter.splitText(
+  //       product_texts.join('\n'),
+  //     );
+
+  //     const productVectorStore = await FaissStore.fromTexts(
+  //       product_chunks,
+  //       {},
+  //       this.embeddings,
+  //     );
+
+  //     const productRetriever = productVectorStore.asRetriever();
+
+  //     // Contextualize question
+  //     const contextualizeQSystemPrompt2 =
+  //       'Given a chat history and the latest user question ' +
+  //       'which might reference context in the chat history, ' +
+  //       'formulate a standalone question which can be understood ' +
+  //       'without the chat history. Do NOT answer the question, ' +
+  //       'just reformulate it if needed and otherwise return it as is.';
+
+  //     const contextualizeQPrompt2 = ChatPromptTemplate.fromMessages([
+  //       ['system', contextualizeQSystemPrompt2],
+  //       new MessagesPlaceholder('chat_history'),
+  //       ['human', '{input}'],
+  //     ]);
+
+  //     const historyAwareRetriever2 = await createHistoryAwareRetriever({
+  //       llm: llm,
+  //       retriever: productRetriever,
+  //       rephrasePrompt: contextualizeQPrompt2,
+  //     });
+
+  //     // Answer question
+  //     const systemPrompt2 =
+  //       'You are an assistant for question-answering tasks. ' +
+  //       'Use the following pieces of retrieved context to answer ' +
+  //       "the question. If you don't know the answer, say that you " +
+  //       "don't know." +
+  //       '\n\n' +
+  //       '{context}';
+
+  //     const qaPrompt2 = ChatPromptTemplate.fromMessages([
+  //       ['system', systemPrompt2],
+  //       new MessagesPlaceholder('chat_history'),
+  //       ['human', '{input}'],
+  //     ]);
+
+  //     const questionAnswerChain3 = await createStuffDocumentsChain({
+  //       llm: llm,
+  //       prompt: qaPrompt2,
+  //     });
+
+  //     const ragChain3 = await createRetrievalChain({
+  //       retriever: historyAwareRetriever2,
+  //       combineDocsChain: questionAnswerChain3,
+  //     });
+
+  //     const conversationalRagChain2 = new RunnableWithMessageHistory({
+  //       runnable: ragChain3,
+  //       getMessageHistory: (sessionId) =>
+  //         new MongoDBChatMessageHistory({
+  //           collection,
+  //           sessionId,
+  //         }),
+  //       inputMessagesKey: 'input',
+  //       historyMessagesKey: 'chat_history',
+  //       outputMessagesKey: 'answer',
+  //     });
+
+  //     // Example usage
+
+  //     // for await (const s of await conversationalRagChain2.stream(
+  //     //   { input: query },
+  //     //   { configurable: { sessionId: chatId } },
+  //     // )) {
+  //     //   console.log(s);
+  //     //   subject.next(s.answer);
+  //     //   console.log('----');
+  //     // }
+
+  //     // const messageHistory = conversationalRagChain2.getMessageHistory();
+  //     // console.log(messageHistory);
+
+  //     // async function getSessionHistory2(sessionId: string) {
+  //     //   const sessionHistory = await memory.(sessionId);
+  //     //   if (!sessionHistory) {
+  //     //     await memory.saveMessages(sessionId, []); // Create an empty history if none exists
+  //     //   }
+  //     //   return sessionHistory;
+  //     // }
+  //     // subject.complete();
+  //   } catch (error) {
+  //     console.error('Error handling query:', error);
+  //     throw new Error('Failed to handle query');
+  //   }
+  // }
+
   async handleQuery(
-    query: string,
-    chatId: string,
-    collection: Collection,
-    products: ProductDocument[],
+    messages: MessageDocument[],
+    productsText: string[],
+    message: string,
   ) {
-    // const memory = new MongoDBChatMessageHistory({
-    //   collection,
-    //   sessionId: chatId,
-    // });
-
-    // const subject = new Subject<string>();
-
     try {
       const llm = new ChatOllama({
         baseUrl: this.configService.get('AI_URL'), // Default Ollama URL
@@ -245,148 +367,22 @@ export class AiService {
         model: this.configService.get('AI_MODEL') || 'llama3.2',
       });
 
-      const product_texts: string[] = [];
-
-      products.map((product) =>
-        product_texts.push(this.convertToProductText(product)),
-      );
-
-      const text_splitter = new RecursiveCharacterTextSplitter({
-        chunkSize: 500,
-        chunkOverlap: 50,
+      const chatMessages = messages.map((msg) => {
+        if (msg.type === MessageTypeEnum.USER) {
+          return new HumanMessage(msg.content);
+        } else if (msg.type === MessageTypeEnum.SYSTEM) {
+          return new SystemMessage(msg.content);
+        } else if (msg.type === MessageTypeEnum.AI) {
+          // For assistant messages, we'll use HumanMessage with a prefix
+          return new AIMessage(msg.content);
+        }
       });
 
-      const product_chunks = await text_splitter.splitText(
-        product_texts.join('\n'),
-      );
-
-      const productVectorStore = await FaissStore.fromTexts(
-        product_chunks,
-        {},
-        this.embeddings,
-      );
-
-      const productRetriever = productVectorStore.asRetriever();
-
-      // Contextualize question
-      const contextualizeQSystemPrompt2 =
-        'Given a chat history and the latest user question ' +
-        'which might reference context in the chat history, ' +
-        'formulate a standalone question which can be understood ' +
-        'without the chat history. Do NOT answer the question, ' +
-        'just reformulate it if needed and otherwise return it as is.';
-
-      const contextualizeQPrompt2 = ChatPromptTemplate.fromMessages([
-        ['system', contextualizeQSystemPrompt2],
-        new MessagesPlaceholder('chat_history'),
-        ['human', '{input}'],
-      ]);
-
-      const historyAwareRetriever2 = await createHistoryAwareRetriever({
-        llm: llm,
-        retriever: productRetriever,
-        rephrasePrompt: contextualizeQPrompt2,
-      });
-
-      // Answer question
-      const systemPrompt2 =
-        'You are an assistant for question-answering tasks. ' +
-        'Use the following pieces of retrieved context to answer ' +
-        "the question. If you don't know the answer, say that you " +
-        "don't know." +
-        '\n\n' +
-        '{context}';
-
-      const qaPrompt2 = ChatPromptTemplate.fromMessages([
-        ['system', systemPrompt2],
-        new MessagesPlaceholder('chat_history'),
-        ['human', '{input}'],
-      ]);
-
-      const questionAnswerChain3 = await createStuffDocumentsChain({
-        llm: llm,
-        prompt: qaPrompt2,
-      });
-
-      const ragChain3 = await createRetrievalChain({
-        retriever: historyAwareRetriever2,
-        combineDocsChain: questionAnswerChain3,
-      });
-
-      const conversationalRagChain2 = new RunnableWithMessageHistory({
-        runnable: ragChain3,
-        getMessageHistory: (sessionId) =>
-          new MongoDBChatMessageHistory({
-            collection,
-            sessionId,
-          }),
-        inputMessagesKey: 'input',
-        historyMessagesKey: 'chat_history',
-        outputMessagesKey: 'answer',
-      });
-
-      // Example usage
-
-      // for await (const s of await conversationalRagChain2.stream(
-      //   { input: query },
-      //   { configurable: { sessionId: chatId } },
-      // )) {
-      //   console.log(s);
-      //   subject.next(s.answer);
-      //   console.log('----');
-      // }
-
-      // const messageHistory = conversationalRagChain2.getMessageHistory();
-      // console.log(messageHistory);
-
-      // async function getSessionHistory2(sessionId: string) {
-      //   const sessionHistory = await memory.(sessionId);
-      //   if (!sessionHistory) {
-      //     await memory.saveMessages(sessionId, []); // Create an empty history if none exists
-      //   }
-      //   return sessionHistory;
-      // }
-      // subject.complete();
+      const response = await llm.invoke(chatMessages);
+      return response;
     } catch (error) {
       console.error('Error handling query:', error);
       throw new Error('Failed to handle query');
     }
-  }
-
-  private convertToProductText = (product: ProductDocument) => {
-    return `
-        ID: ${product._id},
-        Name: ${product.name},
-        Price: ${product.price},
-        Discount: ${product.discountPrice},
-        rating: ${product.rating},
-        specifications: ${product.specifications},
-        Key Features: ${product.keyFeatures},
-        Store: ${product.store.name},
-        Description: ${product.description},
-        Tags: ${product.tags.map((tag, index) => `${index}-${tag.name}`)},
-        Brand: ${
-          //product?.brand?.name ||
-          ''
-        }
-        Categories: ${product.categories.map((category, index) => `${index}-${category.name}`)}
-        `;
-  };
-
-  async testChat({ chat }: { chat: string }) {
-    const llm = new ChatOllama({
-      baseUrl: this.configService.get('AI_URL'), // Default Ollama URL
-      temperature: 0.7,
-      model: this.configService.get('AI_MODEL') || 'llama3.2',
-    });
-
-    const embeddings = new OllamaEmbeddings({ model: 'nomic-embed-text' });
-
-    const vectorStore = new FaissStore(embeddings, {});
-
-    const splitter = new RecursiveCharacterTextSplitter({
-      chunkSize: 1000,
-      chunkOverlap: 200,
-    });
   }
 }

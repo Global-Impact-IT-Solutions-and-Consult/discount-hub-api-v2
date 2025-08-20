@@ -3,10 +3,10 @@ import { HydratedDocument, SchemaTypes } from 'mongoose';
 import { MessageTypeEnum } from 'src/utils/constants';
 import { ChatDocument } from './chat.schema';
 
-export type MessageDocument = HydratedDocument<Message>;
+export type MessageDocument = HydratedDocument<ChatMessage>;
 
 @Schema({ timestamps: true })
-export class Message {
+export class ChatMessage {
   @Prop({ type: SchemaTypes.ObjectId, ref: 'Chat' })
   chat: ChatDocument;
 
@@ -28,4 +28,4 @@ export class Message {
   metaData: any;
 }
 
-export const MessageSchema = SchemaFactory.createForClass(Message);
+export const MessageSchema = SchemaFactory.createForClass(ChatMessage);

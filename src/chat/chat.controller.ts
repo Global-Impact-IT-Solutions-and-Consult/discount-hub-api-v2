@@ -38,12 +38,6 @@ export class ChatController {
     return response;
   }
 
-  @Post('chat/test')
-  async testChat(@Body() addMessageDto: AddMessageDto) {
-    const response = await this.chatService.testChat(addMessageDto);
-    return response;
-  }
-
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.chatService.remove(id);
