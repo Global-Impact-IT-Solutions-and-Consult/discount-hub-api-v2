@@ -2,7 +2,7 @@
 sudo su
 
 # Navigate to the application directory
-cd /home/ec2-user/discounts-hub-api
+cd /home/ec2-user/discounts-hub-api-v2
 
 # Start the application with PM2
 export NVM_DIR="$HOME/.nvm"
