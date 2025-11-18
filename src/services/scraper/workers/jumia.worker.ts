@@ -6,7 +6,6 @@ import { parsePrice } from 'src/utils/misc';
 async function scrapePage(url) {
   let currentPageUrl = url;
   const fetchedProducts = [];
-  console.log(`initial first products `, fetchedProducts);
   try {
     puppeteer.use(StealthPlugin());
     const browser = await puppeteer.launch({

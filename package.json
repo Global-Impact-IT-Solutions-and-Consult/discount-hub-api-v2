@@ -23,6 +23,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.922.0",
+    "@aws-sdk/client-lambda": "^3.922.0",
     "@bull-board/api": "^6.10.1",
     "@bull-board/express": "^6.10.1",
     "@bull-board/nestjs": "^6.10.1",
