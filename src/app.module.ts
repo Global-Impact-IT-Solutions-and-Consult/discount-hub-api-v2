@@ -45,6 +45,7 @@ import { ExpressAdapter } from '@bull-board/express';
           port: configService.get('REDIS_PORT'),
           password: configService.get('REDIS_PASSWORD') ?? undefined,
           username: configService.get('REDIS_USERNAME') ?? undefined,
+          tls: configService.get('NODE_ENV') === 'production' ? {} : undefined,
           maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
           enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
         },
