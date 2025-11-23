@@ -196,7 +196,7 @@ export class CategoryService {
     return await this.categoryModel.findByIdAndDelete(id);
   }
 
-  async clearCategories() {
+  async clearCategories(): Promise<any> {
     return await this.categoryModel.deleteMany({ isSeeded: false });
   }
 }
