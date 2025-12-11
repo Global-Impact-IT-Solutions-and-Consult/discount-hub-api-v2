@@ -48,7 +48,8 @@ import { ExpressAdapter } from '@bull-board/express';
           username: configService.get('REDIS_USERNAME') ?? undefined,
           tls: configService.get('NODE_ENV') === 'production' ? {} : undefined,
           maxRetriesPerRequest: null, // 🛠️ Prevents creating new clients when a request fails
-          enableOfflineQueue: true, // 🚀 Allow queuing commands when the connection is down
+          enableOfflineQueue: false, // 🚀 Allow queuing commands when the connection is down
+          enableReadyCheck: false, // ✅ Ensures the client is ready before processing commands
         },
         sharedConnection: true, // ✅ Use a single Redis connection for all queues
       }),
