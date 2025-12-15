@@ -45,7 +45,7 @@ export class TagService {
       .exec();
   }
 
-  async clearTags() {
+  async clearTags(): Promise<any> {
     return await this.tagModel.deleteMany({ isSeeded: false }).exec();
   }
 }

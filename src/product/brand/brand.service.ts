@@ -45,7 +45,7 @@ export class BrandService {
       .exec();
   }
 
-  async clearBrands() {
+  async clearBrands(): Promise<any> {
     return await this.brandModel.deleteMany({ isSeeded: false }).exec();
   }
 }

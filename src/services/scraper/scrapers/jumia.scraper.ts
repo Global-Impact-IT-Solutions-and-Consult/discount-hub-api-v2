@@ -1,19 +1,19 @@
 import { OnWorkerEvent, Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { InternalServerErrorException, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { SaveProductConsumerDto } from 'src/product/save-product.consumer';
 import { ProductService } from 'src/product/product.service';
 import { JOB_NAMES } from 'src/utils/constants';
-import { Worker } from 'worker_threads';
-
-import path from 'path';
-// import chromium from '@sparticuz/chromium';
+import { LambdaService } from 'src/services/aws/lambda.service';
 
 @Processor(JOB_NAMES.scraper.SCRAPE_JUMIA) // BullMQ processor for 'scraper' jobs
 export class JumiaScraperService extends WorkerHost {
   logger = new Logger(JumiaScraperService.name);
-  constructor(private productService: ProductService) {
+  private readonly BATCH_SIZE = 10;
+  constructor(
+    private productService: ProductService,
+    private lambdaService: LambdaService,
+  ) {
     super();
   }
 
@@ -23,7 +23,6 @@ export class JumiaScraperService extends WorkerHost {
     const products = await this.scrapePage(job.data.link).catch((error) => {
       console.error('Error scraping page:', error);
     });
-    // console.log({ products });
     for (const product of products as SaveProductConsumerDto[]) {
       product.createProductDto.store = job.data.storeId;
       this.productService.saveProductJob(product);
@@ -32,29 +31,67 @@ export class JumiaScraperService extends WorkerHost {
   }
 
   async scrapePage(url: string): Promise<SaveProductConsumerDto[]> {
-    return new Promise((resolve, reject) => {
-      const worker = new Worker(
-        path.join(__dirname, '../', 'workers', 'jumia.worker.js'),
-        {
-          workerData: { url },
-        },
-      );
+    type Product = {
+      anchor: any;
+      discount: string;
+      link: string;
+      image: string;
+      name: string;
+      discountPrice: string;
+      price: string;
+      reviewText: string;
+    };
 
-      worker.on('message', (result: SaveProductConsumerDto[]) => {
-        console.log('Worker finished processing:', result);
-        resolve(result);
+    const { products }: { products: Product[] } =
+      await this.lambdaService.callFunction('jumia-scraper', {
+        url,
       });
+    const data: SaveProductConsumerDto[] = [];
 
-      worker.on('error', (error) => {
-        reject(error);
-      });
-
-      worker.on('exit', (code) => {
-        if (code !== 0) {
-          reject(new Error(`Worker stopped with exit code ${code}`));
+    for (let i = 0; i < products.length; i += this.BATCH_SIZE) {
+      const batch = products.slice(i, i + this.BATCH_SIZE);
+      const promises = batch.map(async (product) => {
+        try {
+          const {
+            productDetails,
+          }: {
+            productDetails: {
+              description: string;
+              imageUrls: string[];
+              keyFeatures: string;
+              specifications: string;
+            };
+          } = await this.lambdaService.callFunction('jumia-scraper', {
+            url: product.link,
+            isProductPage: true,
+          });
+          return {
+            createProductDto: {
+              discountPrice: parseFloat(
+                product.discountPrice.replace(/[^0-9.-]+/g, ''),
+              ),
+              name: product.name,
+              price: parseFloat(product.price.replace(/[^0-9.-]+/g, '')),
+              description: productDetails.description,
+              link: product.link,
+              keyFeatures: productDetails.keyFeatures,
+              image: product.image,
+              images: productDetails.imageUrls,
+            },
+            brand: null,
+            categories: [],
+            tags: [],
+          };
+        } catch (error) {
+          console.error('Error processing product:', error);
+          return null;
         }
       });
-    });
+      const results = await Promise.all(promises);
+      data.push(...results.filter((item) => item !== null));
+    }
+
+    return data;
   }
 
   @OnWorkerEvent('error')

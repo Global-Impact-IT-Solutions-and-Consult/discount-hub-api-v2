@@ -35,6 +35,6 @@ import { TemuScraperService } from './scrapers/temu.scraper';
     TemuScraperService,
     AliExpressScraperService,
   ],
-  exports: [ScraperService],
+  exports: [ScraperService, JumiaScraperService],
 })
 export class ScraperModule {}

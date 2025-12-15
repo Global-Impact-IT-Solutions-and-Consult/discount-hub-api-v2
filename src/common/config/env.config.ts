@@ -93,6 +93,15 @@ export class EnvironmentVariables {
 
   @IsString()
   EMAIL_PASSWORD: string;
+
+  @IsString()
+  AWS_REGION: string;
+
+  @IsString()
+  AWS_ACCESS_KEY: string;
+
+  @IsString()
+  AWS_SECRET_KEY: string;
 }
 
 export function validateEnv(config: Record<string, unknown>) {

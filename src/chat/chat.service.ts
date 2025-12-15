@@ -68,10 +68,16 @@ export class ChatService {
   }
 
   async addMessage(chatId: string, addMessageDto: AddMessageDto) {
+    console.log({ chatId, addMessageDto });
+    if (!chatId) {
+      throw new Error('Chat ID is required');
+    }
     const chat = await this.chatModel
       .findById(chatId)
       .populate('messages')
       .exec();
+
+    console.log({ chat });
 
     let productsText = await this.cacheManager.get<string[]>('productsText');
     if (!productsText) {
