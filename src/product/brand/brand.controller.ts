@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BrandService } from './brand.service';
@@ -66,6 +67,24 @@ export class BrandController {
     return {
       success: true,
       message: 'Brand deleted successfully',
+    };
+  }
+
+  @Get(':id/products')
+  async getProductsByBrand(
+    @Param('id') id: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    const data = await this.brandService.getProductsByBrand(
+      id,
+      parseInt(page, 10),
+      parseInt(limit, 10),
+    );
+    return {
+      success: true,
+      message: 'Products fetched successfully',
+      data,
     };
   }
 }
