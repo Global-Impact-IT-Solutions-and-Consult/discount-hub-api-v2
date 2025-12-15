@@ -8,6 +8,8 @@ import puppeteer from 'puppeteer';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
+import { normalizeTagName } from 'src/utils/tag.utils';
+import { SaveProductConsumerDto } from 'src/product/save-product.consumer';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 
 @Processor('scraper') // BullMQ processor for 'scraper' jobs
@@ -405,6 +407,7 @@ export class AliExpressScraperService extends WorkerHost {
 
       if (payload.special_links) {
         for (const specialLink of payload.special_links) {
+          const normalizedTag = normalizeTagName(specialLink.name);
           for (const url of specialLink.urls) {
             let currentPageUrl = url;
 
@@ -521,8 +524,7 @@ export class AliExpressScraperService extends WorkerHost {
                         discount,
                         rating,
                         numberOfRatings,
-                        // tag: categoryHeading,
-                        tag: '',
+                        tag: '', // Will be set after evaluation (normalizedTag not accessible here)
                         // store: 'aliexpress',
                         description: '', // Initialize description (will be populated later)
                         keyFeatures: '', // Initialize key features (will be populated later)
@@ -651,6 +653,7 @@ export class AliExpressScraperService extends WorkerHost {
                     product.specifications = specifications; // Set the specifications
                     product.price = price; // Set the price
                     product.discountPrice = discountPrice; // Set the discountPrice
+                    product.tag = normalizedTag; // Set normalized tag (outside evaluate context)
 
                     await productPage.close(); // Close the new page
 
@@ -760,7 +763,7 @@ export class AliExpressScraperService extends WorkerHost {
         const createProductDto: CreateProductDto = {
           name: product.name,
           price: this.parsePrice(product.price),
-          image: '',
+          image: product.images?.[0] || '',
           discountPrice: this.parsePrice(product.discountPrice),
           images: product.images,
           specifications: product.specifications,
@@ -771,17 +774,20 @@ export class AliExpressScraperService extends WorkerHost {
           discount: product.discount,
           rating: product.rating,
           numberOfRatings: product.numberOfRatings,
-          // store: company.name,
-          // storeBadgeColor: company.badgeColor || 'red', // Use badgeColor from company
-          // store: company.id,
-          // storeName: company.name,
-          // storeLogo: company.logo,
+          store: company._id.toString(),
           keyFeatures: product.keyFeatures,
-          // tag: product.tag,
+        };
+
+        const saveProductDto: SaveProductConsumerDto = {
+          createProductDto,
+          brand: product.brand,
+          categories: product.categories,
+          tags: product.tag ? [product.tag] : [],
         };
 
         try {
-          await this.productService.create(createProductDto);
+          await this.productService.saveProductJob(saveProductDto);
+          this.logger.log(`Product queued: ${createProductDto.name}`);
         } catch (error) {
           this.logger.error('Error saving product:', error);
         }

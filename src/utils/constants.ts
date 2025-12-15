@@ -20,38 +20,34 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     badgeColor: 'blue',
     urls: [
       // 'https://www.jumia.com.ng',
-      // 'https://www.jumia.com.ng/mlp-appliances',
-      // 'https://www.jumia.com.ng/health-beauty',
-      // 'https://www.jumia.com.ng/electronics',
-      // 'https://www.jumia.com.ng/mlp-beauty-essentials',
-      // 'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
-      // 'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
-      // 'https://www.jumia.com.ng/category-fashion-by-jumia',
-      // 'https://www.jumia.com.ng/mlp-beverages-drinks',
+      'https://www.jumia.com.ng/mlp-appliances',
+      'https://www.jumia.com.ng/health-beauty',
+      'https://www.jumia.com.ng/electronics',
+      'https://www.jumia.com.ng/mlp-beauty-essentials',
+      'https://www.jumia.com.ng/mlp-screen-and-sound-sale',
+      'https://www.jumia.com.ng/mlp-smart-phones-smart-discounts',
+      'https://www.jumia.com.ng/category-fashion-by-jumia',
+      'https://www.jumia.com.ng/mlp-beverages-drinks',
+      'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
       // 'https://www.jumia.com.ng/mlp-best-sellers-in-underwear-accessories-jewelry',
-      // 'https://www.jumia.com.ng/catalog/?sort=lowest-price&tag=CP_MT4',
-      // 'https://www.jumia.com.ng/flash-sales',
-      // 'https://www.jumia.com.ng/mlp-clearance-sale',
-      // 'https://www.jumia.com.ng/mlp-global-best-deal',
-      // 'https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest',
     ],
     special_links: [
       {
-        name: 'Jumia Flash Sales',
+        name: 'Flash Sales',
         urls: ['https://www.jumia.com.ng/flash-sales'],
       },
       {
-        name: 'Global New Arrival',
+        name: 'New Arrival',
         urls: ['https://www.jumia.com.ng/mlp-global-new-arrival/?sort=newest'],
       },
-      // {
-      //   name: 'Jumia Clearance Sale',
-      //   urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
-      // },
-      // {
-      //   name: 'Global Best Deals',
-      //   urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
-      // },
+      {
+        name: 'Clearance Sale',
+        urls: ['https://www.jumia.com.ng/mlp-clearance-sale'],
+      },
+      {
+        name: 'Best Deals',
+        urls: ['https://www.jumia.com.ng/mlp-global-best-deal'],
+      },
     ],
     website: 'https://www.jumia.com.ng/',
     logoUrl:
@@ -67,7 +63,7 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     ],
     special_links: [
       {
-        name: 'Konga Daily Deals',
+        name: 'Daily Deals',
         urls: ['https://www.konga.com/deals/daily'],
       },
     ],
@@ -104,15 +100,15 @@ export const defaultCompanies: Partial<CreateCompanyDto>[] = [
     ],
     special_links: [
       {
-        name: 'Aliexpress Best Sellers',
+        name: 'Best Sellers',
         urls: ['https://www.aliexpress.com/ssr/300000444/GSDWp3p6aC'],
       },
       {
-        name: 'AliExpress Bundle Deals',
+        name: 'Bundle Deals',
         urls: ['https://www.aliexpress.com/ssr/300000512/BundleDeals2'],
       },
       {
-        name: 'AliExpress Choices',
+        name: 'Best Deals',
         urls: ['https://www.aliexpress.com/ssr/300000556/zQFHEaEPNJ'],
       },
     ],

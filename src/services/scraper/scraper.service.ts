@@ -71,13 +71,15 @@ export class ScraperService {
       await this.jumiaScraper.add(url, {
         link: url,
         storeId: payload.company._id,
+        tagName: null,
       });
     });
-    payload.company.special_links?.map(async (url) => {
-      for (const link of url.urls) {
+    payload.company.special_links?.map(async (specialLink) => {
+      for (const link of specialLink.urls) {
         await this.jumiaScraper.add(link, {
           link,
           storeId: payload.company._id,
+          tagName: specialLink.name,
         });
       }
     });
