@@ -8,6 +8,8 @@ import puppeteer from 'puppeteer';
 import { CompanyDocument } from 'src/company/schemas/company.schema';
 import { CreateProductDto } from 'src/product/dto/create-product.dto';
 import { Job } from 'bullmq';
+import { normalizeTagName } from 'src/utils/tag.utils';
+import { SaveProductConsumerDto } from 'src/product/save-product.consumer';
 // import { CreateCompanyDto } from 'src/company/dto/create-company.dto';
 
 @Injectable()
@@ -299,6 +301,7 @@ export class KongaScraperService extends WorkerHost {
 
       if (payload.special_links) {
         for (const specialLink of payload.special_links) {
+          const normalizedTag = normalizeTagName(specialLink.name);
           for (const url of specialLink?.urls) {
             let currentPageUrl = url;
 
@@ -383,8 +386,7 @@ export class KongaScraperService extends WorkerHost {
                         discount,
                         rating,
                         numberOfRatings: '0',
-                        // tag: specialLink.name,
-                        tag: '',
+                        tag: '', // Will be set after evaluation (normalizedTag not accessible here)
                         // store: 'konga',
                         description: '', // Initialize description (will be populated later)
                         keyFeatures: '', // Initialize key features (will be populated later)
@@ -457,7 +459,7 @@ export class KongaScraperService extends WorkerHost {
                     product.rating = rating; // Set the product rating
                     product.numberOfRatings = numberOfRatings; // Set the product rating
                     product.description = description; // Set the product description
-                    // product.tag = specialLink.name;
+                    product.tag = normalizedTag; // Set normalized tag
 
                     await productPage.close(); // Close the new page
 
@@ -540,7 +542,7 @@ export class KongaScraperService extends WorkerHost {
     for (const product of scrapedData) {
       const createProductDto: CreateProductDto = {
         name: product.name,
-        image: '',
+        image: product.images?.[0] || '',
         price: this.parsePrice(product.price),
         discountPrice: this.parsePrice(product.discountPrice),
         images: product.images,
@@ -552,17 +554,19 @@ export class KongaScraperService extends WorkerHost {
         discount: product.discount,
         rating: product.rating,
         numberOfRatings: product.numberOfRatings,
-        // store: company.name,
-        // storeBadgeColor: company.badgeColor || 'red', // Use badgeColor from company
-        // store: company.id,
-        // storeName: company.name,
-        // storeLogo: company.logo,
-        // keyFeatures: product.keyFeatures,
-        // tag: product.tag,
+        store: company._id.toString(),
       };
+
+      const saveProductDto: SaveProductConsumerDto = {
+        createProductDto,
+        brand: product.brand,
+        categories: product.categories,
+        tags: product.tag ? [product.tag] : [],
+      };
+
       try {
-        await this.productService.create(createProductDto);
-        this.logger.log(`Product saved: ${createProductDto.name}`);
+        await this.productService.saveProductJob(saveProductDto);
+        this.logger.log(`Product queued: ${createProductDto.name}`);
       } catch (error) {
         this.logger.error('Error saving product:', error);
       }

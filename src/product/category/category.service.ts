@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './schemas/category.schema';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateCategoryDTO } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { QueryCategoryDto } from './dto/query-categories.dto';
@@ -28,15 +28,130 @@ export class CategoryService {
   }
 
   async findAll() {
-    const categories = await this.categoryModel.find().populate('productCount');
+    const categories = await this.categoryModel.aggregate([
+      {
+        $lookup: {
+          from: 'products',
+          let: { categoryId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ['$$categoryId', '$categories'],
+                },
+              },
+            },
+            { $limit: 10 },
+          ],
+          as: 'products',
+        },
+      },
+      {
+        $addFields: {
+          productCount: { $size: '$products' },
+        },
+      },
+    ]);
     return categories;
   }
 
   async findOneById(id: string) {
-    const category = await this.categoryModel
-      .findById(id)
-      .populate('productCount');
-    return category;
+    const categories = await this.categoryModel.aggregate([
+      { $match: { _id: new Types.ObjectId(id) } },
+      {
+        $lookup: {
+          from: 'products',
+          let: { categoryId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ['$$categoryId', '$categories'],
+                },
+              },
+            },
+          ],
+          as: 'products',
+        },
+      },
+      {
+        $lookup: {
+          from: 'brands',
+          localField: 'products.brand',
+          foreignField: '_id',
+          as: 'brandData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'products.store',
+          foreignField: '_id',
+          as: 'companyData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'tags',
+          localField: 'products.tags',
+          foreignField: '_id',
+          as: 'tagData',
+        },
+      },
+      {
+        $addFields: {
+          productCount: { $size: '$products' },
+          products: {
+            $map: {
+              input: '$products',
+              as: 'product',
+              in: {
+                $mergeObjects: [
+                  '$$product',
+                  {
+                    brand: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$brandData',
+                            as: 'brand',
+                            cond: { $eq: ['$$brand._id', '$$product.brand'] },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                    store: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$companyData',
+                            as: 'company',
+                            cond: { $eq: ['$$company._id', '$$product.store'] },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                    tags: {
+                      $filter: {
+                        input: '$tagData',
+                        as: 'tag',
+                        cond: {
+                          $in: ['$$tag._id', '$$product.tags'],
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    return categories[0] || null;
   }
 
   async findOneByName(name: string) {
@@ -123,19 +238,31 @@ export class CategoryService {
       {
         $lookup: {
           from: 'products',
-          localField: '_id',
-          foreignField: 'categories',
+          let: { categoryId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ['$$categoryId', '$categories'],
+                },
+              },
+            },
+          ],
           as: 'products',
         },
       },
       {
         $addFields: {
           productCount: { $size: '$products' },
-          products: { $slice: ['$products', 3] },
         },
       },
       { $sort: { productCount: -1 } },
       { $limit: 3 },
+      {
+        $addFields: {
+          products: { $slice: ['$products', 3] },
+        },
+      },
       {
         $lookup: {
           from: 'brands',
@@ -178,10 +305,48 @@ export class CategoryService {
                 $mergeObjects: [
                   '$$product',
                   {
-                    store: { $arrayElemAt: ['$companyData', 0] },
-                    brand: { $arrayElemAt: ['$brandData', 0] },
-                    categories: '$categoryData',
-                    tags: '$tagData',
+                    store: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$companyData',
+                            as: 'company',
+                            cond: { $eq: ['$$company._id', '$$product.store'] },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                    brand: {
+                      $arrayElemAt: [
+                        {
+                          $filter: {
+                            input: '$brandData',
+                            as: 'brand',
+                            cond: { $eq: ['$$brand._id', '$$product.brand'] },
+                          },
+                        },
+                        0,
+                      ],
+                    },
+                    categories: {
+                      $filter: {
+                        input: '$categoryData',
+                        as: 'cat',
+                        cond: {
+                          $in: ['$$cat._id', '$$product.categories'],
+                        },
+                      },
+                    },
+                    tags: {
+                      $filter: {
+                        input: '$tagData',
+                        as: 'tag',
+                        cond: {
+                          $in: ['$$tag._id', '$$product.tags'],
+                        },
+                      },
+                    },
                   },
                 ],
               },

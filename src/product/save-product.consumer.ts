@@ -34,7 +34,12 @@ export class SaveProductConsumer extends WorkerHost {
     let brandId,
       categoriesIds = [],
       tagIds = [];
-    if (!brand || !categories) {
+
+    // Check if we need AI categorization (if brand is missing OR categories array is empty/missing)
+    const needsAICategorization =
+      !brand || !categories || categories.length === 0;
+
+    if (needsAICategorization) {
       const dbCategories = await this.categoryService.findAll();
       const aiResponse = await this.aiService.categorizeProducts({
         categories: dbCategories.map((c) => c.name),
@@ -51,7 +56,8 @@ export class SaveProductConsumer extends WorkerHost {
         brandId = newBrand._id;
       }
 
-      if (!categories) {
+      // Always use AI categories if we're using AI (categories array was empty/missing)
+      if (!categories || categories.length === 0) {
         for (const cat of aiResponse.categories) {
           const cate = await this.categoryService.findOneOrCreate({
             name: cat,
@@ -59,18 +65,32 @@ export class SaveProductConsumer extends WorkerHost {
           categoriesIds.push(cate._id);
         }
       } else {
-        categories?.forEach(async (cat) => {
+        // If categories were provided, use them
+        for (const cat of categories) {
           const cate = await this.categoryService.findOneOrCreate({
             name: cat,
           });
           categoriesIds.push(cate._id);
+        }
+      }
+    } else {
+      // Brand and categories are provided, use them directly
+      const newBrand = await this.brandService.findOrCreate({ name: brand });
+      brandId = newBrand._id;
+
+      for (const cat of categories) {
+        const cate = await this.categoryService.findOneOrCreate({
+          name: cat,
         });
+        categoriesIds.push(cate._id);
       }
     }
-    if (tags) {
+
+    // Process tags - always use findOrCreate for tags
+    if (tags && tags.length > 0) {
       for (const tag of tags) {
-        const newTags = await this.tagService.findOrCreate({ name: tag });
-        tagIds.push(newTags._id);
+        const newTag = await this.tagService.findOrCreate({ name: tag });
+        tagIds.push(newTag._id);
       }
     }
 
