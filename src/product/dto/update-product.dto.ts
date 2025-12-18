@@ -6,6 +6,7 @@ import {
   IsNumber,
   ArrayMinSize,
   IsMongoId,
+  IsBoolean,
   // IsObject,
 } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
@@ -105,4 +106,9 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   @ApiProperty({ required: false })
   @IsOptional()
   storeBadgeColor?: string;
+
+  @ApiProperty({ required: false })
+  @IsBoolean()
+  @IsOptional()
+  isFeatured?: boolean;
 }

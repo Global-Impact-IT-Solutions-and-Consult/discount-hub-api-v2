@@ -64,6 +64,11 @@ export class Product {
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Category' }] })
   categories: CategoryDocument[];
+
+  @Prop({
+    default: false,
+  })
+  isFeatured: boolean;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);

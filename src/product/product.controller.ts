@@ -42,6 +42,16 @@ export class ProductController {
     };
   }
 
+  @Get('featured')
+  async getFeaturedProducts() {
+    const data = await this.productService.fetchFeaturedProducts();
+    return {
+      success: true,
+      message: 'Featured products fetched successfully',
+      data,
+    };
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.productService.findOne(id);

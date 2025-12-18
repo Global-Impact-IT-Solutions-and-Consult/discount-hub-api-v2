@@ -13,8 +13,7 @@ import { SeedService } from './seed/seed.service';
 // import { CompanyService } from './company/company.service';
 
 @Injectable()
-export class AppService {
-  // export class AppService implements OnApplicationBootstrap {
+export class AppService implements OnApplicationBootstrap {
   private readonly logger = new Logger(AppService.name);
 
   constructor(
@@ -39,6 +38,46 @@ export class AppService {
     await this.categoryService.clearCategories();
     await this.productService.clearProducts();
     await this.seedService.scrapeProducts();
+    // Select new featured products after scraping
+    await this.selectFeaturedProducts();
+  }
+
+  /**
+   * Select featured products (called at midnight after scraping or on startup)
+   */
+  async selectFeaturedProducts() {
+    this.logger.log('Selecting featured products...');
+    try {
+      await this.productService.selectFeaturedProducts(20);
+      this.logger.log('Featured products selected successfully');
+    } catch (error) {
+      this.logger.error('Error selecting featured products:', error);
+    }
+  }
+
+  /**
+   * On application startup, check if featured products exist
+   * If none exist, select them automatically
+   */
+  async onApplicationBootstrap() {
+    this.logger.log('Application starting up...');
+    try {
+      const hasFeatured = await this.productService.hasFeaturedProducts();
+      if (!hasFeatured) {
+        this.logger.log(
+          'No featured products found. Selecting featured products on startup...',
+        );
+        await this.productService.selectFeaturedProducts(20);
+        this.logger.log('Featured products selected on startup');
+      } else {
+        this.logger.log('Featured products already exist');
+      }
+    } catch (error) {
+      this.logger.error(
+        'Error checking/selecting featured products on startup:',
+        error,
+      );
+    }
   }
 
   async testAIIntegration(prompt: string) {

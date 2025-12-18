@@ -305,4 +305,232 @@ export class ProductService {
   async clearProducts() {
     await this.productModel.deleteMany({});
   }
+
+  async fetchFeaturedProducts(limit: number = 20) {
+    const products = await this.productModel.aggregate([
+      { $match: { isFeatured: true } },
+      {
+        $lookup: {
+          from: 'brands',
+          localField: 'brand',
+          foreignField: '_id',
+          as: 'brandData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'categories',
+          foreignField: '_id',
+          as: 'categoryData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'companies',
+          localField: 'store',
+          foreignField: '_id',
+          as: 'companyData',
+        },
+      },
+      {
+        $lookup: {
+          from: 'tags',
+          localField: 'tags',
+          foreignField: '_id',
+          as: 'tagData',
+        },
+      },
+      {
+        $addFields: {
+          store: {
+            $arrayElemAt: ['$companyData', 0],
+          },
+          brand: {
+            $arrayElemAt: ['$brandData', 0],
+          },
+          categories: '$categoryData',
+          tags: '$tagData',
+        },
+      },
+      {
+        $project: {
+          brandData: 0,
+          categoryData: 0,
+          companyData: 0,
+          tagData: 0,
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $limit: limit },
+    ]);
+    return products;
+  }
+
+  /**
+   * Check if any featured products exist
+   */
+  async hasFeaturedProducts(): Promise<boolean> {
+    const count = await this.productModel.countDocuments({ isFeatured: true });
+    return count > 0;
+  }
+
+  /**
+   * Remove featured status from all products
+   */
+  async unfeatureAllProducts(): Promise<void> {
+    await this.productModel.updateMany(
+      { isFeatured: true },
+      { $set: { isFeatured: false } },
+    );
+  }
+
+  /**
+   * Select featured products based on criteria:
+   * - Best discount percentage
+   * - High ratings
+   * - Recent products
+   */
+  async selectFeaturedProducts(limit: number = 20): Promise<void> {
+    // First, unfeature all existing featured products
+    await this.unfeatureAllProducts();
+
+    // Select new featured products based on a scoring system
+    const products = await this.productModel.aggregate([
+      {
+        $addFields: {
+          // Calculate discount percentage
+          discountPercentage: {
+            $cond: {
+              if: { $gt: ['$price', 0] },
+              then: {
+                $multiply: [
+                  {
+                    $divide: [
+                      { $subtract: ['$price', '$discountPrice'] },
+                      '$price',
+                    ],
+                  },
+                  100,
+                ],
+              },
+              else: 0,
+            },
+          },
+          // Convert rating to number for sorting (handle string ratings)
+          ratingNumber: {
+            $cond: {
+              if: { $ne: ['$rating', null] },
+              then: {
+                $toDouble: {
+                  $ifNull: [
+                    {
+                      $arrayElemAt: [
+                        {
+                          $split: [{ $toString: '$rating' }, ' '],
+                        },
+                        0,
+                      ],
+                    },
+                    '0',
+                  ],
+                },
+              },
+              else: 0,
+            },
+          },
+          // Convert numberOfRatings to number
+          numberOfRatingsNumber: {
+            $cond: {
+              if: { $ne: ['$numberOfRatings', null] },
+              then: {
+                $toDouble: {
+                  $ifNull: [
+                    {
+                      $replaceAll: {
+                        input: { $toString: '$numberOfRatings' },
+                        find: ',',
+                        replacement: '',
+                      },
+                    },
+                    '0',
+                  ],
+                },
+              },
+              else: 0,
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          // Calculate a composite score
+          // Weight: 50% discount, 30% rating, 20% recency (days since creation)
+          score: {
+            $add: [
+              // Discount score (0-50 points)
+              {
+                $multiply: [
+                  {
+                    $min: [{ $divide: ['$discountPercentage', 2] }, 50],
+                  },
+                  1,
+                ],
+              },
+              // Rating score (0-30 points) - normalized to 0-5 scale
+              {
+                $multiply: [
+                  {
+                    $min: [{ $multiply: ['$ratingNumber', 6] }, 30],
+                  },
+                  1,
+                ],
+              },
+              // Recency score (0-20 points) - newer products get higher score
+              {
+                $multiply: [
+                  {
+                    $max: [
+                      {
+                        $subtract: [
+                          20,
+                          {
+                            $divide: [
+                              {
+                                $subtract: [
+                                  new Date(),
+                                  { $ifNull: ['$createdAt', new Date()] },
+                                ],
+                              },
+                              86400000, // milliseconds in a day
+                            ],
+                          },
+                        ],
+                      },
+                      0,
+                    ],
+                  },
+                  1,
+                ],
+              },
+            ],
+          },
+        },
+      },
+      // Sort by score descending, then by discount percentage
+      { $sort: { score: -1, discountPercentage: -1 } },
+      { $limit: limit },
+      // Project only the _id field for updating
+      { $project: { _id: 1 } },
+    ]);
+
+    // Update selected products to be featured
+    if (products.length > 0) {
+      const productIds = products.map((p) => p._id);
+      await this.productModel.updateMany(
+        { _id: { $in: productIds } },
+        { $set: { isFeatured: true } },
+      );
+    }
+  }
 }

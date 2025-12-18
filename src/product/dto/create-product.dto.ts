@@ -6,6 +6,7 @@ import {
   IsNumber,
   ArrayMinSize,
   IsMongoId,
+  IsBoolean,
   // IsObject,
 } from 'class-validator';
 import { Types } from 'mongoose';
@@ -86,4 +87,8 @@ export class CreateProductDto {
   @IsMongoId({ each: true })
   @IsOptional()
   store?: Types.ObjectId | string; // Allow array of ObjectId or string
+
+  @IsBoolean()
+  @IsOptional()
+  isFeatured?: boolean;
 }
