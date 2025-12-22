@@ -52,6 +52,17 @@ export class ProductController {
     };
   }
 
+  @Post('featured/reset')
+  async resetFeaturedProducts() {
+    await this.productService.selectFeaturedProducts(20);
+    const data = await this.productService.fetchFeaturedProducts();
+    return {
+      success: true,
+      message: 'Featured products reset and refreshed successfully',
+      data,
+    };
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     const data = await this.productService.findOne(id);
