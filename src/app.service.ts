@@ -91,9 +91,22 @@ export class AppService implements OnApplicationBootstrap {
 
   async testScraper() {
     this.logger.log('Testing Scraper...');
-    return await this.jumiaScraperService.scrapePage(
-      'https://www.jumia.com.ng/flash-sales',
-    );
-    // Implement scraper test logic here
+    try {
+      const result = await this.jumiaScraperService.scrapePage(
+        'https://www.jumia.com.ng/flash-sales',
+      );
+      return {
+        success: true,
+        message: `Successfully scraped ${result.length} products`,
+        data: result,
+      };
+    } catch (error) {
+      this.logger.error('Error testing scraper:', error);
+      return {
+        success: false,
+        message: error.message || 'Failed to scrape products',
+        error: error.message,
+      };
+    }
   }
 }
