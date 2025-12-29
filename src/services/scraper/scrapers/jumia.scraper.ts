@@ -10,7 +10,7 @@ import { normalizeTagName } from 'src/utils/tag.utils';
 @Processor(JOB_NAMES.scraper.SCRAPE_JUMIA) // BullMQ processor for 'scraper' jobs
 export class JumiaScraperService extends WorkerHost {
   logger = new Logger(JumiaScraperService.name);
-  private readonly BATCH_SIZE = 2; // Reduced to 2 to avoid Lambda concurrent invocation limits
+  private readonly DELAY_BETWEEN_PRODUCTS = 1000; // 1 second delay between each product to avoid Lambda limits
   constructor(
     private productService: ProductService,
     private lambdaService: LambdaService,
@@ -155,10 +155,10 @@ export class JumiaScraperService extends WorkerHost {
 
         if (isRateLimitError) {
           this.logger.warn(
-            `Rate limit hit for product ${product.link}. Waiting before retry...`,
+            `Rate limit hit for product ${product.link}. Waiting 10 seconds before retry...`,
           );
-          // Wait longer for rate limit errors
-          await new Promise((resolve) => setTimeout(resolve, 5000)); // 5 second delay
+          // Wait longer for rate limit errors - give Lambda time to free up
+          await new Promise((resolve) => setTimeout(resolve, 10000)); // 10 second delay
           // Retry once
           try {
             const {
@@ -205,18 +205,21 @@ export class JumiaScraperService extends WorkerHost {
       }
     };
 
-    // Process products with limited concurrency using batches
-    for (let i = 0; i < products.length; i += this.BATCH_SIZE) {
-      const batch = products.slice(i, i + this.BATCH_SIZE);
+    // Process products sequentially (one at a time) to avoid Lambda concurrent invocation limits
+    // This is slower but more reliable than batching, especially for accounts with low Lambda limits
+    for (let i = 0; i < products.length; i++) {
+      const product = products[i];
+      const result = await processProduct(product);
+      if (result) {
+        data.push(result);
+      }
 
-      // Process batch with limited concurrency
-      const batchPromises = batch.map((product) => processProduct(product));
-      const results = await Promise.all(batchPromises);
-      data.push(...results.filter((item) => item !== null));
-
-      // Add delay between batches to avoid rate limits
-      if (i + this.BATCH_SIZE < products.length) {
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // 2 second delay between batches
+      // Add delay between products to avoid overwhelming Lambda
+      // Skip delay for the last product
+      if (i < products.length - 1) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, this.DELAY_BETWEEN_PRODUCTS),
+        );
       }
     }
 
