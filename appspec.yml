@@ -3,13 +3,13 @@ os: linux
 
 files:
   - source: /
-  # use aws linux
+    # use aws linux
     destination: /home/ec2-user/discounts-hub-api-v2
     overwrite: true
 
 permissions:
   - object: /home/ec2-user/discounts-hub-api-v2
-    pattern: "**"
+    pattern: '**'
     owner: ec2-user
     group: ec2-user
     mode: 755
@@ -18,6 +18,10 @@ hooks:
   
   ApplicationStop:
     - location: scripts/application_stop.sh
+      timeout: 300
+      runas: ec2-user
+  BeforeInstall:
+    - location: scripts/before_install.sh
       timeout: 300
       runas: ec2-user
   AfterInstall:
@@ -31,5 +35,3 @@ hooks:
     - location: scripts/validate_service.sh
       timeout: 300
       runas: ec2-user
-
-  
