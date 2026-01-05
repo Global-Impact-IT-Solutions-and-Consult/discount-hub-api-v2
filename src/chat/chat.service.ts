@@ -79,26 +79,15 @@ export class ChatService {
 
     console.log({ chat });
 
-    let productsText = await this.cacheManager.get<string[]>('productsText');
-    if (!productsText) {
-      const products = await this.productService.findAll();
-      const product_texts: string[] = [];
-
-      products.map((product) =>
-        product_texts.push(this.convertToProductText(product)),
-      );
-      productsText = product_texts;
-      await this.cacheManager.set('productsText', productsText);
-    }
-
     const message = new this.chatMessageModel({
       content: addMessageDto.content,
       type: MessageTypeEnum.USER,
     });
     chat.messages.push(message);
-    const response = await this.aiService.handleQuery(
+
+    // Use the new chatbot method with tool support
+    const response = await this.aiService.handleChatbotQuery(
       chat.messages,
-      productsText,
       addMessageDto.content,
     );
 

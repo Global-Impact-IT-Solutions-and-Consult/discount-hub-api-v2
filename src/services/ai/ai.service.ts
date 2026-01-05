@@ -11,12 +11,16 @@ import { MessageDocument } from 'src/chat/schemas/chat-message.schema';
 import { MessageTypeEnum } from 'src/utils/constants';
 import { BedRockService } from '../aws/bedrock.service';
 import { ConversationRole } from '@aws-sdk/client-bedrock-runtime';
+import { QueryTool } from './tools/query.tool';
+import { FormatTool } from './tools/format.tool';
 
 @Injectable()
 export class AiService {
   constructor(
     private BedrockService: BedRockService,
     private configService: ConfigService,
+    private queryTool: QueryTool,
+    private formatTool: FormatTool,
   ) {}
 
   async categorizeProducts(input: {
@@ -128,6 +132,103 @@ export class AiService {
     } catch (error) {
       console.error('Error handling query:', error);
       throw new Error('Failed to handle query');
+    }
+  }
+
+  /**
+   * Enhanced chatbot method that uses tools to query and format products
+   * This method handles user queries about products using AI with tool calling
+   */
+  async handleChatbotQuery(
+    messages: MessageDocument[],
+    userQuery: string,
+  ): Promise<any> {
+    try {
+      const llm = new ChatOllama({
+        baseUrl: this.configService.get('AI_URL'),
+        temperature: 0.7,
+        model: this.configService.get('AI_MODEL') || 'llama3.2',
+      });
+
+      // Bind tools to the LLM
+      const llmWithTools = llm.bindTools([
+        this.queryTool.queryProductsTool,
+        this.formatTool.formatProductCardTool,
+      ]);
+
+      // Build chat history
+      const chatMessages = [
+        new SystemMessage(
+          `You are a helpful shopping assistant for a discount hub platform. Your role is to help users find products they're looking for.
+          
+          When users ask for products:
+          1. Use the query_products tool to search for products with appropriate filters (brand, category, price range, etc.)
+          2. After getting product results, use the format_product_card tool for each product ID to generate markdown cards
+          3. Present the results in a friendly, conversational way with the markdown product cards
+          4. For price-related queries like "cheap" or "affordable", use appropriate maxPrice filters
+          5. Extract brand names and category names from user queries (e.g., "LG fridges" means brandName="LG", categoryName="Refrigerators")
+          
+          Example flow for "I need cheap LG fridges":
+          - Use query_products with: brandName="LG", categoryName="Refrigerators", maxPrice=1000, sortBy="discountPrice", order="asc"
+          - Format the top 3-5 results using format_product_card for each productId
+          - Present with friendly text like "Here are some affordable LG refrigerators I found for you:"
+          `,
+        ),
+        ...messages.map((msg) => {
+          if (msg.type === MessageTypeEnum.USER) {
+            return new HumanMessage(msg.content);
+          } else if (msg.type === MessageTypeEnum.AI) {
+            return new AIMessage(msg.content);
+          }
+        }),
+        new HumanMessage(userQuery),
+      ];
+
+      // Invoke the LLM with tools
+      let response = await llmWithTools.invoke(chatMessages);
+      let iterations = 0;
+      const maxIterations = 10;
+
+      // Handle tool calls iteratively
+      while (
+        response.tool_calls &&
+        response.tool_calls.length > 0 &&
+        iterations < maxIterations
+      ) {
+        iterations++;
+
+        // Execute all tool calls
+        const toolMessages = [];
+        for (const toolCall of response.tool_calls) {
+          let toolResult;
+
+          if (toolCall.name === 'query_products') {
+            toolResult = await this.queryTool.queryProductsTool.invoke(
+              toolCall.args,
+            );
+          } else if (toolCall.name === 'format_product_card') {
+            toolResult = await this.formatTool.formatProductCardTool.invoke(
+              toolCall.args,
+            );
+          }
+
+          toolMessages.push({
+            role: 'tool',
+            content: toolResult,
+            tool_call_id: toolCall.id,
+          });
+        }
+
+        // Continue the conversation with tool results
+        chatMessages.push(response);
+        chatMessages.push(...(toolMessages as any));
+        response = await llmWithTools.invoke(chatMessages);
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error handling chatbot query:', error);
+      throw new Error('Failed to handle chatbot query');
     }
   }
 }

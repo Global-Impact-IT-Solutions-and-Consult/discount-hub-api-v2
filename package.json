@@ -29,9 +29,9 @@
     "@bull-board/express": "^6.10.1",
     "@bull-board/nestjs": "^6.10.1",
     "@langchain/community": "^0.3.16",
-    "@langchain/core": "^0.3.19",
+    "@langchain/core": "^0.3.79",
     "@langchain/groq": "^0.1.2",
-    "@langchain/langgraph": "^0.2.23",
+    "@langchain/langgraph": "^0.2.74",
     "@langchain/langgraph-checkpoint-mongodb": "^0.0.4",
     "@langchain/mongodb": "^0.1.0",
     "@langchain/ollama": "^0.1.2",
@@ -71,7 +71,7 @@
     "faiss-node": "^0.5.1",
     "groq-sdk": "^0.7.0",
     "ioredis": "^5.4.1",
-    "langchain": "^0.3.6",
+    "langchain": "^0.3.36",
     "mongoose": "^8.5.0",
     "openai": "^4.55.0",
     "otp-generator": "^4.0.1",
@@ -87,7 +87,8 @@
     "resend": "^4.4.0",
     "rxjs": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "uniqid": "^5.4.0"
+    "uniqid": "^5.4.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
