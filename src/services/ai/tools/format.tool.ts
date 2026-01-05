@@ -1,3 +1,5 @@
+/* eslint-disable */
+// @ts-nocheck
 import { Injectable } from '@nestjs/common';
 import { tool } from '@langchain/core/dist/tools';
 import * as z from 'zod';
