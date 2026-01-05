@@ -151,6 +151,7 @@ export class AiService {
       });
 
       // Bind tools to the LLM
+      // @ts-ignore - LangChain tool types are complex and cause TS2589
       const llmWithTools = llm.bindTools([
         this.queryTool.queryProductsTool,
         this.formatTool.formatProductCardTool,
@@ -203,10 +204,12 @@ export class AiService {
           let toolResult;
 
           if (toolCall.name === 'query_products') {
+            // @ts-ignore - Tool invoke method exists but TypeScript has type issues
             toolResult = await this.queryTool.queryProductsTool.invoke(
               toolCall.args,
             );
           } else if (toolCall.name === 'format_product_card') {
+            // @ts-ignore - Tool invoke method exists but TypeScript has type issues
             toolResult = await this.formatTool.formatProductCardTool.invoke(
               toolCall.args,
             );
